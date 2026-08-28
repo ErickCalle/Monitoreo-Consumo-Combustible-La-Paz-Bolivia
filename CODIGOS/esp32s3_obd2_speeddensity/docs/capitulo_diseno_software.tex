@@ -1,0 +1,969 @@
+% ============================================================
+% FRAGMENTO -- continuación del capítulo "Diseño del software".
+% NO es un documento standalone: no lleva \documentclass ni portada.
+% Insértalo con \input{capitulo_diseno_software} (o copia/pega el
+% contenido) dentro de tu documento original, en el punto donde va este
+% capítulo. Ajusta el nivel de \section por \subsection si en tu
+% documento esto ya cuelga de un \chapter{Diseño del software}.
+%
+% Requisitos que van en el PREAMBULO de tu documento maestro (no aquí):
+%
+%   \usepackage{amsmath,amssymb}
+%   \usepackage{booktabs}
+%   \usepackage{array}
+%   \usepackage{xcolor}
+%   \usepackage{listings}
+%   \usepackage{float}
+%   \usepackage{lmodern}    % fuentes escalables -- requisito de microtype
+%                           % si tu documento usa babel en espanol (que
+%                           % carga fuentes EC de mapa de bits sin esto)
+%   \usepackage{microtype}  % reduce cajas "overfull" en parrafos con
+%                           % identificadores \texttt largos (p.ej.
+%                           % FUEL_CALIBRATION_FACTOR); combinar con:
+%   \tolerance=1500
+%   \emergencystretch=3em
+%
+%   \definecolor{codebg}{RGB}{245,245,245}
+%   \definecolor{codekw}{RGB}{0,90,170}
+%   \definecolor{codecom}{RGB}{110,110,110}
+%   \definecolor{codestr}{RGB}{160,40,40}
+%   \lstdefinestyle{cpp}{
+%     language=C++, backgroundcolor=\color{codebg}, basicstyle=\ttfamily\small,
+%     keywordstyle=\color{codekw}\bfseries, commentstyle=\color{codecom}\itshape,
+%     stringstyle=\color{codestr}, numbers=left, numberstyle=\tiny\color{gray},
+%     numbersep=8pt, breaklines=true, showstringspaces=false,
+%     frame=single, rulecolor=\color{gray!40}, tabsize=2,
+%   }
+%   \lstdefinestyle{plain}{
+%     backgroundcolor=\color{codebg}, basicstyle=\ttfamily\small,
+%     breaklines=true, showstringspaces=false,
+%     frame=single, rulecolor=\color{gray!40},
+%   }
+%   \lstset{style=cpp}
+%
+% Bibliografía: las fuentes citadas aquí (\cite{...}) están en
+% referencias.bib, para fusionar con la bibliografía única de tu
+% documento (donde ya tengas \bibliography{...} o \addbibresource{...}).
+% \cite{} es el comando base de LaTeX, compatible con bibliografía clásica
+% (\bibliographystyle{apalike} da formato "(Autor, Año)" sin paquetes
+% extra), con natbib, y con biblatex.
+% ============================================================
+
+Esta sección retoma el capítulo de diseño de software y describe, parte por
+parte, el firmware que corre en el ESP32-S3: las herramientas con las que se
+construyó, cómo reparte el trabajo entre tareas, el protocolo con el que
+habla con el vehículo, el método de cálculo del consumo, cómo persiste los
+datos, cómo expone un panel de control, y el criterio detrás de cada
+elección de componente y de librería.
+
+% ============================================================
+\section{Herramientas y entorno de desarrollo}
+\label{sec:herramientas}
+% ============================================================
+
+\subsection{Visual Studio Code + PlatformIO}
+El firmware se desarrolla en Visual Studio Code con la extensión PlatformIO
+IDE, en vez del IDE oficial de Arduino. La diferencia no es cosmética:
+
+\begin{itemize}
+  \item \textbf{Toolchain embebido integrado.} PlatformIO gestiona la
+        descarga y versión exacta del framework
+        (\texttt{framework-arduinoespressif32}) \cite{arduinoesp32core2024},
+        el compilador cruzado (\texttt{toolchain-xtensa-esp32s3}) y
+        \texttt{esptool} para programar, todo declarado y fijado en
+        \texttt{platformio.ini} \cite{platformio2024}. Esto hace que el
+        \textit{build} sea reproducible entre máquinas —un requisito real
+        una vez que el proyecto tiene múltiples archivos fuente y
+        dependencias externas—, algo que el modelo de "sketch único" del
+        IDE de Arduino maneja peor.
+  \item \textbf{Autocompletado real de C++.} Con un servidor de lenguaje
+        indexando todo el árbol de \texttt{src/}/\texttt{include/}, moverse
+        entre los siete archivos fuente del proyecto y sus cabeceras
+        compartidas (\texttt{config.h}, \texttt{types.h}) es inmediato.
+  \item \textbf{Terminal integrado.} Compilar, subir y abrir el monitor
+        serie desde el mismo terminal donde se edita el código evita el
+        cambio de contexto entre editor y herramienta externa, y deja el
+        registro de errores de compilación con enlaces directos a archivo y
+        línea.
+\end{itemize}
+
+\subsection{Por qué FreeRTOS}
+Un sistema que a la vez sondea un bus CAN sensible a tiempos, refresca una
+pantalla, escribe en una tarjeta SD y sirve un panel web por WiFi es, por
+naturaleza, un problema \textbf{concurrente}. Hay dos formas razonables de
+resolverlo: un único \texttt{loop()} con máquinas de estado manuales y
+sondeo no bloqueante en cada punto donde se podría esperar —viable en
+proyectos pequeños, pero frágil a medida que crecen—, o un sistema operativo
+de tiempo real con prioridades y primitivas de sincronización reales. Este
+proyecto usa la segunda opción.
+
+FreeRTOS no es, en rigor, una dependencia externa que se "agregó" —es el
+planificador que el propio núcleo Arduino-ESP32 ya usa por debajo
+\cite{freertos2024}; usarlo explícitamente es aprovechar la plataforma en
+vez de pelear contra ella con un \texttt{loop()} monolítico encima.
+Concretamente, esto permite:
+
+\begin{itemize}
+  \item Darle al sondeo CAN la \textbf{prioridad más alta} de todas las
+        tareas, garantizando que una transacción I2C lenta hacia el OLED o
+        una descarga de CSV por WiFi nunca retrase la lectura del vehículo.
+  \item Proteger el estado compartido con mutex reales en vez de banderas
+        improvisadas.
+  \item Que agregar una funcionalidad nueva sea, casi siempre, agregar una
+        tarea nueva con una prioridad clara, en vez de insertar más lógica
+        condicional dentro de un bucle ya complejo —el modo de bajo consumo
+        de la Sección~\ref{sec:idle} solo requirió tocar el bucle de la
+        tarea CAN y agregar una bandera de estado que las demás tareas ya
+        sabían consultar.
+\end{itemize}
+
+\begin{figure}[H]
+\begin{lstlisting}[caption={Creación de tareas FreeRTOS en \texttt{src/main.cpp}.}, label={fig:tasks}]
+statusLedsInit();
+xTaskCreatePinnedToCore(statusLedsTask, "leds", STACK_LED_TASK, nullptr,
+                         PRIO_LED_TASK, nullptr, CORE_LED_TASK);
+
+bool oledOk = displayInit();
+bool sdOk   = sdLoggerInit();
+bool canOk  = canObd2Init();
+
+webServerInit(); // reporta ErrorCode::WIFI_FAIL si el softAP falla
+
+if (canOk) {
+  xTaskCreatePinnedToCore(canObd2Task, "canObd2", STACK_CAN_TASK, nullptr,
+                           PRIO_CAN_TASK, nullptr, CORE_CAN_TASK);
+}
+if (oledOk) {
+  xTaskCreatePinnedToCore(displayTask, "display", STACK_DISPLAY_TASK, nullptr,
+                           PRIO_DISPLAY_TASK, nullptr, CORE_DISPLAY_TASK);
+}
+if (sdOk) {
+  xTaskCreatePinnedToCore(sdLoggerTask, "sdLogger", STACK_SD_TASK, nullptr,
+                           PRIO_SD_TASK, nullptr, CORE_SD_TASK);
+}
+\end{lstlisting}
+\end{figure}
+
+% ============================================================
+\section{Interfaz con el hardware}
+% ============================================================
+
+El software está organizado alrededor de las interfaces físicas del
+ESP32-S3 \cite{espressif2024datasheet,espressif2024trm}. Cada periférico se
+eligió por una razón concreta, no por ser "lo que venía en el kit":
+
+\begin{table}[H]
+\centering
+\caption{Mapa de pines definido en \texttt{include/config.h}.}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Bus & Señal & GPIO ESP32-S3 \\
+\midrule
+TWAI (CAN)   & TX $\rightarrow$ SN65HVD230 CTX & GPIO4 \\
+TWAI (CAN)   & RX $\leftarrow$ SN65HVD230 CRX  & GPIO5 \\
+I2C          & SDA $\rightarrow$ OLED          & GPIO8 \\
+I2C          & SCL $\rightarrow$ OLED          & GPIO9 \\
+SPI (SD)     & SCK                              & GPIO12 \\
+SPI (SD)     & MISO                             & GPIO13 \\
+SPI (SD)     & MOSI                             & GPIO11 \\
+SPI (SD)     & CS                               & GPIO10 \\
+LED          & CAN activo                       & GPIO15 \\
+LED          & Actividad SD                     & GPIO16 \\
+LED          & Servidor activo                  & GPIO17 \\
+LED          & Error                            & GPIO18 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textit{Nota.} Pines reservados —no usar—: GPIO 26-37 (bus interno hacia el
+flash y la PSRAM octal del módulo N16R8) y GPIO 0/3/19/20/43-46 (pines de
+\textit{strapping}, USB nativo y consola UART0 del chip).
+
+\subsection{Controlador CAN: TWAI integrado, no un chip externo}
+El ESP32-S3 trae un controlador CAN (TWAI) integrado en el propio chip
+\cite{espressif2024trm}. Esa es la razón por la que el diseño no usa un
+controlador CAN externo por SPI como el MCP2515, común en proyectos sobre
+Arduino Uno/Nano que no tienen esta capacidad de fábrica: usar el
+controlador nativo ahorra un dispositivo, una interrupción y un bus SPI que
+ya está ocupado por la microSD, y evita la latencia adicional de tener que
+serializar cada trama CAN a través de otro periférico intermediario.
+
+\subsection{Transceptor CAN: SN65HVD230}
+El TWAI del ESP32-S3 solo genera niveles lógicos TTL; convertirlos a las
+señales diferenciales CAN\_H/CAN\_L del bus físico requiere un transceptor.
+Se eligió el SN65HVD230 \cite{ti2018sn65hvd230} en concreto porque opera
+nativamente a 3.3\,V —el mismo nivel lógico del ESP32-S3—, evitando un
+\textit{level-shifter} que sí haría falta con transceptores clásicos de 5\,V
+como el MCP2551. CAN\_H y CAN\_L se conectan a los pines 6 y 14 del conector
+OBD2 (J1962).
+
+\subsection{Pantalla: SSD1306 OLED por I2C}
+Se eligió un OLED monocromático de $128\times64$ px con controlador SSD1306
+\cite{solomon2008ssd1306} sobre I2C en vez de, por ejemplo, una pantalla TFT
+a color por SPI, por tres razones: consume solo 2 pines (I2C) dejando el SPI
+libre para la SD; su consumo (10-20\,mA encendida, y se puede apagar por
+software, Sección~\ref{sec:idle}) es bajo comparado con un TFT retroiluminado;
+y la resolución alcanza de sobra para los pocos números grandes que hace
+falta mostrar al conductor —no se necesita color ni gráficos complejos en el
+tablero físico, eso ya lo cubre el panel web.
+
+\subsection{Almacenamiento: microSD por SPI dedicado}
+La tarjeta microSD usa su propio bus SPI, sin compartirlo con ningún otro
+periférico. La alternativa —reutilizar un bus SPI ya en uso— se descartó
+porque el registro en la SD ocurre una vez por segundo de forma predecible
+mientras que una eventual escritura de mayor tamaño (por ejemplo, servir una
+descarga de CSV completa) no debe competir por el bus con otra
+responsabilidad no relacionada; un bus dedicado simplifica el análisis de
+tiempos y evita tener que coordinar dos periféricos distintos sobre el mismo
+SPI.
+
+% ============================================================
+\section{Arquitectura de tareas}
+% ============================================================
+
+\begin{table}[H]
+\centering
+\caption{Tareas FreeRTOS, definidas en \texttt{include/config.h} y creadas en \texttt{src/main.cpp}.}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+Tarea & Función & Núcleo & Prioridad & Pila \\
+\midrule
+CAN/OBD2          & \texttt{canObd2Task}       & 0 & 5 & 4096 \\
+SD logger         & \texttt{sdLoggerTask}      & 1 & 4 & 6144 \\
+WebSocket push     & \texttt{webSocketPushTask} & 0 & 3 & 4096 \\
+OLED display      & \texttt{displayTask}       & 1 & 2 & 4096 \\
+LEDs de estado    & \texttt{statusLedsTask}    & 1 & 1 & 2048 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El núcleo 0 concentra lo sensible a tiempos (sondeo CAN de alta prioridad +
+la pila WiFi/AsyncTCP, que en Arduino-ESP32 corre en ese mismo núcleo). El
+núcleo 1 queda con las tareas de interfaz/almacenamiento, que toleran más
+\textit{jitter} sin afectar la lectura del vehículo. Las prioridades no son
+arbitrarias: reflejan directamente qué tan caro es que cada tarea llegue
+tarde (perder un ciclo de sondeo CAN corrompe el cálculo de consumo; llegar
+tarde a refrescar un LED es imperceptible).
+
+\subsection{Sincronización entre tareas}
+Dos mutex protegen el estado compartido: \texttt{g\_dataMutex} protege
+\texttt{g\_vehicleData} (la tarea CAN arma cada ciclo en una copia local y
+solo toca la estructura global, bajo mutex, en el paso final de fusión —
+Figura~\ref{fig:merge}); \texttt{g\_sdMutex} protege el bus SPI de la
+microSD, compartido entre el \textit{logger} periódico y los endpoints de
+descarga/gráfica del servidor web. El criterio para usar mutex en vez de,
+por ejemplo, deshabilitar interrupciones o copiar datos sin protección, es
+que ambos recursos (la estructura de datos y el bus SPI) tienen escritores y
+lectores en tareas de distinta prioridad corriendo en núcleos distintos —un
+mutex es la primitiva correcta quando el acceso puede, en principio,
+bloquear brevemente sin romper los tiempos críticos del sistema.
+
+\begin{figure}[H]
+\begin{lstlisting}[caption={Fusión bajo mutex al final de cada ciclo, \texttt{src/can\_obd2.cpp}.}, label={fig:merge}]
+if (xSemaphoreTake(g_dataMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+  VehicleData &g = g_vehicleData;
+  g.rpm = scratch.rpm;
+  g.speed_kmh = scratch.speed_kmh;
+  // ... resto de los campos ...
+  g.can_status = status;
+  g.data_valid = criticalOk;
+  g.last_update_ms = now;
+
+  if (criticalOk && dt > 0.0f && dt < 5.0f) {
+    fuelCalcUpdate(g, dt);
+  }
+  xSemaphoreGive(g_dataMutex);
+}
+\end{lstlisting}
+\end{figure}
+
+\subsection{Manejo de errores}
+\texttt{systemReportError(ErrorCode)} centraliza el reporte de fallos: guarda
+el último código en \texttt{g\_systemStatus.error\_code} (dispara el parpadeo
+del LED de error) y lo imprime por \texttt{Serial} con el detalle completo.
+El criterio es separar dos audiencias distintas: el LED es para el
+conductor, que solo necesita saber \textit{que algo falló}; el log serie es
+para depuración en banco, donde sí importa el detalle completo y el
+historial.
+
+\begin{table}[H]
+\centering
+\caption{Códigos de \texttt{ErrorCode} (\texttt{include/types.h}).}
+\begin{tabular}{@{}cl@{}}
+\toprule
+Código & Significado \\
+\midrule
+1 & Fallo al iniciar el driver TWAI/CAN \\
+2 & Fallo al iniciar la microSD \\
+3 & Fallo al iniciar el OLED \\
+4 & Fallo al iniciar el punto de acceso WiFi \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Protocolo CAN / OBD2}
+% ============================================================
+
+El controlador TWAI del ESP32-S3 se configura a \textbf{500\,kbit/s}, el
+estándar de la mayoría de vehículos livianos con OBD2 sobre CAN
+(ISO 15765-4, \cite{iso157654}). Todas las
+peticiones usadas caben en un único \textit{frame} CAN de 8 bytes
+(\textit{single frame}), así que no hace falta implementar el mecanismo
+multi-\textit{frame} de control de flujo ISO-TP —una simplificación
+deliberada: ninguno de los PIDs que este proyecto necesita supera ese
+tamaño, y soportar multi-\textit{frame} sin necesitarlo solo agrega
+superficie de error.
+
+\subsection{PIDs consultados (Modo 01)}
+El conjunto de PIDs se eligió por ser el mínimo necesario para el cálculo
+speed-density (Sección~\ref{sec:speeddensity}) más los que enriquecen el
+registro sin costo relevante de tiempo de bus, siguiendo el estándar SAE
+J1979 \cite{saej1979}:
+
+\begin{table}[H]
+\centering
+\caption{PIDs Mode 01 consultados por \texttt{canObd2Task}.}
+\begin{tabular}{@{}cll@{}}
+\toprule
+PID & Dato & Uso \\
+\midrule
+\texttt{0x0C} & RPM                          & speed-density (crítico) \\
+\texttt{0x0B} & MAP (kPa)                    & speed-density (crítico) \\
+\texttt{0x0F} & IAT (\textdegree C)          & speed-density (crítico) \\
+\texttt{0x0D} & Velocidad (km/h)             & L/100km, distancia (crítico) \\
+\texttt{0x05} & Temperatura refrigerante     & mostrado en pantalla/CSV \\
+\texttt{0x04} & Carga calculada (\%)         & mostrado en pantalla/CSV \\
+\texttt{0x06} & Fuel trim corto plazo (\%)   & corrige el AFR estimado \\
+\texttt{0x07} & Fuel trim largo plazo (\%)   & corrige el AFR estimado \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textit{Nota.} Los cuatro PIDs marcados "crítico" son indispensables para el
+cálculo speed-density; si la ECU no responde alguno, el ciclo completo se
+marca inválido y no se integra al viaje.
+
+\subsection{Formato de la petición}
+
+\begin{figure}[H]
+\begin{lstlisting}[style=plain,caption={Trama de petición Mode 01, PID genérico.}]
+ID = 0x7DF
+Data[0] = 0x02   ; SF, 2 bytes de payload (modo + pid)
+Data[1] = 0x01   ; Modo 01: datos actuales
+Data[2] = <PID>
+Data[3..7] = 0x00 (relleno)
+\end{lstlisting}
+\end{figure}
+
+Las ECUs responden en el rango \texttt{0x7E8}-\texttt{0x7EF}; se acepta la
+primera respuesta cuyo \texttt{Data[1] == 0x41} y \texttt{Data[2]} coincida
+con el PID pedido.
+
+\subsection{Recuperación de bus-off}
+Si el controlador entra en estado \texttt{BUS\_OFF}, la recuperación se
+sondea en cada vuelta del bucle sin bloquear con una espera fija —según el
+driver TWAI de ESP-IDF \cite{espressif2024trm}, la recuperación solo llega a
+\texttt{STOPPED} tras contar 128 ocurrencias de 11 bits recesivos
+consecutivos en el bus, un tiempo que depende del tráfico real y no se puede
+predecir de antemano; sondear en vez de esperar un tiempo fijo evita tanto
+reintentar demasiado pronto (fallar en vano) como esperar de más
+innecesariamente.
+
+% ============================================================
+\section{Método de cálculo: Speed-Density}
+\label{sec:speeddensity}
+% ============================================================
+
+El método speed-density estima el flujo másico de aire admitido por el motor
+a partir de la ley de gases ideales, sin medirlo con un sensor MAF —la
+razón de fondo para elegir este método sobre uno basado en MAF real es que
+la mayoría de los vehículos con OBD2 reportan MAP, no flujo de aire directo,
+así que speed-density es el único método viable sin instalar un sensor
+adicional—:
+
+\begin{equation}
+\dot{m}_{aire} \;[\text{g/s}] =
+\frac{\dfrac{VE}{100} \cdot RPM \cdot MAP\,[\text{kPa}] \cdot V_d\,[\text{L}] \cdot 28.97}
+     {2 \cdot 8.314 \cdot T_{IAT}\,[\text{K}] \cdot 60}
+\end{equation}
+
+donde $VE$ es la eficiencia volumétrica (\%) interpolada de una tabla
+calibrable (Sección~\ref{sec:ve}); $V_d$ la cilindrada en litros; $28.97$ la
+masa molar del aire (g/mol); $8.314$ la constante universal de los gases
+(L$\cdot$kPa/(mol$\cdot$K)); el factor $2$ corresponde a que un motor de 4
+tiempos completa una admisión cada 2 vueltas de cigüeñal; y $T_{IAT}$ la
+temperatura de admisión en Kelvin, con guarda de rango
+[$-40$,\,$100$]\,\textdegree C.
+
+\begin{figure}[H]
+\begin{lstlisting}[caption={Núcleo del cálculo speed-density, \texttt{src/fuel\_calc.cpp}.}, label={fig:fuelcalc}]
+float ve = fuelCalcVeForRpm(vd.rpm);
+float iat_K = vd.iat_c + 273.15f;
+if (iat_K < 233.15f || iat_K > 373.15f) iat_K = 288.15f;
+
+const float MM_AIR = 28.97f; // g/mol
+const float R = 8.314f;      // L*kPa/(mol*K)
+
+float maf = (ve / 100.0f) * (float)vd.rpm * vd.map_kpa *
+            ENGINE_DISPLACEMENT_L * MM_AIR /
+            (2.0f * R * iat_K * 60.0f);
+\end{lstlisting}
+\end{figure}
+
+\subsection{De aire a combustible}
+
+\begin{equation}
+\dot{m}_{comb}\,[\text{g/s}] = \frac{\dot{m}_{aire}}{AFR} \cdot k_{cal}
+\end{equation}
+
+$AFR$ es la relación aire/combustible, por defecto el valor estequiométrico
+de la gasolina ($AFR_{stoich} = 14.7$), opcionalmente corregido con los
+\textit{fuel trims} que reporta la ECU:
+
+\begin{equation}
+AFR_{efectivo} = \frac{AFR_{stoich}}{1 + \frac{STFT\% + LTFT\%}{100}}
+\end{equation}
+
+acotado a $[8, 25]$. $k_{cal}$ es \texttt{FUEL\_CALIBRATION\_FACTOR}
+(Sección~\ref{sec:calibracion}), $1.0$ por defecto. El criterio para incluir
+la corrección por \textit{fuel trim} es que, sin ella, el cálculo asume que
+el motor siempre corre exactamente en estequiométrico, cosa que en la
+práctica no ocurre; usar los \textit{trims} que la propia ECU ya reporta es
+una corrección "gratis" —no requiere sensores adicionales— frente a un error
+sistemático conocido.
+
+\subsection{De masa a volumen}
+
+\begin{align}
+\dot{V}_{comb}\,[\text{L/h}] &= \frac{\dot{m}_{comb} \cdot 3600}{\rho_{comb}} \\[4pt]
+L/100km &=
+  \begin{cases}
+    \dfrac{\dot{V}_{comb}}{v}\cdot 100 & \text{si } v > 2\,\text{km/h} \\[6pt]
+    0 & \text{vehículo detenido}
+  \end{cases}
+\end{align}
+
+con $\rho_{comb} = 745\,\text{g/L}$ y $v$ la velocidad en km/h.
+
+\subsection{Integración del viaje}
+
+\begin{align}
+L_{viaje} &\mathrel{+}= \dot{m}_{comb} \cdot dt \,/\, \rho_{comb} \\
+km_{viaje} &\mathrel{+}= v \cdot dt / 3600 \\
+Bs_{viaje} &= L_{viaje} \cdot P_{L}
+\end{align}
+
+con $dt$ el paso de tiempo real entre ciclos —no un valor fijo, precisamente
+para no perder precisión si un ciclo de sondeo tarda más o menos de lo
+típico— y $P_L = 6.96$ (\texttt{FUEL\_PRICE\_BS\_PER\_L}) el precio de
+referencia del litro.
+
+\subsection{Tabla de eficiencia volumétrica (VE)}
+\label{sec:ve}
+
+\begin{table}[H]
+\centering
+\caption{\texttt{kVeTable}, \texttt{src/fuel\_calc.cpp}. Interpolación lineal entre puntos.}
+\begin{tabular}{@{}cc@{}}
+\toprule
+RPM & VE (\%) \\
+\midrule
+700  & 60.0 \\
+1500 & 74.0 \\
+2500 & 85.0 \\
+4000 & 88.0 \\
+5500 & 83.0 \\
+7000 & 74.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textit{Nota.} Esta tabla es un punto de partida genérico, no un dato de
+fábrica del vehículo. Sin calibrarla, el consumo calculado tendrá un error
+sistemático.
+
+\subsection{Calibración contra un tanque real}
+\label{sec:calibracion}
+No existe forma de que el ESP32 sepa, por sí solo, si el número que calcula
+es correcto —no hay con qué comparar dentro del propio microcontrolador—.
+El procedimiento recomendado: llenar el tanque y anotar el odómetro, manejar
+con normalidad hasta la próxima recarga, comparar los litros reales cargados
+contra \texttt{trip\_fuel\_L} acumulado en esa misma distancia, y ajustar
+
+\begin{equation}
+\texttt{FUEL\_CALIBRATION\_FACTOR} = \frac{L_{real}}{L_{calculado}}
+\end{equation}
+
+en \texttt{config.h}. El criterio de aplicar un único factor multiplicativo
+sobre \texttt{fuel\_gs}, en vez de reajustar toda la tabla VE a mano, es que
+corrige de forma consistente el instantáneo, el acumulado del viaje y el
+costo con un solo número, y es reversible/auditable —a diferencia de
+retocar seis puntos de la tabla VE por prueba y error.
+
+% ============================================================
+\section{Registro en microSD}
+% ============================================================
+
+Cada arranque crea un archivo nuevo \texttt{/logs/trip\_NNN.csv} (índice
+autoincremental calculado escaneando los archivos existentes, en vez de un
+contador separado que podría desincronizarse tras un corte de energía). Se
+escribe una fila por segundo, solo después del primer ciclo CAN válido, y se
+pausa por completo durante el modo de bajo consumo (Sección~\ref{sec:idle}).
+
+\subsection{Por qué CSV}
+Se eligió CSV en vez de un formato binario compacto o JSON por fila por tres
+razones: es directamente legible/abrible en cualquier hoja de cálculo sin
+escribir un parser; el tamaño de fila (unos 100 bytes) es intrascendente
+frente a la capacidad de una microSD moderna incluso a una fila por segundo
+durante horas; y es el formato que el propio panel web ya necesita poder
+descargar y volver a interpretar (Sección~\ref{sec:panelweb}), así que un
+mismo formato sirve para ambos usos sin conversión intermedia.
+
+\begin{figure}[H]
+\begin{lstlisting}[style=plain,caption={Fila de ejemplo del CSV (encabezado + una fila de datos).}]
+uptime_ms,rpm,speed_kmh,map_kpa,iat_c,coolant_c,ve_pct,maf_gs,
+fuel_gs,instant_Lh,instant_L100km,trip_km,trip_fuel_L,
+trip_avg_L100km,can_status,trip_cost_bs
+
+184532,2150,62.0,58.0,29.0,89.0,81.4,7.82,0.532,1.91,3.09,
+12.400,0.384,3.10,1,2.67
+\end{lstlisting}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Columnas escritas por \texttt{sdLoggerTask} (\texttt{src/sd\_logger.cpp}).}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Columna & Descripción \\
+\midrule
+\texttt{uptime\_ms}        & Milisegundos desde el arranque \\
+\texttt{rpm}                & Revoluciones por minuto \\
+\texttt{speed\_kmh}        & Velocidad, km/h \\
+\texttt{map\_kpa}          & Presión absoluta del múltiple, kPa \\
+\texttt{iat\_c}             & Temperatura del aire de admisión, \textdegree C \\
+\texttt{coolant\_c}        & Temperatura del refrigerante, \textdegree C \\
+\texttt{ve\_pct}            & Eficiencia volumétrica usada, \% \\
+\texttt{maf\_gs}            & Flujo másico de aire calculado, g/s \\
+\texttt{fuel\_gs}           & Flujo másico de combustible calculado, g/s \\
+\texttt{instant\_Lh}       & Consumo instantáneo, L/h \\
+\texttt{instant\_L100km}  & Consumo instantáneo, L/100km \\
+\texttt{trip\_km}          & Distancia acumulada del viaje, km \\
+\texttt{trip\_fuel\_L}    & Combustible acumulado del viaje, L \\
+\texttt{trip\_avg\_L100km} & Promedio del viaje, L/100km \\
+\texttt{can\_status}       & Estado del bus CAN (enum \texttt{CanStatus}) \\
+\texttt{trip\_cost\_bs}    & Costo acumulado del viaje, Bs \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Modo de bajo consumo ("sin contacto")}
+\label{sec:idle}
+% ============================================================
+
+\subsection{Motivación}
+El dispositivo se alimenta del pin 16 del conector OBD2, que entrega
+12\,V \textbf{constantes} sin importar la posición de la llave. Si el
+firmware siguiera sondeando el bus a ritmo completo, con el panel web y
+todos los periféricos encendidos las 24 horas, se convertiría en una carga
+parásita permanente sobre la batería del vehículo. La primera versión de
+este modo se basaba en detectar RPM$=0$ y solo bajaba el ritmo de sondeo
+—una mejora real pero modesta, porque el ESP32-S3 seguía activo con el
+WiFi encendido—. La versión actual va más lejos: separa la alimentación en
+dos rieles y usa \textbf{deep sleep} real del ESP32-S3 mientras no hay
+contacto.
+
+\subsection{Dos rieles de alimentación}
+La PCB entrega dos salidas de 3.3\,V independientes desde el 12\,V
+constante del OBD2:
+
+\begin{itemize}
+  \item \textbf{Riel 1} (siempre encendido): ESP32-S3 + SN65HVD230. Tiene
+        que quedar siempre alimentado porque el transceptor es lo único
+        capaz de "escuchar" el bus CAN para saber cuándo volvió el
+        contacto.
+  \item \textbf{Riel 2} (conmutado por software): LEDs + OLED, y por
+        separado la microSD. Se corta por completo mientras no hay
+        contacto.
+\end{itemize}
+
+\subsection{Circuito de \textit{power-gating}: MOSFET y pines}
+\label{sec:powergate}
+Cada riel 2 se controla con un MOSFET de \textbf{canal P, como interruptor
+de alto lado} (corta el 3.3\,V que entra al periférico, no su GND). Se
+prefiere sobre un N-MOSFET de bajo lado porque con este último el GND del
+periférico puede quedar ligeramente flotante mientras conduce, lo que
+genera problemas de integridad de señal en buses referenciados a GND como
+I2C (OLED) y SPI (microSD).
+
+\begin{table}[H]
+\centering
+\caption{Pines de \textit{power-gating}, \texttt{include/config.h}.}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Señal & GPIO ESP32-S3 & Controla \\
+\midrule
+\texttt{PIN\_PWR\_LED\_OLED} & GPIO6 & LEDs + OLED \\
+\texttt{PIN\_PWR\_SD}        & GPIO7 & microSD \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Ambos GPIO son de dominio RTC en el ESP32-S3 (rango GPIO0-21), requisito
+para que \texttt{gpio\_hold\_en()} pueda retener su nivel lógico durante el
+\textit{deep sleep} \cite{espressif2024trm}. Topología de cada MOSFET
+(misma para los dos rieles):
+
+\begin{figure}[H]
+\begin{lstlisting}[style=plain,caption={Interruptor de alto lado con P-MOSFET, un canal por riel.}]
+Riel 2 (3.3V) ---+--------------------- Source (P-MOSFET)
+                 |
+              [R_pullup ~10k]
+                 |
+GPIO --[R_gate ~1k]------------------- Gate
+                                          |
+                                        Drain --- carga (OLED+LED, o microSD)
+\end{lstlisting}
+\end{figure}
+
+El criterio detrás de cada componente: como el GPIO y el riel 2 comparten
+el mismo nivel lógico (3.3\,V), no hace falta un transistor adicional para
+manejar la compuerta —GPIO en alto da $V_{gs}=0$ (MOSFET apagado); GPIO en
+bajo da $V_{gs}\approx-3.3\,\text{V}$, muy por debajo del umbral típico de
+un P-MOSFET de nivel lógico ($-1$ a $-2\,\text{V}$ aprox., p.\,ej. un
+AO3401A o equivalente)—. La resistencia de \textit{pull-up} en la
+compuerta asegura que el MOSFET arranque apagado por defecto durante el
+breve instante antes de que el firmware configure el GPIO como salida; la
+resistencia en serie hacia el GPIO limita la corriente de carga de la
+compuerta.
+
+\subsection{Cadena de regulación}
+\label{sec:regchain}
+La alimentación completa, del 12\,V del OBD2 a los dos rieles de 3.3\,V,
+pasa por tres reguladores en cascada:
+
+\begin{enumerate}
+  \item \textbf{TPS54302}: convertidor \textit{buck} (conmutado) que baja
+        el 12\,V del pin 16 a 5\,V. Es la única etapa de conversión
+        conmutada del sistema; las dos siguientes son lineales.
+  \item \textbf{AMS1117} (5\,V $\rightarrow$ 3.3\,V): alimenta el
+        \textbf{riel 1} (ESP32-S3 + SN65HVD230). Nunca se apaga.
+  \item \textbf{AP2112} (5\,V $\rightarrow$ 3.3\,V): alimenta el
+        \textbf{riel 2}; su salida de 3.3\,V entra a los dos MOSFET de la
+        Sección~\ref{sec:powergate}, que gatean OLED+LED y microSD por
+        separado. El AP2112 en sí mismo nunca se apaga —solo se corta lo
+        que hay \textit{después} de los MOSFET—, pero al ser una LDO de
+        muy baja corriente de reposo su aporte al consumo en espera es
+        pequeño de todos modos (Sección~\ref{sec:consumo}).
+\end{enumerate}
+
+Esta cadena (\textit{buck} + 2 LDO en paralelo desde el mismo 5\,V) es una
+elección de diseño válida y común, pero tiene una consecuencia directa para
+el consumo "sin contacto" que conviene tener presente: a diferencia del
+AP2112, el \textbf{AMS1117 es una LDO de propósito general, no de bajo
+consumo} —su corriente de reposo (\textit{ground current}) es
+comparativamente alta, típicamente 5-8\,mA casi sin importar la carga en
+su salida, con variación notable entre fabricantes clon del mismo chip—.
+Como el AMS1117 alimenta justo el riel que nunca se apaga, esa corriente de
+reposo se sostiene las 24\,horas del día, se detalla en la
+Sección~\ref{sec:consumo}.
+
+\subsection{Implementación en firmware}
+\texttt{canObd2CheckContact()} manda un único \textit{ping} (PID
+\texttt{0x0C}, RPM, obligatorio en todo ECU OBD2) y reporta si algo
+respondió, sin importar el valor. Se usa en dos puntos:
+
+\begin{itemize}
+  \item Al arrancar (\texttt{setup()}, tanto en un encendido normal como al
+        despertar del \textit{deep sleep}): si no hay contacto, el chip
+        vuelve a dormir antes de tocar el riel 2 o el WiFi.
+  \item Ya despierto, dentro de \texttt{canObd2Task}: si el bus deja de
+        responder durante \texttt{CONTACT\_LOST\_DEBOUNCE\_CYCLES} ciclos
+        seguidos (3, para no dormirse por un solo \textit{frame} perdido en
+        un bus ocupado), se considera que se fue el contacto.
+\end{itemize}
+
+\begin{figure}[H]
+\begin{lstlisting}[caption={Entrada a deep sleep, \texttt{src/power\_sleep.cpp}.}, label={fig:deepsleep}]
+void enterDeepSleepUntilContact() {
+  sdLoggerShutdown();  // cierra el archivo antes de cortarle la energia
+  WiFi.mode(WIFI_OFF);
+
+  powerGateSet(false);
+  gpio_hold_en((gpio_num_t)PIN_PWR_LED_OLED);
+  gpio_hold_en((gpio_num_t)PIN_PWR_SD);
+  gpio_deep_sleep_hold_en(); // sin esto el hold no sobrevive al deep sleep
+
+  esp_sleep_enable_timer_wakeup(DEEP_SLEEP_WAKE_INTERVAL_US);
+  esp_deep_sleep_start();  // no retorna
+}
+\end{lstlisting}
+\end{figure}
+
+Cerrar el archivo de la SD \textbf{antes} de cortar su MOSFET es
+obligatorio, no una formalidad: cortar la alimentación con un archivo
+abierto arriesga corromper el sistema de archivos completo, no solo perder
+la última fila. El \textit{deep sleep} borra toda la RAM salvo el dominio
+RTC, así que al despertar \texttt{setup()} vuelve a correr desde el
+principio, exactamente como un arranque en frío.
+
+\subsection{Consumo estimado y autonomía de la batería}
+\label{sec:consumo}
+Los siguientes números son estimaciones a partir de valores típicos de
+hoja de datos, no mediciones sobre la placa real —sirven para tener una
+idea de orden de magnitud, no un valor exacto—.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Contribuyentes al consumo promedio "sin contacto", cadena real (TPS54302 + AMS1117 + AP2112).}
+\begin{tabular}{@{}p{1.7cm}p{3.6cm}p{1.7cm}p{4.8cm}@{}}
+\toprule
+Nodo & Fuente & Aporte típico & Nota \\
+\midrule
+3.3\,V (riel 1) & ESP32-S3 en deep sleep & $\sim$0.02\,mA & 10-25\,$\mu$A \cite{espressif2024datasheet} \\
+3.3\,V (riel 1) & SN65HVD230, siempre activo & $\sim$5-10\,mA & Modo normal, no standby \cite{ti2018sn65hvd230} \\
+3.3\,V (riel 1) & Pulsos de despertar (cada 20\,s) & $\sim$1.5-2\,mA & Promediado: $\sim$150\,mA por $\sim$0.2-0.3\,s \\
+5\,V & \textbf{AMS1117}, corriente de reposo propia & \textbf{$\sim$5-8\,mA} & Casi independiente de la carga \\
+5\,V & AP2112, corriente de reposo propia & $\sim$0.06\,mA & Sin carga (MOSFET de salida abiertos) \\
+12\,V & TPS54302, corriente de reposo propia & $\sim$0.1-0.3\,mA & \\
+\midrule
+\multicolumn{2}{@{}l}{\textbf{Total aproximado, lado 12\,V}} & \textbf{$\sim$7-9\,mA} & Ver conversión abajo \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El resultado es contraintuitivo pero importante: \textbf{el transceptor CAN
+y la LDO del riel 1, no el ESP32-S3, dominan el consumo mientras el
+dispositivo "duerme"} —porque ese riel no se puede cortar sin perder la
+capacidad de detectar cuándo vuelve el contacto (Sección~\ref{sec:powergate}).
+El \textit{deep sleep} resuelve la parte del ESP32-S3 casi por completo,
+pero no puede resolver la del transceptor ni la de su LDO con esta
+arquitectura de dos rieles fija.
+
+Convertir la corriente del lado 3.3\,V/5\,V al lado 12\,V: el AMS1117 y el
+AP2112 son LDO (no reducen corriente, solo voltaje, disipando la diferencia
+como calor), así que la corriente que el TPS54302 debe entregar en su
+salida de 5\,V es aproximadamente la suma de lo que consumen el riel 1
+completo ($\sim$8.5\,mA de ESP32+SN65+pulsos) más la corriente de reposo
+propia del AMS1117 ($\sim$6.5\,mA punto medio) y del AP2112
+($\sim$0.06\,mA): $\approx$15\,mA a 5\,V. El TPS54302, al ser un
+\textit{buck} conmutado, sí convierte potencia de forma más eficiente
+($\sim$80\,\% en carga liviana, estimado):
+
+\begin{equation}
+I_{12V} \approx \frac{5\,\text{V} \times 15\,\text{mA}}{12\,\text{V} \times 0.80} + 0.2\,\text{mA (I}_q\text{ TPS54302)} \approx 8\,\text{mA}
+\end{equation}
+
+Tomando esos $\sim$8\,mA y una batería típica de auto de 50\,Ah (de la cual,
+por buena práctica, no conviene usar más del 50\,\% para no acortar su vida
+útil, es decir $\sim$25\,000\,mAh utilizables):
+
+\begin{equation}
+\frac{25\,000\,\text{mAh}}{8\,\text{mA}} \approx 3\,125\,\text{horas} \approx 130\,\text{días}
+\end{equation}
+
+Es decir, \textbf{el dispositivo por sí solo} tardaría del orden de 4-5
+meses en consumir la mitad de una batería sana —menos que si el riel 1
+usara una LDO de baja corriente de reposo en vez del AMS1117, pero todavía
+un margen amplio frente al uso normal del vehículo—. En la práctica esto
+importa menos de lo que parece, porque el propio vehículo ya tiene su
+propio consumo parásito de fábrica (alarma, memorias de radio/ECU, reloj,
+etc.), típicamente $\sim$20-50\,mA con todo "apagado" —del mismo orden o
+mayor que el aporte de este dispositivo—, y ese consumo de base es el que
+realmente determina cuánto aguanta la batería estacionada, con o sin el
+ESP32-S3 conectado.
+
+\textbf{Decisión de diseño:} se evaluó reemplazar el AMS1117 del riel 1 por
+una LDO de baja corriente de reposo (el propio AP2112, un MCP1700, o una
+TPS7A02 con $I_q$ en el orden de nanoamperios bajarían el consumo "sin
+contacto" varios mA más), pero se optó por mantener el AMS1117 y el AP2112
+tal como estaban ya elegidos en la placa —es el contribuyente individual
+más grande después del SN65HVD230, y queda documentado aquí como una
+compensación consciente entre simplicidad/costo de la lista de materiales y
+la autonomía teórica de la batería, no un descuido.
+
+\subsection{Recomendación de mantenimiento}
+Con esos números, la recomendación práctica no cambia mucho respecto al
+cuidado normal de cualquier batería de auto: \textbf{arrancar/circular el
+vehículo al menos cada 2-3 semanas}, o usar un cargador de mantenimiento
+(\textit{battery tender}) si va a quedar estacionado más tiempo que eso.
+Con la cadena de reguladores actual (AMS1117 incluido) el dispositivo
+agrega una fracción del consumo parásito que el auto ya tiene de fábrica
+—notable, pero no dominante—, así que este intervalo sigue siendo una
+recomendación razonable sin necesitar ser más estricta.
+
+\subsection{¿Afecta consultar tan seguido?}
+Con la arquitectura actual hay dos frecuencias distintas que vale la pena
+separar:
+
+\begin{itemize}
+  \item \textbf{Sondeo CAN mientras hay contacto} (un ciclo completo de 8
+        PIDs cada $\sim$0.2-1.4\,s): el bus CAN a 500\,kbit/s tiene
+        capacidad de sobra para esto —cada trama de petición/respuesta son
+        unos 100 bits, así que incluso varias por segundo representan bien
+        menos del 1\,\% del ancho de banda del bus—. Una ECU real está
+        diseñada para atender consultas de diagnóstico bastante más
+        frecuentes que esto sin ningún problema; no hay riesgo de saturar
+        el bus ni de sobrecargar la ECU.
+  \item \textbf{Escritura a la microSD, una fila por segundo}
+        (\texttt{SD\_LOG\_INTERVAL\_MS}): las escrituras son secuenciales
+        —se van agregando al final del archivo, no se reescribe una y otra
+        vez el mismo bloque—, que es el mejor caso posible para el
+        desgaste de la memoria flash. Una fila ronda los 100 bytes; a una
+        por segundo son unos 360\,KB por hora de viaje, insignificante
+        frente a la resistencia típica de una microSD moderna (miles de
+        ciclos de escritura por bloque, con \textit{wear leveling}
+        integrado). No es un factor de desgaste relevante en la práctica.
+\end{itemize}
+
+% ============================================================
+\section{Panel web}
+\label{sec:panelweb}
+% ============================================================
+
+\subsection{Punto de acceso WiFi: por qué SoftAP en vez de solo STA}
+El dispositivo siempre levanta su propio punto de acceso (SSID
+\texttt{ESP32\_OBD2}, IP típica \texttt{192.168.4.1}) en vez de depender
+únicamente de unirse a una red WiFi conocida. El criterio es el contexto de
+uso real: dentro de un vehículo casi nunca hay una red WiFi conocida en
+rango, así que un diseño solo-STA dejaría el panel inaccesible la mayor
+parte del tiempo. El SoftAP garantiza acceso local sin esa dependencia;
+unirse además como cliente a una red conocida queda como algo opcional,
+únicamente para sincronizar hora por NTP cuando hay una disponible.
+
+\subsection{Por qué ESPAsyncWebServer en vez del servidor síncrono de Arduino}
+Se eligió ESPAsyncWebServer \cite{espasyncwebserver2024} sobre el
+\texttt{WebServer} síncrono incluido en el core de Arduino-ESP32 porque
+atiende las conexiones de forma asíncrona, basada en eventos: una petición
+lenta (por ejemplo, una descarga de CSV grande) no bloquea el hilo mientras
+espera que el cliente reciba los datos. Dado que el servidor corre en el
+mismo núcleo que la pila WiFi (Sección~\ref{sec:herramientas}), un modelo
+síncrono habría significado que una descarga lenta retrasara también el
+resto del tráfico de red, incluyendo el WebSocket que empuja los datos en
+vivo.
+
+\subsection{Empuje en vivo: WebSocket con respaldo por \textit{polling}}
+El estado se empuja a los clientes por WebSocket cada 500\,ms
+—Figura~\ref{fig:merge} ya mostró de dónde sale ese dato—, con un
+mecanismo de respaldo: si el navegador detecta que el WebSocket no está
+abierto, recurre a pedir \texttt{/api/live} por HTTP cada 1.5\,s. El
+criterio es la robustez: un WebSocket puede caerse por muchas razones ajenas
+al firmware (el navegador durmiendo la pestaña, un cambio de red en el
+celular), y el panel no debería quedar congelado solo porque ese canal se
+cortó.
+
+\subsection{JSON con ArduinoJson}
+Las respuestas HTTP y los mensajes WebSocket se serializan con la librería
+ArduinoJson \cite{arduinojson2024} en vez de concatenar \textit{strings} a
+mano. El criterio: construir JSON por concatenación de texto es una fuente
+común de errores de escape/formato difíciles de depurar en un
+microcontrolador, mientras que ArduinoJson gestiona el documento en un
+búfer de tamaño acotado y conocido, algo relevante en un sistema con 320\,KB
+de RAM total repartidos entre cinco tareas.
+
+\begin{table}[H]
+\centering
+\caption{Endpoints servidos por ESPAsyncWebServer (\texttt{src/web\_server.cpp}).}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Método & Ruta & Descripción \\
+\midrule
+GET  & \texttt{/}              & Panel del dashboard (HTML embebido en el firmware) \\
+WS   & \texttt{/ws}             & WebSocket, empuja el estado en vivo cada 500\,ms \\
+GET  & \texttt{/api/live}       & Snapshot JSON del estado actual \\
+GET  & \texttt{/api/files}      & Lista de archivos en \texttt{/logs} \\
+GET  & \texttt{/api/download}   & Descarga un CSV completo \\
+GET  & \texttt{/api/chartdata}  & Puntos decimados para graficar \\
+POST & \texttt{/api/reset}      & Reinicia el contador de viaje \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Interfaz}
+El HTML/CSS/JS está embebido por completo en el firmware, sin dependencias
+de CDN externo —criterio directo del contexto de uso: el SoftAP no tiene
+salida a internet, así que cualquier librería externa de gráficas
+simplemente no cargaría—. El panel tiene dos pestañas (\textit{En vivo} e
+\textit{Historial}), tarjetas destacadas con el consumo instantáneo,
+litros y costo del viaje, casillas para elegir qué variables graficar, y un
+\textit{tooltip} interactivo con línea guía. Cuando hay 2 o más variables
+seleccionadas a la vez, cada una se normaliza a su propio rango (0-100\,\%)
+para poder comparar formas de curva con unidades muy distintas (RPM 0-7000
+frente a L/100km 0-20) sin que una aplaste visualmente a la otra.
+
+% ============================================================
+\section{Compilación y programación}
+\label{sec:build}
+% ============================================================
+
+\subsection{PlatformIO}
+
+\begin{figure}[H]
+\begin{lstlisting}[style=plain,caption={Configuración relevante de \texttt{platformio.ini}.}]
+board = esp32-s3-devkitc-1
+board_build.flash_mode = qio
+board_build.arduino.memory_type = qio_opi
+board_build.psram_type = opi
+board_upload.flash_size = 16MB
+\end{lstlisting}
+\end{figure}
+
+Para compilar y subir: \texttt{pio run -t upload} y luego
+\texttt{pio device monitor -b 115200}.
+
+\subsection{USB nativo frente a UART externo}
+El \textit{devkit} de desarrollo solo expone el \textbf{USB nativo} del
+ESP32-S3 (el periférico USB-Serial-JTAG integrado, sin un chip puente
+CP2102/CH340 aparte). Esto tiene dos implicancias para una PCB propia:
+
+\begin{enumerate}
+  \item Programar por UART \textbf{siempre funciona}, sin importar la
+        configuración del firmware: \texttt{esptool} habla directo con el
+        \textit{bootloader} de ROM del chip, independiente de cualquier
+        opción de compilación de la aplicación.
+  \item El firmware define \texttt{-DARDUINO\_USB\_CDC\_ON\_BOOT=1}. Con ese
+        \textit{flag}, el objeto \texttt{Serial} de Arduino se enruta al
+        USB nativo en vez del UART0 físico (GPIO43/44). Si la PCB propia usa
+        un adaptador UART externo y no tiene el USB nativo conectado a
+        nada, ese \textit{flag} debe quitarse —de lo contrario el monitor
+        serie del adaptador UART no mostrará nada, aunque el firmware esté
+        corriendo correctamente.
+\end{enumerate}
+
+\subsection{Circuito mínimo para programar/arrancar}
+Cualquier placa propia con el ESP32-S3 necesita, como mínimo: \texttt{EN}
+(reset) con \textit{pull-up} a 3.3\,V y un capacitor de $\sim$1\,$\mu$F a
+GND; \texttt{GPIO0} (BOOT) con \textit{pull-up} a 3.3\,V y un botón a GND
+para forzar el modo \textit{bootloader} manualmente; y, opcionalmente, un
+circuito de auto-reset (2 transistores desde DTR/RTS del adaptador UART
+hacia EN y GPIO0) para que PlatformIO entre solo al modo de programación sin
+botones.
+
+% ============================================================
+\section{Solución de problemas comunes}
+% ============================================================
+
+\begin{itemize}
+  \item \textbf{La subida se queda en "Connecting..." indefinidamente.}
+        Entrar manualmente en modo \textit{bootloader} (mantener BOOT,
+        pulsar y soltar RESET/EN, soltar BOOT, y recién ahí lanzar la
+        subida). Verificar también que ningún otro programa tenga el
+        puerto COM abierto.
+  \item \textbf{El monitor serie no muestra nada tras programar.} Revisar
+        que \texttt{ARDUINO\_USB\_CDC\_ON\_BOOT} coincida con el hardware
+        real (Sección~\ref{sec:build}).
+  \item \textbf{\texttt{sdSelectCard(): Select Failed} / \texttt{SD=0} en el
+        arranque.} Casi siempre es cableado/alimentación: revisar tarjeta
+        insertada, tensión correcta del módulo lector, continuidad de los 4
+        pines SPI + GND, formato FAT32, y el \textit{pull-up} de
+        10\,k$\Omega$ en CS si se soldó directo sin módulo.
+  \item \textbf{El panel web no carga en el celular.} Escribir
+        \texttt{http://192.168.4.1} con el esquema explícito —varios
+        navegadores intentan \texttt{https://} por defecto y el dispositivo
+        no tiene TLS—. Algunos celulares además desconectan una red WiFi
+        sin salida a internet a menos que se les indique quedarse
+        conectados igual.
+\end{itemize}

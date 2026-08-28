@@ -1,0 +1,153 @@
+% !TEX root = ../main.tex
+% ============================================================================
+% CAPÍTULO 6 — CONCLUSIONES Y RECOMENDACIONES
+% ============================================================================
+
+\chapter{CONCLUSIONES Y RECOMENDACIONES}
+
+\section{Conclusiones}
+
+\subsection{Conclusiones respecto a los objetivos planteados}
+
+A continuación se retoma cada objetivo específico del Capítulo~1 y se concluye sobre su grado de cumplimiento a partir de la evidencia de diseño (Capítulo~3) y de las pruebas experimentales (Capítulo~4).
+
+\begin{itemize}
+	\item \textbf{Determinación de los parámetros OBD-II disponibles.} El escaneo de PIDs realizado en campo sobre ambos vehículos de prueba (Sección~\ref{subsec:soporte_pids}, Capítulo~3) determinó de forma directa, no supuesta, que el Changan Honor no soporta el PID~0x10 (MAF) mientras que el Nissan Vanette sí; este hallazgo, además, fue el que justificó adoptar el método Speed-Density como vía principal de estimación. Objetivo cumplido.
+	\item \textbf{Modelo matemático de estimación del consumo.} Se cumplió en su componente de lazo abierto: el modelo Speed-Density (Ecuación~\ref{eq:speed_density}) fue formalizado, implementado en firmware y corregido por ajustes de combustible del ECU. El componente de lazo cerrado con aprendizaje adaptativo (factor $K$, curva $\eta_v(N)$ en línea) fue formalizado matemáticamente en su totalidad (Sección~\ref{sec:lazo-cerrado}) pero no se implementó en el firmware evaluado; se documenta como trabajo futuro en la Sección~\ref{sec:escalabilidad} de este capítulo.
+	\item \textbf{Adquisición y registro de datos del motor.} El firmware sondea cíclicamente MAP, RPM, velocidad, IAT y los ajustes de combustible por CAN/TWAI, y los registra junto con las variables derivadas en un archivo CSV por viaje en la tarjeta microSD (Sección de diseño de software, Capítulo~3); con esto el objetivo queda cumplido.
+	\item \textbf{Diseño del sistema embebido de adquisición.} Se completó el diseño de hardware (Capítulo~3) y su validación mediante prototipo en protoboard (Capítulo~4), incluyendo la gestión de energía por dos rieles conmutados y el modo de bajo consumo por ausencia de contacto: el objetivo queda así satisfecho.
+	\item \textbf{Plataforma telemétrica IoT con panel local.} El ESP32-S3 expone un panel web propio vía WiFi SoftAP (sin depender de conectividad externa ni de un servidor de terceros), con datos en vivo por WebSocket y descarga del histórico en CSV. Queda así satisfecho el requisito de una plataforma de telemetría accesible localmente.
+	\item \textbf{Evaluación del sistema en condiciones reales.} Se cumple, aunque con matices. A nivel de consumo acumulado por trayecto (la magnitud relevante para retroalimentar al conductor y, por extensión, contribuir a la mejora de la eficiencia energética planteada en el Capítulo~1), el sistema propio concuerda con el ELM327 + \textit{Car Scanner} dentro de un MAPE de $2{,}75\,\%$ y con el aforo real de tanque lleno dentro de un MAPE de $4{,}84\,\%$ ($n=2$; Tabla~\ref{tab:metricas_validacion}, Capítulo~4), un nivel de exactitud suficiente para ese propósito. A nivel instantáneo, en cambio, el modelo solo pudo validarse de forma directa contra una referencia de MAF real en el Nissan Vanette ($r=0{,}789$, $\mathrm{MAPE}=32{,}2\,\%$ muestra a muestra; Tabla~\ref{tab:validacion_dinamica}), mientras que el Changan Honor, al no soportar el PID~0x10, se validó únicamente de forma indirecta a nivel de consumo acumulado. El ajuste queda entonces mejor fundamentado en el Vanette, con una cadena de validación completa (estática, dinámica y de consumo acumulado); el buen resultado agregado del Changan, aunque real, descansa sobre una validación menos directa y debe interpretarse con esa salvedad.
+\end{itemize}
+
+\subsection{Conclusiones sobre el diseño del hardware}
+
+El diseño de hardware adoptó, desde su primera decisión de arquitectura, el módulo ESP32-S3-WROOM-1-N16R8 con controlador TWAI nativo en lugar de la combinación inicialmente considerada de un microcontrolador más simple con el controlador CAN externo MCP2515, con lo cual se redujo el conteo de componentes y se eliminó una fuente adicional de fallas en la interfaz SPI entre ambos circuitos integrados.
+
+La etapa de alimentación de dos rieles (TPS54302DDCR como conversión conmutada de 12~V a 5~V, seguida de los LDO AMS1117-3.3 y AP2112K-3.3TRG1 en paralelo para separar la alimentación del microcontrolador de la de los periféricos) demostró ser una decisión de diseño acertada para la robustez del sistema frente a los picos de corriente del transmisor WiFi, aunque, como se documentó en la Sección de consumo del Capítulo~3, introduce un costo de corriente de reposo no trivial en el riel permanentemente activo, atribuible a que el AMS1117 no es una LDO de bajo consumo. Esta tensión entre simplicidad de la lista de materiales y autonomía de batería en reposo quedó documentada como una decisión consciente y no como un descuido, y se retoma como recomendación de mejora en la Sección~\ref{sec:mejoras_hardware}.
+
+Gracias al circuito de \textit{power-gating} de dos MOSFET de canal P para las cargas conmutadas (LEDs/OLED y microSD) fue posible implementar un modo de bajo consumo real basado en \textit{deep sleep} del ESP32-S3, en vez de solamente reducir el ritmo de sondeo del bus CAN como en la primera aproximación del proyecto. Esto representa una mejora sustancial en la autonomía del dispositivo frente a la batería del vehículo cuando este permanece estacionado por periodos prolongados.
+
+\subsection{Conclusiones sobre el desarrollo del firmware}
+
+La arquitectura de firmware basada en FreeRTOS con tareas repartidas explícitamente entre los dos núcleos del ESP32-S3 (adquisición CAN y pila WiFi en el núcleo~0; pantalla, registro en microSD y LEDs de estado en el núcleo~1) permitió que el sondeo del bus OBD-II, el proceso más sensible a interrupciones de tiempo real, no compitiera por CPU con el servidor web ni con la escritura a la tarjeta microSD. El patrón de fusión mediante una copia local (\textit{scratch}) del estado del vehículo, sincronizada con el estado global solo bajo mutex al final de cada ciclo de sondeo, resultó ser el mecanismo central que evita que una escritura concurrente (por ejemplo, el reinicio de viaje desde el panel web) corrompa un ciclo de lectura en curso.
+
+Implementar únicamente el método Speed-Density con corrección directa por ajustes de combustible del ECU, en vez de la arquitectura completa de lazo cerrado con aprendizaje adaptativo formalizada en el Capítulo~3, fue la decisión de alcance más relevante del desarrollo de firmware: privilegió tener un sistema simple, íntegramente verificable y coherente con lo efectivamente probado en campo, sobre un sistema más sofisticado pero sin validar experimentalmente dentro del plazo del proyecto de grado.
+
+\subsection{Conclusiones sobre la interfaz web HMI}
+
+El uso de un punto de acceso WiFi propio (SoftAP) en vez de depender de una red conocida resultó coherente con el contexto real de uso del dispositivo (dentro de un vehículo, donde rara vez hay una red WiFi doméstica en rango), y garantiza acceso al panel de control en cualquier circunstancia de despliegue. La elección de ESPAsyncWebServer sobre el servidor síncrono estándar del núcleo Arduino-ESP32, junto con un renderizador de gráficas en \textit{canvas} desarrollado a medida en vez de una librería externa, evitó introducir una dependencia de conectividad a internet que el propio punto de acceso local no puede satisfacer.
+
+\subsection{Conclusiones sobre las pruebas y validación del sistema}
+
+La exactitud global del sistema propio, evaluada sobre los nueve tramos de prueba combinados de ambos vehículos (Tablas~\ref{tab:comparacion_consumo_vanette} y~\ref{tab:comparacion_consumo_changan}), resultó buena a nivel de consumo acumulado por trayecto: frente al ELM327 + \textit{Car Scanner}, RMSE $=0{,}0312$\,L, MAE $=0{,}0262$\,L, MAPE $=2{,}75\,\%$ y $R^2=0{,}9971$ (Tabla~\ref{tab:metricas_validacion}); frente al aforo real de tanque lleno —disponible solo como total combinado por vehículo, $n=2$— RMSE $=0{,}64$\,L, MAE $=0{,}57$\,L y MAPE $=4{,}84\,\%$. El sesgo medio de Bland-Altman frente al ELM327 fue de apenas $-0{,}0024$\,L, con límites de concordancia de $[-0{,}0635,\,0{,}0586]$\,L: esto descarta un sesgo sistemático relevante entre ambos sistemas. Esta exactitud contrasta con el MAPE del $32{,}2\,\%$ obtenido en la validación dinámica muestra a muestra (Tabla~\ref{tab:validacion_dinamica}); ambos resultados son consistentes entre sí, no contradictorios, porque un error instantáneo de signo variable se compensa al integrarse en litros a lo largo de un trayecto completo (Sección~4.4.6, Capítulo~4).
+
+El desempeño sí difirió entre vehículos, pero por profundidad de validación disponible más que por exactitud del resultado final. El Nissan Vanette, al soportar el PID~0x10 (MAF), cuenta con una cadena de validación completa: estática (Tabla~\ref{tab:speed_density_resultados}), dinámica frente a una referencia de flujo de aire real ($r=0{,}789$, Tabla~\ref{tab:validacion_dinamica}) y de consumo acumulado. El Changan Honor, al carecer de sensor MAF, solo pudo validarse de forma indirecta a nivel de consumo acumulado (Tabla~\ref{tab:validacion_changan_sd}), pese a lo cual su acuerdo agregado con el ELM327 fue comparable al del Vanette ($+1{,}4\,\%$ frente a $-1{,}4\,\%$ en el total combinado). La repetibilidad (coeficiente de variación entre repeticiones del mismo trayecto, Tabla~\ref{tab:metricas_validacion}) tampoco mostró un patrón sistemático a favor de un vehículo: osciló entre $6{,}9\,\%$ y $14{,}1\,\%$ según la combinación de vehículo y categoría de trayecto, un rango atribuible a la variabilidad normal del tráfico urbano de La Paz y no a un defecto propio de alguno de los dos vehículos.
+
+Un tercer punto de validación tiene que ver con el sensor MAP: la comparación frente a la altitud (Tabla~\ref{tab:validacion_map_altitud}) respalda el supuesto de autocorrección por altitud discutido en el Capítulo~3. En la prueba \textit{key-on, engine-off}, la lectura de MAP coincidió exactamente con la presión barométrica real en el Changan Honor ($0{,}0\,\%$ de diferencia) y se apartó apenas $-2{,}5\,\%$ en el Nissan Vanette, ambas cifras cercanas al valor teórico del modelo ISA a $3\,600$\,msnm ($\approx 64{,}9$\,kPa). Esto confirma que el sensor MAP de ambos vehículos reporta la presión atmosférica real de La Paz (y no un valor de fábrica calibrado para el nivel del mar), de modo que el modelo Speed-Density parte de una base correcta sin requerir una corrección adicional por altitud en el firmware, tal como se anticipó conceptualmente en el Capítulo~3.
+
+\section{Recomendaciones}
+
+\subsection{Mejoras propuestas para el hardware}
+\label{sec:mejoras_hardware}
+
+\begin{itemize}
+	\item \textbf{LDO de baja corriente de reposo en el riel 1.} Sustituir el AMS1117-3.3 por una LDO de baja $I_q$ (por ejemplo, una TPS7A02 o similar, con corriente de reposo del orden de nanoamperios) reduciría de forma directa el consumo del dispositivo mientras el vehículo permanece estacionado, sin necesitar ningún cambio de firmware, ya que es una sustitución de componente sobre el mismo riel.
+	\item \textbf{Recubrimiento conformado (\textit{conformal coating}).} Dado que la PCB se instala bajo el tablero del vehículo, expuesta a humedad y polvo, se recomienda aplicar un recubrimiento conformado sobre la placa ensamblada antes de la instalación definitiva, especialmente sobre el transceptor CAN y el conector OBD-II.
+	\item \textbf{Alivio de tensión mecánica en el conector OBD-II.} Se recomienda anclar mecánicamente el cable del conector OBD-II al gabinete del dispositivo (por ejemplo, con una brida o prensaestopas), de forma que los tirones accidentales del cable no transmitan esfuerzo directamente a las soldaduras del conector J1 en la PCB.
+	\item \textbf{Unificación de la documentación de diseño.} La documentación de hardware del Capítulo~3 alterna referencias a Altium Designer y a EasyEDA como herramienta de captura esquemática y ruteado; dado que el servicio de fabricación JLCPCB se integra nativamente con EasyEDA (Sección de capacidades de fabricación, Capítulo~3), se recomienda unificar la documentación y las capturas de pantalla hacia una sola herramienta antes de la entrega final, para evitar dar la impresión de que se usaron dos flujos de diseño distintos.
+\end{itemize}
+
+\subsection{Mejoras propuestas para el firmware}
+
+\begin{itemize}
+	\item \textbf{Parámetros configurables desde el panel web.} Actualmente, valores como \texttt{FUEL\_PRICE\_BS\_PER\_L}, \texttt{ENGINE\_DISPLACEMENT\_L} o \texttt{FUEL\_CALIBRATION\_FACTOR} solo pueden cambiarse recompilando el firmware (\texttt{config.h}). Exponerlos como una página de configuración persistida en la propia microSD permitiría recalibrar el dispositivo para un vehículo distinto sin reprogramar el ESP32-S3, lo cual es particularmente relevante si el sistema se replica en varias unidades del transporte público.
+	\item \textbf{Actualización de firmware por WiFi (OTA).} Añadir soporte de actualización \textit{over-the-air} evitaría desmontar el dispositivo del vehículo cada vez que se corrija o mejore el firmware, algo especialmente valioso si el proyecto escala a varias unidades instaladas simultáneamente.
+	\item \textbf{Vigilancia por \textit{watchdog}.} Incorporar un temporizador \textit{watchdog} de hardware que reinicie el ESP32-S3 ante un bloqueo no capturado de alguna tarea de FreeRTOS aumentaría la tolerancia a fallos del dispositivo en operación desatendida durante viajes largos.
+	\item \textbf{Paginación del historial en el panel web.} Para sesiones de registro muy largas, descargar y parsear el CSV completo en el navegador (\texttt{/api/chartdata}) puede volverse lento; se recomienda explorar una paginación o resumen por tramos en el propio firmware para historiales de varios días.
+\end{itemize}
+
+\subsection{Escalabilidad y trabajo futuro}
+\label{sec:escalabilidad}
+
+El Capítulo~3 (Sección~\ref{sec:lazo-cerrado}) formalizó una arquitectura de
+estimador en lazo cerrado más amplia que la evaluada en el Capítulo~4. Se
+recomienda como línea de continuidad directa del proyecto implementar en
+firmware los siguientes tres componentes, ya diseñados y justificados
+matemáticamente, pero pendientes de codificación y validación experimental:
+
+\begin{itemize}
+	\item \textbf{Factor de calibración adaptativo $K$ (filtro EMA).} Sustituir
+	el \texttt{FUEL\_CALIBRATION\_FACTOR} estático de \texttt{config.h} por la
+	actualización en línea de la Ecuación~\eqref{eq:ema-k-simpl}
+	($\alpha_K=0{,}20$), acotada a $[0{,}70,\,1{,}30]$, accionada por el
+	$\mathrm{LTFT}$ ya disponible en \texttt{g\_vehicleData}. Es el cambio de
+	menor costo de implementación de los tres, ya que no requiere PIDs
+	adicionales a los que el firmware actual ya consulta.
+	\item \textbf{Identificación en línea de la curva $\eta_v(N)$.} Reemplazar
+	la tabla fija \texttt{kVeTable} (\texttt{fuel\_calc.cpp}) por el
+	procedimiento de compuerta, promediado por bin y regresión polinómica
+	cúbica del Algoritmo~\ref{alg:etav}, lo que eliminaría la necesidad de
+	recalibrar manualmente la tabla por vehículo.
+	\item \textbf{Conmutación automática MAF/Speed-Density.} Agregar el sondeo
+	del PID 0x10 en la inicialización (análogo al ya implementado para el PID
+	0x33) y, cuando el vehículo lo soporte, usar el flujo de aire medido
+	directamente en vez de estimarlo, conforme al Algoritmo~\ref{alg:conmutacion}.
+	Esto beneficiaría en particular a vehículos como el Nissan Vanette de este
+	estudio, que sí soporta MAF pero se evaluó en modo speed-density para
+	mantener un único método comparable entre ambas unidades de prueba.
+\end{itemize}
+
+Los tres componentes son independientes entre sí y pueden implementarse y
+validarse por separado, de modo que pueden priorizarse según el tiempo
+disponible en una eventual continuación del proyecto.
+
+En un plano más inmediato, la tabla \texttt{kVeTable} calibrada en la
+Sección~\ref{sec:calibracion_speed_density} del Capítulo~4 se validó sobre
+el mismo conjunto de datos con el que se calibró, lo que confirma que la
+inversión algebraica se aplicó correctamente pero no constituye evidencia
+de que el modelo generalice fuera de esas condiciones. Se recomienda, como
+trabajo futuro de corto plazo, repetir la prueba de pasos de RPM en el
+Nissan Vanette en una sesión independiente, extendiéndola además a los
+regímenes de 4000\,rpm en adelante (donde \texttt{kVeTable} conserva
+todavía sus valores genéricos sin calibrar), para validar la tabla contra
+datos que no participaron en su propia calibración.
+
+En el caso del Changan Honor, que no soporta el PID~0x10 y queda por ello
+fuera del método de calibración directa anterior, la Sección
+``Caso sin MAF'' del Capítulo~3 documenta un procedimiento alternativo basado
+en STFT/LTFT (\texttt{CODIGOS/changan\_trim\_logger.py} y
+\texttt{ve\_curve\_calibrator\_indirect.py}) que no llegó a ejecutarse
+dentro del alcance de este trabajo. Queda como trabajo futuro recolectar
+ese registro de campo en el Changan Honor y correr el ajuste indirecto,
+teniendo presente que su resultado sería una corrección relativa a una
+curva semilla genérica, no una calibración absoluta como la del Vanette.
+
+Más allá del firmware de una sola unidad, la motivación original del proyecto (el transporte público urbano de La Paz, Capítulo~1) sugiere una línea de escalabilidad natural hacia una flota: agregación de los históricos de varias unidades en un servidor central (por ejemplo, sincronizando el CSV cuando el vehículo se conecta a una red WiFi conocida al final del día), y un panel comparativo que permita a un operador de transporte identificar qué unidades de su flota presentan un consumo sistemáticamente por encima del resto.
+
+El acceso al bus CAN que ya provee el hardware desarrollado, actualmente empleado solo para lectura de parámetros de consumo, habilita además dos líneas de extensión funcional que exceden el alcance de este proyecto pero que se documentan aquí como trabajo futuro:
+
+\begin{itemize}
+	\item \textbf{Escáner de fallas (lectura de DTC).} El firmware ya implementa el ciclo de solicitud/respuesta del Modo~01 (datos en tiempo real); extenderlo a los Modos~03 (códigos de falla almacenados), 07 (códigos pendientes) y 02 (\textit{freeze frame}) del estándar OBD-II reutilizaría la misma infraestructura de tramas CAN sobre 0x7DF/0x7E8--0x7EF, añadiendo únicamente la decodificación específica de DTC. Esto convertiría al dispositivo en un escáner de diagnóstico general, no limitado a consumo de combustible.
+	\item \textbf{Comunicación bidireccional con la ECU.} La Sección de configuración de SavvyCAN del Capítulo~3 ya documenta un puente bidireccional funcional (\texttt{handleSavvyCANTransmit()}) que permite a una PC no solo escuchar sino también inyectar tramas hacia el bus CAN a través del ESP32, usado allí con fines de ingeniería inversa del protocolo del vehículo. Formalizar esta capacidad en el propio firmware —por ejemplo, para accionar funciones del vehículo mediante los mismos identificadores CAN ya identificados— es técnicamente alcanzable con el hardware actual, pero constituye un cambio de naturaleza del dispositivo: pasa de ser un instrumento de monitoreo pasivo a uno de control activo. El bus CAN de un vehículo no incorpora autenticación a nivel de trama, por lo que cualquier implementación de esta capacidad debería incorporar, como requisito de diseño y no como añadido posterior, control de acceso a la función de transmisión, límites por lista blanca de qué tramas puede emitir el dispositivo, y una revisión de seguridad específica antes de instalarse en un vehículo en uso real. Por esa misma razón, esta capacidad queda fuera del alcance de un despliegue de campo dentro de este proyecto de grado.
+\end{itemize}
+
+\subsection{Recomendaciones para la etapa de producción en PCB}
+
+\begin{itemize}
+	\item \textbf{Escalado del lote de fabricación.} El diseño ya cumple con margen las reglas de diseño del proceso estándar de dos capas de JLCPCB (Tabla~\ref{jlcpcb}, Capítulo~3), por lo que no requiere cambios de \textit{layout} para escalar del lote mínimo de prototipo (5 unidades) a un lote mayor si el proyecto avanza a una serie piloto para varios vehículos de transporte público.
+	\item \textbf{Puntos de prueba (\textit{test points}).} Se recomienda añadir puntos de prueba accesibles para las señales críticas (salida de 5~V del TPS54302, salidas de 3,3~V de ambos LDO, líneas CAN\_H/CAN\_L) en futuras revisiones de la PCB, para agilizar el diagnóstico de fallas de ensamblaje sin necesidad de desoldar componentes.
+	\item \textbf{Paso de un lote ensamblado manualmente a servicio PCBA.} Como se discutió en el Capítulo~5, el ensamblaje manual es adecuado para una unidad de prototipo, pero para una serie piloto se recomienda migrar al servicio de ensamblaje del propio fabricante, dado el riesgo de defectos de soldadura en el regulador \textit{buck} de paso fino (SOT-23-6) al escalar la cantidad de placas ensambladas a mano.
+\end{itemize}
+
+\section{Aportes del proyecto}
+
+\subsection{Aporte tecnológico}
+
+El proyecto entrega un dispositivo de monitoreo de consumo de combustible que no depende de un proveedor externo ni de una suscripción recurrente: el registro histórico se almacena localmente en microSD y el panel de control se sirve desde el propio dispositivo, características que lo diferencian de las soluciones comerciales de telemetría de flota comparadas en el Capítulo~5. La caracterización experimental de los PIDs OBD-II realmente soportados por dos vehículos representativos del parque automotor de La Paz (incluyendo la ausencia confirmada de sensor MAF en un vehículo de fabricación 2023) aporta un dato de campo concreto y poco documentado localmente, útil más allá de este proyecto para cualquier desarrollo posterior de sistemas de diagnóstico OBD-II orientados al contexto boliviano.
+
+\subsection{Aporte académico}
+
+Más allá del sistema efectivamente implementado y evaluado en el Capítulo~4, el desarrollo matemático del estimador en lazo cerrado (Capítulo~3, Sección~\ref{sec:lazo-cerrado}) —incluyendo el análisis de estabilidad del filtro EMA por transformada Z y el procedimiento de identificación de la curva de eficiencia volumétrica por regresión— constituye un aporte formal que excede el alcance mínimo de un proyecto de grado y queda disponible como base directa para un trabajo de continuación. El análisis cuantitativo del efecto de la altitud de La Paz sobre los métodos de estimación de consumo basados en OBD-II, con el hallazgo de que el método Speed-Density se autocorrige por altitud al usar la presión real del colector, corrige además una simplificación conceptual frecuente en la literatura de sistemas similares evaluados a nivel del mar, y queda documentado en este trabajo con su justificación física completa (Sección~\ref{subsec:etav-altitud}, Capítulo~3).
+
+\clearpage

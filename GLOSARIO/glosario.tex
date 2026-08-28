@@ -1,0 +1,81 @@
+% !TEX root = ../main.tex
+\addcontentsline{toc}{section}{GLOSARIO Y LISTA DE ABREVIATURAS}
+\begin{center}
+	\textbf{\Large GLOSARIO Y LISTA DE ABREVIATURAS}
+\end{center}
+\vspace{4mm}
+
+Se listan a continuación, en orden alfabético, las siglas y los términos técnicos empleados a lo largo del documento cuyo significado no siempre se repite en cada capítulo donde aparecen.
+
+\vspace{2mm}
+\begin{center}\textbf{Siglas y acrónimos}\end{center}
+\begin{longtable}{@{}p{2.6cm}p{11.5cm}@{}}
+	\toprule
+	\rowcolor[rgb]{.851,.851,.851}
+	\textbf{Sigla} & \textbf{Significado} \\
+	\midrule
+	\endfirsthead
+	\toprule
+	\rowcolor[rgb]{.851,.851,.851}
+	\textbf{Sigla} & \textbf{Significado} \\
+	\midrule
+	\endhead
+	AFR & \textit{Air/Fuel Ratio}, relación aire-combustible. \\
+	BOM & \textit{Bill of Materials}, lista de materiales de la placa. \\
+	CAN & \textit{Controller Area Network}, protocolo de bus serie usado por la ECU para comunicar sus módulos y, a través del puerto OBD-II, con equipos externos. \\
+	CSV & \textit{Comma-Separated Values}, formato de archivo de texto con valores separados por comas, usado para el registro de datos en MicroSD. \\
+	DTC & \textit{Diagnostic Trouble Code}, código de diagnóstico de fallas almacenado por la ECU (Modos~03/07 de OBD-II). \\
+	ECU & \textit{Electronic Control Unit}, unidad de control electrónico del motor. \\
+	EMA & \textit{Exponential Moving Average}, media móvil exponencial; filtro de suavizado usado en el factor de calibración adaptativo $K$ y en la identificación de la curva $\eta_v(N)$. \\
+	ESD & \textit{Electrostatic Discharge}, descarga electrostática; también se usa para nombrar a los diodos de protección contra ella. \\
+	GPIO & \textit{General Purpose Input/Output}, pin de entrada/salida de propósito general del microcontrolador. \\
+	HMI & \textit{Human-Machine Interface}, interfaz humano-máquina; en este proyecto, el panel de control web. \\
+	I2C & \textit{Inter-Integrated Circuit}, bus serie de dos hilos usado para la comunicación con la pantalla OLED. \\
+	IAT & \textit{Intake Air Temperature}, temperatura del aire de admisión (PID~0x0F). \\
+	IPC & \textit{Institute for Printed Circuits}, organismo que define normas de manufactura de PCB (p.~ej., IPC-2221B). \\
+	ISA & \textit{International Standard Atmosphere}, Atmósfera Estándar Internacional; modelo de presión barométrica en función de la altitud. \\
+	ISO & \textit{International Organization for Standardization}, organización responsable de normas como ISO~15765-4 (CAN sobre OBD-II). \\
+	JSON & \textit{JavaScript Object Notation}, formato de intercambio de datos usado por el panel web. \\
+	KOEO & \textit{Key-On, Engine-Off}, contacto del vehículo puesto con el motor apagado; estado usado para validar el sensor MAP contra la presión atmosférica real. \\
+	LDO & \textit{Low Drop-Out}, regulador de tensión de baja caída (p.~ej., AMS1117, AP2112K). \\
+	LTFT & \textit{Long Term Fuel Trim}, ajuste de combustible a largo plazo (PID~0x07). \\
+	MAF & \textit{Mass Air Flow}, flujo másico de aire admitido por el motor (PID~0x10). \\
+	MAP & \textit{Manifold Absolute Pressure}, presión absoluta del colector de admisión (PID~0x0B). \\
+	MIL & \textit{Malfunction Indicator Lamp}, luz indicadora de falla del vehículo (``check engine''). \\
+	OBD-II & \textit{On-Board Diagnostics}, segunda generación del estándar de diagnóstico a bordo del vehículo. \\
+	OLED & \textit{Organic Light-Emitting Diode}, tecnología de la pantalla usada para el indicador local del sistema. \\
+	PCB & \textit{Printed Circuit Board}, placa de circuito impreso. \\
+	PID & \textit{Parameter ID}, identificador de parámetro consultable por el Modo~01 de OBD-II. En este documento \textbf{no} se refiere a un controlador Proporcional-Integral-Derivativo. \\
+	PWM & \textit{Pulse Width Modulation}, modulación por ancho de pulso. \\
+	RPM & \textit{Revolutions Per Minute}, régimen de giro del motor (PID~0x0C). \\
+	SAE & \textit{Society of Automotive Engineers}, entidad que publica el estándar J1979 de PIDs OBD-II. \\
+	SLCAN & \textit{Serial-Line CAN}, protocolo que transporta tramas CAN sobre un puerto serie, usado por SavvyCAN para capturar el bus. \\
+	SPI & \textit{Serial Peripheral Interface}, bus serie usado para la comunicación con la tarjeta MicroSD. \\
+	STFT & \textit{Short Term Fuel Trim}, ajuste de combustible a corto plazo (PID~0x06). \\
+	TWAI & \textit{Two-Wire Automotive Interface}, nombre del controlador CAN integrado en el ESP32-S3 (equivalente funcional a un controlador CAN clásico). \\
+	UMSA & Universidad Mayor de San Andrés. \\
+	VE & Eficiencia volumétrica ($\eta_v$), cociente entre la masa de aire realmente admitida y la masa teórica que ocuparía la cilindrada a la densidad de admisión. \\
+	\bottomrule
+\end{longtable}
+
+\vspace{2mm}
+\begin{center}\textbf{Términos técnicos}\end{center}
+\begin{longtable}{@{}p{3.6cm}p{10.5cm}@{}}
+	\toprule
+	\rowcolor[rgb]{.851,.851,.851}
+	\textbf{Término} & \textbf{Definición} \\
+	\midrule
+	\endfirsthead
+	\toprule
+	\rowcolor[rgb]{.851,.851,.851}
+	\textbf{Término} & \textbf{Definición} \\
+	\midrule
+	\endhead
+	Deep sleep & Modo de bajo consumo del ESP32-S3 en el que se desactivan la mayoría de sus periféricos, reduciendo el consumo de corriente a nivel de microamperios; el sistema despierta por temporizador para volver a comprobar si hay contacto en el vehículo. \\
+	ELM327 & Circuito integrado comercial que traduce comandos AT en texto plano hacia tramas OBD-II/CAN; usado en este proyecto como adaptador de referencia comercial frente al sistema propio. \\
+	Lambda ($\lambda$) & Razón entre el AFR real y el AFR estequiométrico; $\lambda=1$ indica una mezcla exactamente estequiométrica, $\lambda>1$ una mezcla pobre y $\lambda<1$ una mezcla rica. \\
+	Lazo cerrado (\textit{closed-loop}) & Modo de operación de la ECU en el que corrige la mezcla aire-combustible en tiempo real a partir de la retroalimentación de los sensores de oxígeno, reflejada en los PID de STFT/LTFT. \\
+	SavvyCAN & Software de escritorio de código abierto para el análisis y envío de tramas CAN, usado en este proyecto para la ingeniería inversa de los PID soportados por cada vehículo. \\
+	Speed-Density & Método de estimación del flujo másico de aire admitido a partir de RPM, presión de colector (MAP) y temperatura de admisión (IAT), sin requerir un sensor de flujo de aire (MAF) directo. \\
+	\bottomrule
+\end{longtable}

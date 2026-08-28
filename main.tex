@@ -1,0 +1,207 @@
+\documentclass[12pt,letterpaper]{report}
+
+% --- 1) Codificación y fuente (ANTES de babel; SIN duplicados) -------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}        % [FIX] antes estaba cargado dos veces
+\usepackage{lmodern}
+\usepackage{microtype}
+\tolerance=1500
+\emergencystretch=3em
+
+% --- 2) Idioma (Babel, UNA sola vez) --------------------------------
+\usepackage[spanish,es-tabla,es-nodecimaldot]{babel}
+
+% --- 3) Color (ANTES de pgfplots/tikz/listings; UNA sola vez) -------
+%   [FIX] xcolor debe cargarse con sus opciones ANTES de cualquier
+%   paquete que lo cargue internamente (pgfplots lo hace). Esto elimina
+%   el aviso: "xcolor has already been loaded: ignoring option xcdraw".
+\usepackage[table,xcdraw]{xcolor}
+%   (colortbl y \rowcolor quedan incluidos por la opción [table].)
+
+% --- 4) Gráficos, trazado y flotantes -------------------------------
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{pdfpages}
+
+% --- 5) Tablas ------------------------------------------------------
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}              % [FIX] FALTABA: causaba "\multirow undefined"
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{supertabular}
+
+% --- 6) Matemáticas -------------------------------------------------
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% --- 7) Algoritmos --------------------------------------------------
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+
+% --- 8) Bibliografía ------------------------------------------------
+\usepackage{natbib}
+
+% --- 9) Espaciado y geometría ---------------------------------------
+\usepackage{needspace}
+\usepackage{setspace}
+\usepackage{geometry}
+\geometry{letterpaper, left=3.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+% --- 10) TikZ y librerías -------------------------------------------
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds, calc, babel}
+
+% --- 11) Porcentajes seguros (clave para tus errores) ---------------
+%   [FIX] Bajo babel-spanish, "\,\%" dentro de modo MATEMÁTICO mezcla
+%   unidades mu con pt y produce "Incompatible glue units". Estas dos
+%   líneas lo resuelven sin que tengas que editar la sección:
+%     (a) redefine \% de forma robusta (válido en texto y en math).
+%     (b) define \pct por si quieres escribir un % con espacio fino.
+\AtBeginDocument{\DeclareRobustCommand{\%}{\ifmmode\text{\char37}\else\char37\fi}}
+\newcommand{\pct}{\,\text{\%}}
+
+% --- 12) Captions APA 7 (caption ANTES de subcaption) ---------------
+\usepackage{caption}
+\usepackage{subcaption}            % [FIX] orden correcto: caption -> subcaption
+\captionsetup[figure]{
+	labelformat=simple,
+	labelsep=newline,
+	textfont=it,
+	labelfont=bf,
+	justification=raggedright,
+	singlelinecheck=false
+}
+\captionsetup[table]{
+	labelformat=simple,
+	labelsep=newline,
+	textfont=it,
+	labelfont=bf,
+	justification=raggedright,
+	singlelinecheck=false
+}
+
+% --- 13) Índices (TOC / figuras / tablas) ---------------------------
+\usepackage{tocloft}
+\renewcommand{\cftfigpresnum}{Figura }
+\renewcommand{\cftfigaftersnum}{:}
+\setlength{\cftfignumwidth}{2.5cm}
+\renewcommand{\cfttabpresnum}{Tabla }
+\renewcommand{\cfttabaftersnum}{:}
+\setlength{\cfttabnumwidth}{2.5cm}
+
+% --- 14) Código fuente (listings) -----------------------------------
+\usepackage{listings}
+\definecolor{codegreen}{rgb}{0,0.5,0.2}
+\definecolor{codegray}{rgb}{0.4,0.4,0.4}
+\definecolor{codeblue}{rgb}{0.0,0.2,0.6}
+\definecolor{backcolor}{rgb}{0.97,0.97,0.97}
+\lstdefinestyle{terminal}{
+	backgroundcolor=\color[RGB]{48, 10, 36},
+	basicstyle=\fontsize{8}{10}\ttfamily\color{white},
+	breaklines=true,
+	columns=flexible,
+	frame=single,
+	rulecolor=\color[RGB]{48, 10, 36},
+	showstringspaces=false,
+	numbers=none,
+}
+\lstset{
+	language=C++,
+	backgroundcolor=\color{backcolor},
+	commentstyle=\color{codegreen}\itshape,
+	keywordstyle=\color{codeblue}\bfseries,
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{purple},
+	basicstyle=\ttfamily\small,
+	breakatwhitespace=false,
+	breaklines=true,
+	captionpos=t,
+	keepspaces=true,
+	numbers=left,
+	numbersep=5pt,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	tabsize=4
+}
+
+% --- 15) Hiperenlaces (cerca del final) -----------------------------
+\usepackage{url}
+%   [FIX] opciones contra "destination with the same identifier
+%   (name{page.1}) has been already used".  Si AÚN persistiera el
+%   aviso, añade también:  hypertexnames=false
+\usepackage[plainpages=false,pdfpagelabels]{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=black,
+	citecolor=black,
+	urlcolor=blue
+}
+% Quiebre de URLs largas
+\expandafter\def\expandafter\UrlBreaks\expandafter{\UrlBreaks
+	\do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j
+	\do\k\do\l\do\m\do\n\do\o\do\p\do\q\do\r\do\s\do\t
+	\do\u\do\v\do\w\do\x\do\y\do\z\do\A\do\B\do\C\do\D
+	\do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N
+	\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X
+	\do\Y\do\Z\do\1\do\2\do\3\do\4\do\5\do\6\do\7\do\8\do\9\do\0}
+
+% --- 16) Sangría y espaciado de párrafo -----------------------------
+\usepackage{parskip}
+\setlength{\parindent}{1.27cm}
+% =====================================================================
+
+\begin{document}
+	
+	\begin{titlepage}
+		\begin{center}
+			
+			\textbf{\Large UNIVERSIDAD MAYOR DE SAN ANDRÉS}\\[0.5cm]
+			\textbf{\large FACULTAD DE INGENIERÍA}\\[0.5cm]
+			\textbf{\large CARRERA DE INGENIERÍA MECÁNICA Y ELECTROMECÁNICA}\\[0.5cm]
+			\textbf{\large Programas: Ingeniería Mecatrónica - Ingeniería Automotriz}\\[0.5cm]
+			\textbf{\Large PROYECTO DE GRADO PARA OBTENER EL TÍTULO DE INGENIERO MECATRÓNICO}\\[0.5cm]
+			
+			\includegraphics[width=\textwidth]{Images/UMSA.jpg}\\[0.6cm]
+			
+			\begin{spacing}{1.4}
+				{\LARGE\textbf{
+						``Sistema de monitoreo del consumo de combustible orientado a la mejora de la eficiencia energética en el transporte público urbano en la ciudad de La Paz''
+				}}
+			\end{spacing}
+			\vspace{0.5cm}
+			{\large \textbf{Postulante:} Univ. Cristian Erick Calle Ali}\\[0.5cm]
+			
+			{\large \textbf{Tutor:} Ing. Eloy Cristian Sarabia Yapuchura}\\[1cm]
+			
+			\textbf{LA PAZ - BOLIVIA}
+			
+		\end{center}
+	\end{titlepage}
+	
+	\tableofcontents   % Genera el Índice de Contenido (Capítulos, Secciones, etc.)
+	\newpage
+	\listoffigures     % Genera el Índice de Figuras (Imágenes)
+	\newpage
+	\listoftables      % Genera el Índice de Tablas
+	\newpage
+	\input{GLOSARIO/glosario}
+	\newpage
+
+	\input{CAP1/cap1}
+	\input{CAP2/CAP2}
+	\input{CAP2/CAP2.1}
+	\input{CAP3/cap3}
+	\input{CAP4/cap4}
+	\input{CAP5/cap5}
+	\input{CAP6/cap6}
+	\addcontentsline{toc}{section}{REFERENCIAS}
+	
+	\bibliographystyle{apalike}
+	\bibliography{references1}
+	
+	\input{APENDICE/apendice}
+	
+\end{document}

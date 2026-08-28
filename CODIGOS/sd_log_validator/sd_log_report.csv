@@ -1,0 +1,8 @@
+archivo,formato,filas_totales,filas_validas,filas_corruptas,huecos_muestreo,duracion_s,tasa_muestreo_hz,tamano_bytes,tamano_por_hora_kb
+trip_001.csv,"anterior (16 col, sin baro)",258,258,0,0,257.0,1.0038910505836576,21219,290.3
+trip_002.csv,"anterior (16 col, sin baro)",238,238,0,0,237.0,1.0042194092827004,19753,293.0
+trip_003.csv,"anterior (16 col, sin baro)",0,0,0,0,0.0,0.0,157,0.0
+trip_003.csv,"actual (18 col, con baro)",3649,3649,0,0,3648.0,1.0002741228070176,327643,315.8
+trip_003.csv,"actual (18 col, con baro)",3649,3649,0,0,3648.0,1.0002741228070176,327643,315.8
+trip_002.csv,"anterior (16 col, sin baro)",238,238,0,0,237.0,1.0042194092827004,19753,293.0
+trip_001.csv,"anterior (16 col, sin baro)",258,258,0,0,257.0,1.0038910505836576,21219,290.3
