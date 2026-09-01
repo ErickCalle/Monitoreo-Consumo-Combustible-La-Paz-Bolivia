@@ -256,6 +256,11 @@ La asignación de pines para el prototipo se resume en la Tabla~\ref{tab:asignac
 
 La integración se verifica de manera incremental: primero se confirma la comunicación I2C con la pantalla OLED mediante un barrido de direcciones (\textit{I2C scanner}), luego se valida la escritura y lectura en la tarjeta MicroSD, y finalmente se habilita el controlador TWAI para la recepción de tramas CAN, como se detalla en la Figura~\ref{fig:diagrama_perifericos}.
 
+\subsection{Placa preliminar en EasyEDA}
+\label{sec:placa_preliminar}
+
+Una vez concluidas las pruebas de campo sobre el prototipo en protoboard, se diseñó en EasyEDA una placa preliminar que replica el mismo circuito funcional ya validado (mismo módulo ESP32-S3, mismo transceptor CAN, misma pantalla OLED y microSD), con el único fin de contar con una versión más robusta y cómoda de manejar que las conexiones sueltas de una protoboard, previa a la placa final documentada en el Capítulo~3 (diseñada en Altium Designer). A diferencia de esa placa final, la preliminar resuelve la alimentación con un regulador lineal simple en vez de la conversión conmutada de dos rieles, suficiente para las pruebas de campo dado que no corre con la misma restricción de autonomía en reposo; el esquemático completo, la simulación 3D y las fotografías de la placa fabricada se presentan en el Capítulo~3 (Sección~\ref{sec:pcb_preliminar_diseno}). La fabricación de esta placa preliminar se encargó a Robokit (La Paz) por 150\,Bs (Tabla~\ref{tab:costo_pcb_preliminar}, Capítulo~5), y el ensamblaje de los componentes se realizó manualmente. Al tratarse del mismo circuito ya probado, esta placa no requirió una nueva ronda de pruebas de campo: su función es exclusivamente de robustez física y comodidad de manejo, no de validación técnica adicional sobre lo ya reportado en este capítulo.
+
 \subsection{Conexión al bus CAN del vehículo}
 
 La conexión física al vehículo se realiza a través del conector estandarizado de 16 pines J1962, cuya asignación depende del protocolo de comunicación soportado; desde 2008 la práctica totalidad de los vehículos livianos emplea el protocolo ISO 15765 sobre bus CAN \citep{iso15765}. La Tabla~\ref{tab:pinout_obd} resume los pines relevantes para este proyecto.

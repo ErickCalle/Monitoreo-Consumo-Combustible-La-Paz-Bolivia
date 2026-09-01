@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Benchmark ELM327 -- SOLO para llenar la columna "ELM327 (sesion separada)"
-de la Tabla 4.6 del Capitulo 4.
+Benchmark ELM327 para la columna "ELM327 (sesion separada)" de la
+Tabla 4.6 del Capitulo 4.
 
 Habla directo con el ELM327 por comandos AT (sin pasar por Car Scanner),
-solicitando el PID 0x0C (RPM, igual que el benchmark del ESP32 en
-can_bench_tool/) durante 5 minutos, con el motor del vehiculo en ralenti.
+pidiendo el PID 0x0C (RPM, igual que el benchmark del ESP32 en
+can_bench_tool/) durante 5 minutos con el motor en ralenti.
 
 Requisitos:
     pip install pyserial
@@ -69,8 +69,7 @@ def main():
         elif "41 0C" in resp_clean:
             responses_ok += 1
             latencies.append(elapsed)
-        # cualquier otra cosa (respuesta vacia, timeout de pyserial) se
-        # cuenta como solicitud sin respuesta, ni exito ni error de bus
+        # timeout u otra respuesta: no cuenta como exito ni como error
 
         if time.time() - last_print > 30:
             last_print = time.time()

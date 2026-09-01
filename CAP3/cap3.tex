@@ -1573,6 +1573,57 @@ El esquemático correspondiente a esta etapa se desarrolló en Altium Designer y
 	\textit{Nota.} Diagrama esquemático desarrollado en Altium Designer para el sistema de indicadores visuales. Cada LED se encuentra conectado a un GPIO del módulo ESP32-S3-WROOM-1-N16R8 mediante una resistencia limitadora de 220~$\Omega$, la cual restringe la corriente que circula por el diodo, protege las salidas digitales del microcontrolador y prolonga la vida útil de los indicadores. Los cuatro LED permiten visualizar el estado de la comunicación CAN, la actividad de la memoria MicroSD, la conectividad Wi-Fi y la presencia de condiciones de error detectadas durante el funcionamiento del sistema.
 \end{figure}
 
+\subsection{Placa preliminar (EasyEDA)}
+\label{sec:pcb_preliminar_diseno}
+
+Antes de proceder con el diseño de la placa final descrito en el resto de esta sección, se desarrolló en EasyEDA una placa preliminar que replica el mismo circuito ya validado sobre protoboard (Capítulo~4, Sección~4.1.3), con el fin de contar con una versión física más robusta que las conexiones sueltas de una protoboard para las pruebas de campo. A diferencia de la placa final, esta versión preliminar resuelve la alimentación con un regulador lineal simple (7805 más un transistor de paso TIP42C en configuración de refuerzo de corriente) en lugar de la conversión conmutada de dos rieles, y conecta el transceptor CAN, la pantalla OLED y el módulo microSD --ya validados en la etapa de protoboard-- mediante conectores de pines en vez de integrarlos directamente en la placa. El esquemático completo se muestra en la Figura~\ref{fig:esquematico_pcb_preliminar}.
+
+\begin{figure}[H]
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption[Esquemático de la placa preliminar en EasyEDA]{Esquemático completo de la placa preliminar.}
+	\label{fig:esquematico_pcb_preliminar}
+	\centering
+	\includegraphics[width=0.95\textwidth]{Images/esquematico_pcb_proto.jpg}
+
+	\vspace{2mm}
+	\small\raggedright
+	\textit{Nota.} Desarrollado en EasyEDA. El costo detallado de cada componente se presenta en el Capítulo~5 (Tabla~\ref{tab:costo_placa_preliminar_bom}).
+\end{figure}
+
+La Figura~\ref{fig:simulacion_pcb_preliminar} muestra la vista 3D generada por EasyEDA a partir de ese esquemático y del enrutado de la placa, previo al envío a fabricar.
+
+\begin{figure}[H]
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption[Vista 3D de la placa preliminar en EasyEDA]{Simulación 3D de la placa preliminar, generada en EasyEDA antes de la fabricación.}
+	\label{fig:simulacion_pcb_preliminar}
+	\centering
+	\includegraphics[width=0.55\textwidth]{Images/simulacion_pcb_proto.jpg}
+\end{figure}
+
+La fabricación de la placa preliminar se encargó a Robokit (La Paz); la Figura~\ref{fig:fisica_pcb_preliminar} muestra las caras superior e inferior de la placa recibida, previo al ensamblaje de los componentes.
+
+\begin{figure}[H]
+	\centering
+	\caption{Placa preliminar fabricada por Robokit, sin ensamblar}
+	\label{fig:fisica_pcb_preliminar}
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{Images/top_pcb_proto.jpeg}
+		\caption{Cara superior (\textit{top})}
+		\label{fig:top_pcb_preliminar}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{Images/bottom_pcb_proto.jpeg}
+		\caption{Cara inferior (\textit{bottom})}
+		\label{fig:bottom_pcb_preliminar}
+	\end{subfigure}
+	\vspace{2pt}
+	\\
+	{\footnotesize\textit{Nota.} Placa de una sola cara fabricada por Robokit (La Paz), 150\,Bs (Capítulo~5, Tabla~\ref{tab:costo_pcb_preliminar}); el ensamblaje de los componentes se realizó manualmente. Elaboración propia.}
+\end{figure}
+
 \subsection{Diseño de la PCB (Altium Designer)}
 % Tu contenido actual: monocapa, anchos de pista, bloques,
 % render 3D.

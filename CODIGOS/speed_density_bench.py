@@ -1,49 +1,30 @@
 #!/usr/bin/env python3
 """
-Prueba estatica del modelo Speed-Density -- SOLO para llenar la Tabla 4.x
-y la Figura 4.9 de la seccion 4.3.3 del Capitulo 4 (Nissan Vanette, unico
-vehiculo con PID 0x10/MAF real de referencia).
+Prueba estatica del modelo Speed-Density -- Tabla 4.x y Figura 4.9
+(Seccion 4.3.3, Nissan Vanette, unico vehiculo con MAF real PID 0x10).
 
-Por que ELM327 solo (sin el ESP32-S3): esta prueba no compara "dispositivo A
-vs dispositivo B" -- compara "estimacion Speed-Density vs MAF real", y ambas
-magnitudes se calculan a partir de las MISMAS lecturas de RPM/MAP/IAT tomadas
-en el mismo instante. Usar un solo dispositivo (el ELM327, hablado directo
-por Python) evita por completo la limitacion ya documentada de que el
-ESP32-S3 y el ELM327 no pueden mantener sesion OBD-II simultanea (ver
-seccion 4.2.2): aqui no hace falta una segunda sesion.
+Solo ELM327, sin el ESP32-S3: compara Speed-Density estimado vs. MAF
+real a partir de las mismas lecturas de RPM/MAP/IAT, asi que no hace
+falta mantener dos sesiones OBD-II simultaneas.
 
-Protocolo (motor en ralenti, luego acelerar y sostener cada regimen objetivo
-con el freno de mano puesto y el vehiculo detenido):
-    1. El primer punto NO es un numero fijo de 800 rpm: el governor de
-       ralenti de cada motor tiene su propio piso (en el Vanette probado,
-       ~960-980 rpm), por debajo del cual el motor no puede sostenerse sin
-       calarse. Por eso el script mide el ralenti real al arrancar y lo usa
-       como primer punto en vez de forzar 800.
-    2. Sostener el motor en ralenti, luego acelerar y sostener los otros 3
-       regimenes (1500, 2500, 3500 rpm), uno a la vez.
-    3. El propio script funciona como tacometro en la consola: imprime el
-       RPM leido en cada ciclo, asi que se puede acelerar mirando la
-       pantalla en vez del tablero. Cuando el RPM cae dentro de +/-100 rpm
-       de un punto objetivo, cuenta muestras hasta juntar TARGET_SAMPLES
-       (20) y entonces imprime un aviso "LISTO" para ese punto -- esa es
-       la señal para pasar al siguiente régimen.
-    4. Al terminar (Ctrl+C, idealmente despues de ver los 4 "LISTO"),
-       imprime el promedio por punto y genera:
-         - speed_density_log.csv   (todas las muestras crudas)
-         - figura_4_9_speed_density.png  (grafica de barras agrupadas)
+Protocolo: el motor arranca en ralenti (el script mide el ralenti real
+en vez de forzar 800 rpm fijo, porque el piso del governor varia segun
+el motor), luego se acelera y sostiene cada regimen objetivo (1500,
+2500, 3500 rpm) con freno de mano puesto y vehiculo detenido. La
+consola sirve de tacometro: cuando el RPM cae en +/-100 rpm de un
+punto, cuenta muestras hasta TARGET_SAMPLES y avisa "LISTO". Al
+terminar (Ctrl+C tras ver los 4 avisos) genera speed_density_log.csv y
+figura_4_9_speed_density.png.
 
-Formula y tabla VE identicas a fuel_calc.cpp (firmware real) para que la
-estimacion aqui calculada sea la misma que produciria el equipo embarcado:
+Formula y tabla VE identicas a fuel_calc.cpp:
 
-    MAF(g/s) = (VE/100) * RPM * MAP(kPa) * Vd(L) * 28.97
-               --------------------------------------------
-                     2 * 8.314 * IAT(K) * 60
+    MAF(g/s) = (VE/100) * RPM * MAP(kPa) * Vd(L) * 28.97 / (2 * 8.314 * IAT(K) * 60)
 
 Requisitos:
     pip install pyserial matplotlib
 
-Antes de correr, cambiar PORT abajo por el puerto COM del ELM327 (ver
-elm327_bench.py para como identificarlo).
+Antes de correr, cambiar PORT abajo (ver elm327_bench.py para como
+identificar el puerto).
 """
 import csv
 import os
@@ -63,9 +44,8 @@ IDLE_SAMPLE_COUNT = 8      # lecturas para promediar y detectar el ralenti real 
 # --- Motor: Nissan Vanette (parametros identicos a config.h) ---
 ENGINE_DISPLACEMENT_L = 1.626  # litros, real de fabrica (Tabla 4.4, 1626 mL) -- antes 1.6 por error
 
-# --- Tabla VE: identica a kVeTable en fuel_calc.cpp -- 940/1500/2500/3500
-# calibrados con calibrate_ve_table.py contra el MAF real del Vanette;
-# 4000/5500/7000 siguen sin calibrar (genericos, sin datos de prueba) ---
+# Tabla VE identica a kVeTable en fuel_calc.cpp. 940-3500 calibrados con
+# calibrate_ve_table.py; 4000/5500/7000 siguen sin calibrar (genericos).
 VE_TABLE = [
     (940,  82.7),
     (1500, 79.7),
@@ -137,9 +117,8 @@ def read_rpm(ser):
 
 
 def detect_idle_rpm(ser):
-    """Mide el ralenti real del motor en vez de asumir un numero fijo (800
-    rpm): el governor de ralenti tiene su propio piso segun el motor, y
-    forzar un valor por debajo de ese piso nunca se puede sostener."""
+    """Mide el ralenti real en vez de asumir 800 rpm fijo (el piso del
+    governor varia segun el motor)."""
     print(f"\nDeja el motor en ralenti (sin acelerar). Midiendo {IDLE_SAMPLE_COUNT} muestras...")
     readings = []
     while len(readings) < IDLE_SAMPLE_COUNT:
@@ -271,11 +250,8 @@ def plot_results(results):
     est_vals = [results[t][0] for t in targets]
     ref_vals = [results[t][1] for t in targets]
 
-    # Paleta categorica validada (dataviz skill, references/palette.md):
-    # slot 1 azul y slot 2 naranja, par adyacente que pasa los umbrales
-    # CVD/contraste en modo claro (impreso en la tesis).
-    color_est = "#2a78d6"   # slot 1 -- azul: Estimado (Speed-Density)
-    color_ref = "#eb6834"   # slot 2 -- naranja: Referencia (MAF real, PID 0x10)
+    color_est = "#2a78d6"   # azul: Estimado (Speed-Density)
+    color_ref = "#eb6834"   # naranja: Referencia (MAF real, PID 0x10)
     color_grid = "#e1e0d9"
     color_ink = "#0b0b0b"
     color_muted = "#52514e"

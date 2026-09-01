@@ -1,48 +1,35 @@
 #!/usr/bin/env python3
 """
-Validador de los CSV de registro en MicroSD -- SOLO para llenar la Tabla
-4.x de la seccion 4.3.6 del Capitulo 4 ("Pruebas de registro de datos en
-MicroSD").
+Validador de los CSV de registro en MicroSD -- Tabla 4.x de la Seccion
+4.3.6 (pruebas de registro en MicroSD).
 
-Que verifica, por cada archivo trip_NNN.csv (Sección~3.1 de este mismo
-capítulo describe el formato, columnas idénticas a sd_logger.cpp):
-    1. Que el encabezado sea exactamente el esperado (18 columnas).
-    2. Lineas corruptas o incompletas: numero de columnas incorrecto, o
-       algun campo que no se puede interpretar como numero.
-    3. Huecos en el muestreo: saltos en uptime_ms mayores a la tolerancia
-       (por defecto 2.5x el intervalo nominal de 1000 ms configurado en
-       SD_LOG_INTERVAL_MS), que delatan una escritura perdida o un reinicio.
-    4. Duracion cubierta, filas validas, tasa de muestreo real (Hz) y
-       tamaño de archivo, extrapolado a tamaño por hora de registro.
+Por cada trip_NNN.csv (columnas identicas a sd_logger.cpp) verifica:
+    1. Encabezado esperado (18 columnas).
+    2. Lineas corruptas/incompletas (columnas de mas/menos, campos no
+       numericos).
+    3. Huecos de muestreo: saltos en uptime_ms mayores a la tolerancia
+       (2.5x el intervalo nominal SD_LOG_INTERVAL_MS).
+    4. Duracion, filas validas, tasa de muestreo (Hz) y tamaño
+       extrapolado por hora.
 
-Como usarlo para la prueba de corte abrupto de alimentacion: iniciar una
-sesion de registro, dejar correr unos minutos y desconectar la
-alimentacion del sistema de forma abrupta (simulando apagar el vehiculo),
-luego reconectar y correr este script sobre el archivo resultante. Un
-archivo integro debe tener como maximo la ultima linea incompleta (el
-propio sd_logger.cpp llama flush() tras cada fila, así que en el peor
-caso se pierde la fila que estaba a medio escribir, no el archivo
-completo); cualquier corrupcion mas alla de eso indica un problema del
-sistema de archivos, no solo de la ultima escritura.
+Para la prueba de corte abrupto: iniciar el registro, desconectar la
+alimentacion de golpe a los pocos minutos, reconectar y correr este
+script sobre el archivo resultante. Como sd_logger.cpp hace flush() por
+fila, en el peor caso se pierde solo la ultima fila a medio escribir.
 
 Uso:
     python validate_sd_log.py trip_001.csv [trip_002.csv ...]
     python validate_sd_log.py logs/*.csv
 
-Cada archivo analizado se anexa a sd_log_report.csv, lista para copiar a
-la Tabla 4.x del Capítulo 4. No requiere ninguna conexión al vehículo ni
-al ELM327 -- se corre sobre los CSV ya descargados (panel web
-/api/download o copiados directamente de la tarjeta).
+Cada archivo se anexa a sd_log_report.csv, lista para copiar a la Tabla
+4.x. No requiere conexion al vehiculo ni al ELM327.
 """
 import csv
 import glob
 import os
 import sys
 
-# Encabezado actual (sd_logger.cpp con baro_kpa/baro_is_estimated) y el
-# formato anterior a esa columna, por si el CSV se grabó con un firmware
-# más viejo. Cualquier otro encabezado se acepta igual, pero se marca
-# como "desconocido" para que quede visible en el reporte.
+# encabezado actual y el formato anterior (sin baro); otros quedan como "desconocido"
 KNOWN_HEADERS = {
     "actual (18 col, con baro)": [
         "uptime_ms", "rpm", "speed_kmh", "map_kpa", "iat_c", "coolant_c",

@@ -1,27 +1,16 @@
 #!/usr/bin/env python3
 """
-Grafica de barras horizontales para la Figura 5.2 del Capitulo 5
-("Comparacion de costo inicial entre el sistema propuesto y
-alternativas comerciales"), a partir de la fila "Costo inicial" de la
-Tabla 5.10 (tab:comparacion_comercial) del propio capitulo.
+Barras horizontales para la Figura 5.2 (Cap. 5): costo inicial del
+sistema propuesto vs. alternativas comerciales, con la fila "Costo
+inicial" de la Tabla 5.10.
 
-El unico dato de costo inicial (pago unico) disponible para telemetria
-de flota comercial es el de FuelForce (USD 5000, fuente citada en la
-Nota de la Tabla 5.10); el resto de proveedores revisados (Fleetio,
-Geotab, Motive, Samsara) cobra por suscripcion mensual con hardware
-aparte, sin publicar ese monto -- por eso NO se promedia ni se inventa
-un "costo inicial tipico" de la categoria, se grafica el unico dato
-real disponible y se anota su origen para que no se lea como
-representativo de todo el rubro.
+Solo FuelForce publica un costo inicial de pago unico (USD 5000); el
+resto de proveedores revisados cobra suscripcion mensual sin publicar
+ese monto, asi que se grafica solo el dato real disponible.
 
-La escala es logaritmica en el eje X porque el rango de valores abarca
-casi tres ordenes de magnitud (85 a 58 000 Bs); en escala lineal las
-dos primeras barras serian invisibles. Cada barra lleva su valor
-exacto como etiqueta directa para que la distorsion de longitud propia
-de la escala log no induzca a error de lectura.
-
-Si cambian los montos de la Tabla 5.10, actualizar el diccionario
-ALTERNATIVAS de este script antes de volver a correrlo.
+Escala logaritmica en X (rango de 85 a 58 000 Bs) con el valor exacto
+como etiqueta en cada barra. Si cambian los montos de la Tabla 5.10,
+actualizar ALTERNATIVAS.
 
 Uso:
     python comparacion_comercial_bar.py

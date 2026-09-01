@@ -1,45 +1,27 @@
 #!/usr/bin/env python3
 """
-Calibracion de la tabla de eficiencia volumetrica (VE) del modelo
-Speed-Density -- SOLO para la Seccion 4.3.3 del Capitulo 4, subseccion
-"Calibracion del modelo Speed-Density".
+Calibracion de la tabla VE (eficiencia volumetrica) del modelo
+Speed-Density para el Nissan Vanette (Seccion 4.3.3).
 
-Por que existe este script: al correr speed_density_bench.py (RPM-step
-estatico en el Nissan Vanette) se encontro un error grande y con signo
-variable frente al MAF real (PID 0x10): -23,7% en ralenti, -9,8% en 1500
-rpm, +4,7% en 2500 rpm, +18,7% en 3500 rpm. La tabla kVeTable de
-fuel_calc.cpp es un valor generico de partida (asi lo dice su propio
-comentario), no calibrado a este motor -- y ademas se detecto que
-ENGINE_DISPLACEMENT_L estaba en 1.6 L cuando la cilindrada real del
-Vanette es 1.626 L (Tabla 4.4). Este script corrige ambas cosas: invierte
-la formula de fuel_calc.cpp para despejar, por cada muestra real, la VE
-que hace que el estimado coincida exactamente con la referencia, y
-promedia esa VE por punto de regimen:
+La kVeTable generica de fuel_calc.cpp no estaba calibrada a este motor
+(error de -23.7% a +18.7% vs. MAF real, PID 0x10), y ademas
+ENGINE_DISPLACEMENT_L estaba en 1.6 L en vez de la cilindrada real,
+1.626 L (Tabla 4.4). El script invierte la formula de MAF de
+fuel_calc.cpp para despejar la VE real por muestra y la promedia por
+punto de regimen:
 
-    MAF = (VE/100) * RPM * MAP * Vd * 28.97 / (2 * 8.314 * IAT_K * 60)
-    =>  VE_requerida = MAF_ref * 100 * 2 * 8.314 * IAT_K * 60 / (RPM * MAP * Vd * 28.97)
+    VE_requerida = MAF_ref * 100 * 2 * 8.314 * IAT_K * 60 / (RPM * MAP * Vd * 28.97)
 
 Uso:
     python calibrate_ve_table.py [ruta_al_csv]
 
-Sin argumento, busca speed_density_log.csv en el directorio actual.
-Imprime, por punto de regimen (ralenti, 1500, 2500, 3500 rpm):
-    - la VE que exigia la tabla vieja (generica) en ese punto
-    - la VE real requerida, medida contra el MAF de referencia
-    - el fragmento de kVeTable ya calibrado, listo para copiar a
-      fuel_calc.cpp y a speed_density_bench.py
-    - una segunda pasada de validacion: recalcula el MAF estimado de cada
-      muestra usando la tabla YA calibrada y reporta el error residual.
+Sin argumento usa speed_density_log.csv del directorio actual. Imprime
+la VE vieja vs. requerida por punto, la kVeTable calibrada lista para
+pegar en fuel_calc.cpp, y el error residual de validacion (ojo: usa el
+mismo dataset de la calibracion, asi que ~0% ahi no implica
+generalizacion a otras condiciones).
 
-Advertencia metodologica importante: esta validacion usa el MISMO
-dataset con el que se calibro, asi que un error residual cercano a 0% en
-los 4 puntos calibrados es esperable por construccion (no es evidencia
-de que el modelo generalice a otras condiciones) -- confirma que la
-inversion algebraica se aplico bien, no reemplaza una validacion
-independiente con datos nuevos, que quedo pendiente por no poder volver
-a usar el vehiculo.
-
-Requisitos: solo la libreria estandar (csv).
+Requisitos: solo libreria estandar (csv).
 """
 import csv
 import sys
@@ -133,9 +115,7 @@ def main():
               f"VE_vieja={ve_old:5.1f}%  VE_requerida={ve_required[t]:5.1f}%")
 
     # --- Paso 2: construir la tabla calibrada ---
-    # Se reemplazan/insertan solo los puntos con datos reales; los
-    # extremos sin medir (4000, 5500, 7000) se dejan igual que antes,
-    # marcados como no calibrados -- no se inventan valores para ellos.
+    # Puntos medidos con VE nueva; los extremos sin medir se dejan igual.
     new_table = []
     for t in targets:
         new_table.append((t, round(ve_required[t], 1)))

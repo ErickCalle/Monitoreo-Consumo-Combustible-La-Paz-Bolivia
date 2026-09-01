@@ -1,54 +1,26 @@
 #!/usr/bin/env python3
 """
-Calculadora GENERAL de la curva de eficiencia volumetrica (VE) del modelo
-Speed-Density -- funciona para cualquier vehiculo, no solo el Nissan
-Vanette de este proyecto. Documentado en el Capitulo 3, Diseno de
-software, subseccion "Calculo general de la eficiencia volumetrica"
-(Seccion~sec:ve-general).
+Calculadora general de la curva de eficiencia volumetrica (VE) para el
+modelo Speed-Density -- sirve para cualquier vehiculo, no solo el
+Vanette (Capitulo 3, "Calculo general de la eficiencia volumetrica").
 
-QUE HACE Y QUE NO HACE (leer antes de usar):
-    No existe una formula fisica universal que prediga la VE de un motor
-    a partir de datos de catalogo (cilindrada, potencia, etc.) -- depende
-    de geometria de valvulas, arbol de levas, resonancia del multiple de
-    admision/escape y otros parametros de diseno mecanico que ningun PID
-    OBD-II expone. Por eso la VE siempre se obtiene de forma empirica
-    (ver Seccion "Incertidumbre de eta_v" del Capitulo 3).
-
-    Lo que SI es general -- y es lo que hace este script -- es el
-    ALGORITMO para calcularla a partir de datos reales de CUALQUIER
-    motor: dado un registro de RPM/MAP/IAT y una referencia real de
-    flujo de aire (MAF, PID 0x10), se invierte algebraicamente la misma
-    ecuacion de fuel_calc.cpp para despejar la VE que hace coincidir el
-    modelo con la referencia, muestra por muestra. El codigo no sabe
-    nada de un vehiculo en particular: solo necesita su cilindrada (Vd)
-    y un CSV con esas 4 columnas.
-
-CRITERIO DEL PROGRAMA (generaliza calibrate_ve_table.py, que solo
-aceptaba 4 puntos de RPM fijos):
-    1. En vez de exigir puntos de RPM fijos, agrupa TODAS las muestras
-       del CSV en bins de ancho configurable (por defecto 250 rpm,
-       igual que el Algoritmo de identificacion de la curva eta_v(N)
-       del Capitulo 3) que cubren cualquier rango presente en los datos.
-    2. Promedia la VE requerida dentro de cada bin (rechazo de ruido).
-    3. Los bins con menos de N_MIN_SAMPLES_PER_BIN muestras se marcan
-       como de baja confianza y se EXCLUYEN del ajuste -- no se rellenan
-       con un valor inventado, siguiendo el mismo criterio de no
-       fabricar datos usado en el resto de este proyecto.
-    4. Ajusta un polinomio cubico eta_v(N) = c0 + c1*N + c2*N^2 + c3*N^3
-       a los bins de confianza, ponderado por el numero de muestras de
-       cada uno -- la misma forma parametrica de la Ecuacion (eq:etav-cubica)
-       del Capitulo 3, pero identificada aqui de forma directa a partir
-       del MAF real (no del STFT/LTFT indirecto que usa el algoritmo
-       en linea propuesto en el lazo cerrado, todavia sin implementar).
+La VE no se puede predecir con una formula universal a partir de datos
+de catalogo, siempre se obtiene de forma empirica. Este script
+generaliza a calibrate_ve_table.py (que solo aceptaba 4 puntos fijos):
+agrupa las muestras del CSV en bins de RPM configurables, promedia la
+VE requerida por bin (invirtiendo la ecuacion de fuel_calc.cpp),
+excluye los bins con pocas muestras en vez de inventar datos, y ajusta
+un polinomio cubico eta_v(N) = c0 + c1*N + c2*N^2 + c3*N^3 ponderado
+por numero de muestras.
 
 Uso:
     python ve_curve_calibrator.py <csv> <cilindrada_L> [--bin-width 250]
                                    [--min-samples 5] [--vehiculo "Nombre"]
 
     <csv> debe tener las columnas: rpm, map_kpa, iat_c, maf_referencia_gs
-    (el mismo formato que genera speed_density_bench.py).
+    (mismo formato que genera speed_density_bench.py).
 
-Ejemplo (Nissan Vanette, Vd=1.626 L, Tabla 4.4):
+Ejemplo (Nissan Vanette, Vd=1.626 L):
     python ve_curve_calibrator.py speed_density_log.csv 1.626
 
 Requisitos:

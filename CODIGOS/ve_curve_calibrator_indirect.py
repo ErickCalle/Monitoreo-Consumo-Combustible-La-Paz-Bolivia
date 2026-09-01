@@ -1,53 +1,23 @@
 #!/usr/bin/env python3
 """
-Refinamiento INDIRECTO de la curva de eficiencia volumetrica (VE) para
-vehiculos SIN PID 0x10 (MAF) -- caso del Changan Honor. Documentado en
-el Capitulo 3, Diseno de software, subseccion "Caso sin MAF: el Changan
-Honor" (dentro de la Seccion "Calculo general de la eficiencia
-volumetrica").
+Refinamiento INDIRECTO de la curva VE para vehiculos sin PID 0x10 (MAF)
+-- caso del Changan Honor (Capitulo 3, "Caso sin MAF").
 
-DIFERENCIA DE FONDO con ve_curve_calibrator.py (que SI requiere MAF):
-    Aquel invierte la ecuacion de speed-density y despeja la VE de forma
-    DIRECTA y ABSOLUTA a partir de un flujo de aire real (PID 0x10) --
-    no necesita saber nada de antemano sobre la VE del motor.
+A diferencia de ve_curve_calibrator.py, que despeja la VE de forma
+directa a partir del MAF real, aqui no hay referencia real de aire. En
+su lugar se usa el ajuste de mezcla que ya reporta la ECU -- STFT
+(0x06) y LTFT (0x07) -- como señal indirecta: si el motor esta
+sumando combustible de forma sostenida en cierto regimen, el modelo
+esta subestimando el aire ahi, y viceversa:
 
-    Este script NO tiene ninguna referencia real de flujo de aire para
-    el Changan (no soporta 0x10). En su lugar usa el ajuste de mezcla
-    que la propia ECU ya reporta -- STFT (PID 0x06) y LTFT (PID 0x07),
-    confirmados soportados en el Changan segun Apendice O /
-    DATASHEET/CHANGAN.pdf -- como señal INDIRECTA y RELATIVA de que la
-    VE asumida esta mal: si el ECU esta añadiendo combustible de forma
-    sostenida en cierto regimen (STFT+LTFT > 0), es porque el modelo
-    (con la VE que se le dio) esta subestimando el aire admitido ahi, y
-    viceversa. Es la misma logica del Algoritmo de identificacion de la
-    curva eta_v(N) del lazo cerrado (Capitulo 3, alg:etav), aplicada
-    aqui de forma offline en vez de en linea dentro del firmware:
+    eta_v_estimada(N) = eta_v_semilla(N) * (1 + (STFT% + LTFT%) / 100)
 
-        eta_v_estimada(N) = eta_v_semilla(N) * (1 + (STFT% + LTFT%) / 100)
-
-    Esta corriente algebraica NO involucra la cilindrada, el MAP ni el
-    IAT -- es un ajuste multiplicativo relativo, no una inversion de la
-    ecuacion de gas ideal. Por eso este script no pide Vd como
-    parametro.
-
-ADVERTENCIA EPISTEMOLOGICA (leer antes de usar los resultados):
-    Este metodo NO calibra la VE del Changan desde cero -- la CORRIGE a
-    partir de una curva semilla asumida (por defecto, la misma curva
-    generica de literatura con la que arranco este proyecto antes de
-    calibrar la del Vanette). Si la curva semilla esta muy alejada de la
-    realidad de este motor en particular, la correccion multiplicativa
-    tambien lo estara: no hay forma de saber, sin una referencia real de
-    aire o combustible, si el resultado final es correcto en terminos
-    absolutos -- solo que es *mas consistente* con los STFT/LTFT
-    observados que la curva semilla de partida. A diferencia de la curva
-    del Vanette (Figura ve_curve_fit_vanette.png), esta NO debe
-    reportarse como "calibrada" sino como "refinada a partir de una
-    curva semilla generica".
-
-    Ademas, solo se aceptan muestras con el motor en lazo cerrado
-    (lambda comandado, PID 0x44, cercano a 1) -- fuera de esa condicion
-    el ECU esta enriqueciendo deliberadamente y el STFT/LTFT no reflejan
-    un error de VE, sino una estrategia distinta de la ECU.
+Ojo: esto CORRIGE una curva semilla asumida, no calibra desde cero. Si
+la semilla esta lejos de la realidad del motor, la correccion tambien
+lo estara -- el resultado es "mas consistente" con los STFT/LTFT
+observados, no necesariamente correcto en terminos absolutos, por eso
+se reporta como "refinada" y no "calibrada". Solo se aceptan muestras
+en lazo cerrado (lambda_cmd cercano a 1, PID 0x44).
 
 Uso:
     python ve_curve_calibrator_indirect.py <csv> [--bin-width 250]
@@ -64,9 +34,7 @@ Requisitos:
 import argparse
 import csv
 
-# Curva semilla generica (misma tabla de literatura con la que arranco
-# el proyecto, antes de calibrar la del Vanette con datos reales) --
-# punto de partida documentado, no un dato de este motor en particular.
+# curva semilla generica (misma tabla de literatura con la que arranco el proyecto)
 SEED_VE_TABLE = [
     (700,  60.0),
     (1500, 74.0),

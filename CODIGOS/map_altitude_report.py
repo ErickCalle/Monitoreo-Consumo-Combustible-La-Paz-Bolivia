@@ -1,28 +1,24 @@
 #!/usr/bin/env python3
 """
-Reporte de validacion del sensor MAP frente a la altitud -- SOLO para
-llenar la Tabla 4.x de la seccion 4.3.4 del Capitulo 4.
+Reporte de validacion del sensor MAP frente a la altitud, para la
+Tabla 4.x (Seccion 4.3.4).
 
-Que mide: con el contacto puesto y el motor APAGADO (key-on, engine-off,
-sin vacio de admision), el MAP del vehiculo deberia leer aproximadamente
-lo mismo que la presion barometrica real, porque en ese estado no hay
-vacio que lo separe de la presion atmosferica. Comparar ambas confirma
-si el sensor MAP del vehiculo esta bien calibrado para operar a los
-~3600 msnm de La Paz (ver README del firmware y Seccion 4.3.4).
+Con el contacto puesto y el motor APAGADO (KOEO, sin vacio de admision)
+el MAP deberia leer aproximadamente la presion barometrica real.
+Comparar ambas confirma si el sensor esta bien calibrado a los ~3600
+msnm de La Paz.
 
-Fuente de la presion barometrica de referencia:
-    1. PID 0x33 (presion barometrica), si el vehiculo lo soporta.
-    2. Si no lo soporta ("NO DATA"), se usa el modelo ISA evaluado en
-       SITE_ALTITUDE_M (idéntica formula a isaPressureKpaAt() en
-       can_obd2.cpp), igual que hace el firmware real como respaldo.
+Presion de referencia: PID 0x33 si el vehiculo lo soporta; si no, el
+modelo ISA en SITE_ALTITUDE_M (misma formula que isaPressureKpaAt() en
+can_obd2.cpp).
 
 Uso:
     1. Contacto puesto, motor APAGADO (no arrancar el vehiculo).
     2. Cambiar PORT y VEHICULO abajo.
     3. Ejecutar: python map_altitude_report.py
     4. Repetir para el segundo vehiculo cambiando VEHICULO.
-    El script anexa cada corrida a map_altitude_report.csv y al final
-    imprime la fila lista para copiar a la Tabla 4.x del Capitulo 4.
+    Anexa cada corrida a map_altitude_report.csv y al final imprime la
+    fila lista para copiar a la Tabla 4.x.
 
 Requisitos:
     pip install pyserial

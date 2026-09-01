@@ -151,9 +151,73 @@ El conjunto de herramientas de desarrollo empleado (Visual Studio Code, la exten
 
 \section{Costos de fabricación y ensamblaje}
 
-\subsection{Costos de manufactura de PCB (JLCPCB)}
+\subsection{Costos de la placa preliminar (Robokit)}
+\label{sec:costo_pcb_preliminar}
 
-La fabricación se cotiza sobre el lote mínimo estándar de JLCPCB para placas de dos capas (Tabla~\ref{jlcpcb}, Capítulo~3), habitualmente de 5 unidades, que es también el tamaño de lote recomendado para tener margen ante fallas de soldadura o defectos de una unidad individual durante las pruebas iniciales.
+La placa preliminar en EasyEDA descrita en la Sección~\ref{sec:placa_preliminar} (Capítulo~4) es, hasta el momento, la única placa de este proyecto efectivamente fabricada y ensamblada; por eso es la que se usa como \textbf{costo real del prototipo} en el presupuesto consolidado de este capítulo (Tabla~\ref{tab:presupuesto_total}). Se encargó localmente a Robokit (La Paz), lo que evita el envío internacional y la aduana que sí aplican a una fabricación en JLCPCB (Subsección~\ref{sec:costo_pcb_final}).
+
+\begin{table}[H]
+	\centering
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption{Costo de fabricación de la placa preliminar en Robokit}
+	\label{tab:costo_pcb_preliminar}
+	\begin{tabularx}{\textwidth}{X >{\centering\arraybackslash}p{2cm} >{\centering\arraybackslash}p{2.6cm}}
+		\toprule
+		\rowcolor[rgb]{0.851, 0.851, 0.851}
+		Concepto & Cantidad & Subtotal (Bs) \\
+		\midrule
+		Fabricación de PCB (Robokit, La Paz) & 1 & 150,00 \\
+		Ensamblaje (soldadura manual, propia) & --- & 0,00 \\
+		\midrule
+		\textbf{Total} & --- & \textbf{150,00} \\
+		\bottomrule
+	\end{tabularx}
+	\vspace{2mm}
+	\\
+	\begin{minipage}{\linewidth}
+		\small
+		\textit{Nota.} Cotización y fabricación locales (La Paz), sin envío internacional ni aduana. El ensamblaje fue realizado por el propio autor, por lo que no tiene costo monetario adicional, consistente con el criterio ya aplicado en la Tabla~\ref{tab:costo_horas} (tarifa de horas propias en 0\,Bs/h).
+	\end{minipage}
+\end{table}
+
+La lista de materiales real de esta placa (16 referencias, exportada desde EasyEDA) muestra que su etapa de alimentación es una regulación lineal simple (7805 + transistor de paso TIP42C) y no la conversión conmutada de dos rieles de la Tabla~\ref{tab:costo_alimentacion} —esa etapa es específica de la placa final—; el módulo ESP32-S3, el transceptor CAN, la pantalla OLED y la tarjeta microSD son los mismos ya presupuestados en las Tablas~\ref{tab:costo_procesamiento}, \ref{tab:costo_can} y~\ref{tab:costo_perifericos}, reutilizados desde la etapa de protoboard y conectados a esta placa mediante los conectores de la Tabla~\ref{tab:costo_placa_preliminar_bom} en vez de cableado suelto. Los indicadores LED y sus resistencias limitadoras también coinciden con los ya contabilizados en la Tabla~\ref{tab:costo_perifericos}, por lo que no se repiten aquí.
+
+\begin{table}[H]
+	\centering
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption{Componentes adicionales de la placa preliminar (etapa de alimentación y conectores)}
+	\label{tab:costo_placa_preliminar_bom}
+	\begin{tabularx}{\textwidth}{X >{\centering\arraybackslash}p{1.6cm} >{\centering\arraybackslash}p{2.2cm} >{\centering\arraybackslash}p{2.2cm} >{\centering\arraybackslash}p{2.2cm}}
+		\toprule
+		\rowcolor[rgb]{0.851, 0.851, 0.851}
+		Componente & Cant. & Precio unit. (USD) & Precio unit. (Bs) & Subtotal (Bs) \\
+		\midrule
+		Regulador lineal 7805 (TO-252) & 1 & 0,0979 & 1,14 & 1,14 \\
+		Transistor de paso TIP42C (TO-220) & 1 & 0,1777 & 2,06 & 2,06 \\
+		Capacitor electrolítico 220\,\textmu F & 1 & 0,1400 & 1,62 & 1,62 \\
+		Capacitor electrolítico 22\,\textmu F & 1 & 0,1200 & 1,39 & 1,39 \\
+		Capacitor cerámico 100\,nF & 2 & 0,0200 & 0,23 & 0,46 \\
+		Resistor THT 47\,$\Omega$ 1\,W & 1 & 0,0112 & 0,13 & 0,13 \\
+		Conector de entrada de alimentación, 4~pines (WJ301V-5.0) & 1 & 0,1700 & 1,97 & 1,97 \\
+		Header 4~pines (pantalla OLED) & 1 & 0,0198 & 0,23 & 0,23 \\
+		Header 6~pines (transceptor SN65HVD230) & 1 & 0,0298 & 0,35 & 0,35 \\
+		Header 8~pines (módulo microSD) & 1 & 0,0400 & 0,46 & 0,46 \\
+		\midrule
+		\textbf{Total} & --- & --- & --- & \textbf{9,81} \\
+		\bottomrule
+	\end{tabularx}
+	\vspace{2mm}
+	\\
+	\begin{minipage}{\linewidth}
+		\small
+		\textit{Nota.} Precios de referencia LCSC para las referencias de fabricante exportadas desde EasyEDA (por ejemplo, \texttt{KS104M050C07RR0VH2FP0} para el capacitor de 100\,nF), convertidos a bolivianos al tipo de cambio de este capítulo (11,60\,Bs/USD); las referencias sin coincidencia exacta en el catálogo (capacitor de 22\,\textmu F, header de 8 pines y conector de 4 pines) se estiman por interpolación directa a partir de variantes de la misma familia con precio confirmado (por ejemplo, el conector WJ301V-5.0 sí tiene precio publicado en sus variantes de 2 y 3 pines), no por un valor arbitrario.
+	\end{minipage}
+\end{table}
+
+\subsection{Costos de manufactura de la placa final (JLCPCB)}
+\label{sec:costo_pcb_final}
+
+A diferencia de la placa preliminar, la placa final documentada en el Capítulo~3 (diseñada en Altium Designer) todavía no se ha mandado a fabricar; esta subsección presenta su cotización de referencia, relevante si el proyecto avanza hacia esa versión más profesional o hacia una serie piloto para varios vehículos de transporte público. Se cotiza sobre el lote mínimo estándar de JLCPCB para placas de dos capas (Tabla~\ref{jlcpcb}, Capítulo~3), habitualmente de 5 unidades, que es también el tamaño de lote recomendado para tener margen ante fallas de soldadura o defectos de una unidad individual durante las pruebas iniciales.
 
 \begin{table}[H]
 	\centering
@@ -178,9 +242,9 @@ La fabricación se cotiza sobre el lote mínimo estándar de JLCPCB para placas 
 	\end{minipage}
 \end{table}
 
-\subsection{Costos de ensamblaje SMD}
+\subsection{Costos de ensamblaje SMD de la placa final}
 
-El ensamblaje de los componentes de montaje superficial puede resolverse por dos vías con una disyuntiva clara de costo contra riesgo: el servicio de ensamblaje (PCBA) del propio fabricante, o el soldado manual con estación de aire caliente/soldadora de precisión.
+Para la placa final, el ensamblaje de los componentes de montaje superficial puede resolverse por dos vías con una disyuntiva clara de costo contra riesgo: el servicio de ensamblaje (PCBA) del propio fabricante, o el soldado manual con estación de aire caliente/soldadora de precisión. La placa preliminar (Sección~\ref{sec:costo_pcb_preliminar}), en cambio, ya se ensambló manualmente por el propio autor, sin necesidad de esta disyuntiva.
 
 \begin{table}[H]
 	\centering
@@ -202,7 +266,7 @@ El ensamblaje de los componentes de montaje superficial puede resolverse por dos
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} Elaboración propia. La vía efectivamente utilizada para este prototipo es el ensamblaje PCBA de JLCPCB (columna izquierda); la columna de soldadura manual se mantiene como referencia de la alternativa considerada.
+		\textit{Nota.} Elaboración propia. Comparación de referencia para cuando se mande a fabricar la placa final; la vía efectivamente utilizada para la placa preliminar ya construida (Tabla~\ref{tab:costo_pcb_preliminar}) fue la soldadura manual (columna derecha), con el mismo criterio de costo cero de mano de obra propia que el resto del capítulo.
 	\end{minipage}
 \end{table}
 
@@ -236,7 +300,7 @@ El ensamblaje de los componentes de montaje superficial puede resolverse por dos
 
 \section{Presupuesto total del proyecto}
 
-La Tabla~\ref{tab:presupuesto_total} consolida los subtotales de las secciones anteriores. Al tratarse de un prototipo único, el presupuesto se presenta también en su forma de \textit{costo marginal por unidad adicional} (Tabla~\ref{tab:presupuesto_total}, última fila), relevante si el proyecto se extendiera a una pequeña serie de dispositivos para varios vehículos de transporte público, escenario directamente ligado a la motivación planteada en el Capítulo~1.
+La Tabla~\ref{tab:presupuesto_total} consolida los subtotales de las secciones anteriores, usando la placa preliminar de Robokit (Sección~\ref{sec:costo_pcb_preliminar}) como fabricación real del prototipo. El presupuesto se presenta también en su forma de \textit{costo marginal por unidad adicional} (Tabla~\ref{tab:presupuesto_total}, última fila), escalando esta vez hacia la placa final en Altium Designer y su fabricación en JLCPCB (Sección~\ref{sec:costo_pcb_final}), relevante si el proyecto avanza hacia esa versión más profesional o hacia una pequeña serie de dispositivos para varios vehículos de transporte público, escenario directamente ligado a la motivación planteada en el Capítulo~1.
 
 \begin{table}[H]
 	\centering
@@ -248,21 +312,21 @@ La Tabla~\ref{tab:presupuesto_total} consolida los subtotales de las secciones a
 		\rowcolor[rgb]{0.851, 0.851, 0.851}
 		Categoría & Subtotal (Bs) & \%~del total \\
 		\midrule
-		Componentes electrónicos (Tablas~\ref{tab:costo_procesamiento}--\ref{tab:costo_perifericos}) & 386,66 & 14,70\,\% \\
+		Componentes electrónicos (Tablas~\ref{tab:costo_procesamiento}, \ref{tab:costo_can}, \ref{tab:costo_perifericos} y~\ref{tab:costo_placa_preliminar_bom}) & 235,79 & 33,58\,\% \\
 		Desarrollo y software (Tabla~\ref{tab:costo_horas}) & 0,00 & 0,00\,\% \\
-		Fabricación y ensamblaje (Tablas~\ref{tab:costo_pcb}--\ref{tab:costo_ensamblaje}) & 1\,927,80 & 73,28\,\% \\
-		Pruebas y validación (Tabla~\ref{tab:costo_pruebas}) & 316,32 & 12,02\,\% \\
+		Fabricación y ensamblaje, placa preliminar (Tabla~\ref{tab:costo_pcb_preliminar}) & 150,00 & 21,36\,\% \\
+		Pruebas y validación (Tabla~\ref{tab:costo_pruebas}) & 316,32 & 45,05\,\% \\
 		\midrule
-		\textbf{Total del prototipo} & \textbf{2\,630,78} & \textbf{100\,\%} \\
+		\textbf{Total del prototipo} & \textbf{702,11} & \textbf{100\,\%} \\
 		\midrule
-		Costo marginal estimado por unidad adicional$^{a}$ & 772,22 & --- \\
+		Costo marginal estimado por unidad adicional, placa final$^{a}$ & 772,22 & --- \\
 		\bottomrule
 	\end{tabularx}
 	\vspace{2mm}
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} $^{a}$Excluye las horas de diseño de hardware/firmware (Tabla~\ref{tab:costo_horas}), que son un costo de desarrollo único (\textit{non-recurring engineering}) y no se repiten por unidad adicional fabricada. Incluye componentes (386,66\,Bs) más la fabricación de PCB y el ensamblaje PCBA a prorrata del lote mínimo de 5 unidades (Tablas~\ref{tab:costo_pcb}/\ref{tab:costo_ensamblaje}: $(487{,}20+1\,440{,}60)/5 = 385{,}56$\,Bs), es decir $386{,}66+385{,}56=772{,}22$\,Bs por unidad adicional dentro del mismo lote.
+		\textit{Nota.} $^{a}$A diferencia del total del prototipo (que usa la placa preliminar de Robokit, ya fabricada), esta fila estima el costo de una unidad adicional producida por la vía de la placa final: excluye las horas de diseño de hardware/firmware (Tabla~\ref{tab:costo_horas}), que son un costo de desarrollo único (\textit{non-recurring engineering}) y no se repiten por unidad adicional fabricada. Incluye componentes (386,66\,Bs) más la fabricación de PCB y el ensamblaje PCBA a prorrata del lote mínimo de 5 unidades de JLCPCB (Tablas~\ref{tab:costo_pcb}/\ref{tab:costo_ensamblaje}: $(487{,}20+1\,440{,}60)/5 = 385{,}56$\,Bs), es decir $386{,}66+385{,}56=772{,}22$\,Bs por unidad adicional dentro del mismo lote.
 	\end{minipage}
 \end{table}
 
@@ -304,7 +368,7 @@ El sistema propuesto se contrasta contra dos categorías de alternativas ya menc
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} Elaboración propia. $^{a}$Se usa el costo marginal por unidad adicional (Tabla~\ref{tab:presupuesto_total}) y no el presupuesto total del prototipo (2\,630,78\,Bs), porque este último incluye el lote mínimo completo de PCB/ensamblaje (5 unidades) y los instrumentos de prueba del Capítulo~4 (ELM327, tester, combustible de validación), costos que no se repiten al adquirir o fabricar una unidad adicional y que no tienen equivalente en el costo de compra de las alternativas comerciales. $^{b}$Precios de mercado internacional (no existe cotización pública para el mercado boliviano), tomados de \textit{Fleetio}, ``6 Best Fuel Monitoring Systems: 2025 Comparison Guide'' (\texttt{fleetio.com/blog/fuel-monitoring-systems}, consultado en agosto de 2026): Fleetio USD 4--10/vehículo/mes; Motive desde USD~25/vehículo/mes más costo de dispositivos ELD; Samsara USD 27--33/vehículo/mes (software; hardware facturado aparte); Geotab USD 35--100/vehículo/mes (software; hardware facturado aparte); FuelForce desde USD~5\,000 en modalidad de pago único por funcionalidad, en vez de suscripción. La conversión a bolivianos usa el mismo tipo de cambio de este capítulo (11,60\,Bs/USD).
+		\textit{Nota.} Elaboración propia. $^{a}$Se usa el costo marginal por unidad adicional escalando a la placa final (Tabla~\ref{tab:presupuesto_total}) y no el presupuesto total del prototipo (702,11\,Bs, fabricado con la placa preliminar de Robokit), porque este segundo aún incluye los instrumentos de prueba del Capítulo~4 (ELM327, tester, combustible de validación) —costos de validación, no de una unidad desplegable—, mientras que la cifra de la placa final sí representa lo que costaría producir una unidad adicional a mayor escala, con un acabado más cercano al de un producto terminado y comparable con las alternativas comerciales de esta tabla. $^{b}$Precios de mercado internacional (no existe cotización pública para el mercado boliviano), tomados de \textit{Fleetio}, ``6 Best Fuel Monitoring Systems: 2025 Comparison Guide'' (\texttt{fleetio.com/blog/fuel-monitoring-systems}, consultado en agosto de 2026): Fleetio USD 4--10/vehículo/mes; Motive desde USD~25/vehículo/mes más costo de dispositivos ELD; Samsara USD 27--33/vehículo/mes (software; hardware facturado aparte); Geotab USD 35--100/vehículo/mes (software; hardware facturado aparte); FuelForce desde USD~5\,000 en modalidad de pago único por funcionalidad, en vez de suscripción. La conversión a bolivianos usa el mismo tipo de cambio de este capítulo (11,60\,Bs/USD).
 	\end{minipage}
 \end{table}
 
@@ -347,7 +411,7 @@ donde el ahorro mensual se obtiene de multiplicar la reducción porcentual de co
 		Gasto mensual de combustible (Bs) & 3\,315,74 & 4\,355,57 \\
 		Reducción de consumo atribuible al monitoreo (\%)$^{c}$ & 6,6 & 6,6 \\
 		Ahorro mensual estimado (Bs/mes) & 218,84 & 287,47 \\
-		Periodo de recuperación (meses) & 12,02 & 9,15 \\
+		Periodo de recuperación (meses) & 3,21 & 2,44 \\
 		\bottomrule
 	\end{tabularx}
 	\vspace{2mm}
@@ -365,7 +429,7 @@ donde el ahorro mensual se obtiene de multiplicar la reducción porcentual de co
 	\includegraphics[width=0.85\textwidth]{Images/figura_breakeven.png}
 
 	\vspace{2pt}
-	{\footnotesize\textit{Nota.} Se elige un gráfico de líneas porque ambas magnitudes (costo fijo y ahorro acumulado) son funciones continuas del tiempo, y lo relevante para el lector es identificar visualmente el punto de cruce entre ambas curvas, algo que una tabla de valores puntuales no comunica con la misma inmediatez. Las rectas de ahorro acumulado y los periodos de recuperación (9,15 y 12,02 meses) se derivan de los valores de literatura de la Tabla~\ref{tab:payback} (kilometraje mensual y reducción de consumo atribuible al monitoreo), no de una medición directa; deben leerse como una estimación, no como una garantía de recuperación en ese plazo exacto. Elaboración propia.}
+	{\footnotesize\textit{Nota.} Se elige un gráfico de líneas porque ambas magnitudes (costo fijo y ahorro acumulado) son funciones continuas del tiempo, y lo relevante para el lector es identificar visualmente el punto de cruce entre ambas curvas, algo que una tabla de valores puntuales no comunica con la misma inmediatez. Las rectas de ahorro acumulado y los periodos de recuperación (2,44 y 3,21 meses) se derivan del costo real del prototipo con la placa preliminar (Tabla~\ref{tab:presupuesto_total}) y de los valores de literatura de la Tabla~\ref{tab:payback} (kilometraje mensual y reducción de consumo atribuible al monitoreo); estos últimos no son una medición directa y el resultado debe leerse como una estimación, no como una garantía de recuperación en ese plazo exacto. Elaboración propia.}
 \end{figure}
 
 La viabilidad económica de este proyecto, para cerrar el capítulo, no depende únicamente de recuperar el costo de un prototipo individual: depende de su potencial de escalar a una pequeña serie de unidades para el transporte público de La Paz. En ese escenario, el costo marginal por unidad (Tabla~\ref{tab:presupuesto_total}), ya sin las horas de diseño amortizadas por este primer desarrollo, es la cifra económicamente relevante, y no el presupuesto total del prototipo aquí calculado.

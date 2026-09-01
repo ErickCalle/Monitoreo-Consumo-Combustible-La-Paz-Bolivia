@@ -1,18 +1,12 @@
 #!/usr/bin/env python3
 """
-Grafica de barras agrupadas para la Figura 4.x del Capitulo 4
-("Comparacion grafica del consumo de combustible por trayecto y
-vehiculo"), a partir de los 9 tramos YA CARGADOS a mano en las Tablas
-4.18/4.19 (Nissan Vanette / Changan Honor) del propio capitulo -- no
-hay un CSV fuente para esta figura en particular porque son solo 18
-numeros por vehiculo (9 tramos x 2 metodos), ya validados y
-convertidos (bolivianos -> litros donde aplico) directamente en el
-texto.
+Barras agrupadas para la Figura 4.x (Cap. 4): consumo por tramo y
+vehiculo, con los 9 tramos de las Tablas 4.18/4.19 (Nissan Vanette /
+Changan Honor) cargados a mano -- son solo 18 numeros por vehiculo, ya
+validados en el texto, no vale la pena un CSV aparte.
 
-Si en algun momento cambian los valores de las tablas, actualizar las
-listas VANETTE/CHANGAN de este script antes de volver a correrlo --
-deliberadamente no se leen de un CSV para evitar que este script y el
-texto del capitulo queden con numeros distintos sin que se note.
+Si cambian los valores de las tablas, actualizar VANETTE/CHANGAN aqui
+para que no queden desincronizados con el capitulo.
 
 Uso:
     python comparacion_consumo_plot.py

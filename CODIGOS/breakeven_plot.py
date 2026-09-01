@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
 """
-Grafica de lineas para la Figura 5.3 del Capitulo 5 ("Punto de
-equilibrio (breakeven) entre el costo del dispositivo y el ahorro
-acumulado de combustible"), a partir de la Tabla 5.11 (tab:payback) y
-la Tabla 5.9 (tab:presupuesto_total) del propio capitulo.
+Grafica de la Figura 5.3 (Cap. 5): punto de equilibrio entre el costo
+del prototipo y el ahorro acumulado de combustible, con las tablas 5.9
+y 5.11.
 
-Costo total del prototipo (linea horizontal constante): 2630.78 Bs
-(Tabla 5.9). Ahorro acumulado = ahorro mensual estimado (Tabla 5.11) x
-mes, una recta por vehiculo. El cruce de cada recta con la horizontal
-es el periodo de recuperacion (Ecuacion 5.1 / Tabla 5.11).
-
-Si cambian los montos de la Tabla 5.9/5.11, actualizar las constantes
-de este script antes de volver a correrlo.
+Ahorro acumulado = ahorro mensual (Tabla 5.11) x mes, una recta por
+vehiculo. El cruce con la linea de costo (Tabla 5.9) es el periodo de
+recuperacion. Si cambian los montos de esas tablas, actualizar las
+constantes de abajo.
 
 Uso:
     python breakeven_plot.py
@@ -20,15 +16,15 @@ Requisitos:
     pip install matplotlib
 """
 
-COSTO_PROTOTIPO_BS = 2630.78  # Tabla 5.9
+COSTO_PROTOTIPO_BS = 702.11  # Tabla 5.9 (placa preliminar Robokit)
 
 # (ahorro mensual Bs/mes, periodo de recuperacion meses) -- Tabla 5.11
 VEHICULOS = {
-    "Nissan Vanette": {"ahorro_mensual": 287.47, "payback_meses": 9.15, "color": "#2a78d6"},
-    "Changan Honor":  {"ahorro_mensual": 218.84, "payback_meses": 12.02, "color": "#eb6834"},
+    "Nissan Vanette": {"ahorro_mensual": 287.47, "payback_meses": 2.44, "color": "#2a78d6"},
+    "Changan Honor":  {"ahorro_mensual": 218.84, "payback_meses": 3.21, "color": "#eb6834"},
 }
 
-MESES_MAX = 16
+MESES_MAX = 5
 
 
 def fmt_bs(value):

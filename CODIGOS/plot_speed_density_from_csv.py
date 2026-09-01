@@ -53,9 +53,7 @@ def summarize(groups):
 
 
 def label_for(t, ordered_targets):
-    # El punto mas bajo es el ralenti real medido por el script (no un
-    # numero redondo fijo), asi que se etiqueta como tal en vez de solo
-    # como "rpm".
+    # el punto mas bajo es el ralenti real medido, no un numero fijo
     if t == ordered_targets[0] and t < 1200:
         return f"Ralentí ({t} rpm)"
     return f"{t} rpm"
@@ -95,9 +93,7 @@ def main():
     est_vals = [results[t][0] for t in ordered_targets]
     ref_vals = [results[t][1] for t in ordered_targets]
 
-    # Misma paleta categorica validada (dataviz skill, references/palette.md)
-    # usada en speed_density_bench.py: azul/naranja, par adyacente que pasa
-    # los umbrales CVD/contraste en modo claro (impreso en la tesis).
+    # misma paleta que speed_density_bench.py (azul/naranja)
     color_est = "#2a78d6"
     color_ref = "#eb6834"
     color_grid = "#e1e0d9"

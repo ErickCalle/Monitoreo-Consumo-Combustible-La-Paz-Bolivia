@@ -1,23 +1,14 @@
 #!/usr/bin/env python3
 """
-Impacto de la curva VE en el consumo estimado -- SOLO para la Seccion
-4.4.5 del Capitulo 4 ("Comparacion de consumo estimado vs. consumo
-real"), a partir de un registro real (speed_density_drive_log.csv,
-Nissan Vanette).
+Impacto de la curva VE en el consumo estimado -- Seccion 4.4.5
+(consumo estimado vs. real), a partir de un registro real
+(speed_density_drive_log.csv, Nissan Vanette).
 
-Que muestra: la Figura 3.x del Capitulo 3 (ve_curve_fit_vanette.png) ya
-grafica la curva VE(N) calibrada, pero una desviacion de VE en g/s de
-aire no dice directamente cuantos litros de mas o de menos representa.
-Este script conecta ambas cosas: para cada muestra real convierte tanto
-el MAF estimado (via la tabla VE) como el MAF de referencia (PID 0x10)
-a consumo instantaneo en L/100km -- misma formula que
-speed_density_drive_log.py --, agrupa por bin de RPM, y grafica en dos
-paneles verticales que comparten el eje de RPM:
-    (arriba)  la curva VE(N) calibrada
-    (abajo)   el error de consumo promedio (L/100km) en ese mismo bin de RPM,
-              con barras por signo: subestima (azul) / sobrestima (naranja)
-para que se pueda leer directamente "en este rango de RPM, la VE calibrada
-hace que el consumo estimado se desvie tanto".
+Conecta la curva VE(N) calibrada (Figura 3.x) con su efecto en litros:
+convierte el MAF estimado y el de referencia a L/100km por muestra,
+agrupa por bin de RPM, y grafica dos paneles que comparten el eje de
+RPM: la curva VE(N) arriba, y el error de consumo promedio por bin
+abajo (subestima en azul, sobrestima en naranja).
 
 Uso:
     python ve_consumo_impacto.py speed_density_drive_log.csv
@@ -136,7 +127,7 @@ def plot(bins):
         return
 
     color_ve = "#2a78d6"
-    color_under = "#2a78d6"   # subestima (azul) -- mismo par diverging usado en el resto del documento
+    color_under = "#2a78d6"   # subestima (azul)
     color_over = "#eb6834"    # sobrestima (naranja)
     color_grid = "#e1e0d9"
     color_ink = "#0b0b0b"

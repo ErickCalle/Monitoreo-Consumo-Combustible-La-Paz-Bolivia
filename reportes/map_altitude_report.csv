@@ -1,0 +1,3 @@
+vehiculo,map_koeo_kpa,baro_kpa,diferencia_pct,fuente_baro,n_muestras
+Changan Honor,63.0,63.0,+0.0,PID 0x33 real,10
+Nissan Vanette,63.0,64.6,-2.5,ISA estimado,10

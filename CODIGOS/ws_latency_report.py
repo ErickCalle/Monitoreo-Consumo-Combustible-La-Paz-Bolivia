@@ -1,30 +1,17 @@
 #!/usr/bin/env python3
 """
-Analisis de la latencia/estabilidad del panel web -- SOLO para llenar la
-Tabla y la Figura de la seccion 4.3.7 del Capitulo 4 ("Pruebas del panel
-de control web").
+Analisis de latencia/estabilidad del panel web -- Tabla y Figura de la
+Seccion 4.3.7 (pruebas del panel de control).
 
-De donde sale el CSV que este script lee: web_server.cpp instrumenta el
-propio panel (sin afectar su funcionamiento normal) contando, en el
-navegador, el intervalo real entre cada mensaje WebSocket recibido y las
-veces que la conexion se cae y se reconecta. Con el panel abierto:
+web_server.cpp instrumenta el propio panel contando el intervalo real
+entre mensajes WebSocket y las reconexiones. Con el panel abierto:
+    1. Dejarlo correr el tiempo de la prueba.
+    2. Abrir la consola (F12) y correr wsStatsReport() (resumen) y
+       wsStatsDownload() (descarga ws_intervals.csv).
+    3. python ws_latency_report.py ws_intervals.csv
 
-    1. Dejarlo correr el tiempo que dure la prueba (ver protocolo en la
-       tesis: sesion corta para latencia, sesion larga para estabilidad).
-    2. Abrir la consola del navegador (F12) y correr:
-         wsStatsReport()      -> imprime un resumen (n, media, desv,
-                                  min, max, reconexiones, duracion)
-         wsStatsDownload()    -> descarga ws_intervals.csv con TODOS
-                                  los intervalos individuales (ms)
-    3. Correr este script sobre ese CSV:
-         python ws_latency_report.py ws_intervals.csv
-
-Genera:
-    - Resumen estadistico impreso en consola (mismo contenido que
-      wsStatsReport(), pero recalculado en Python para el reporte).
-    - figura_ws_latencia.png: histograma de los intervalos, con una
-      linea vertical marcando el valor nominal (WS_PUSH_PERIOD_MS=500 ms
-      en config.h) para visualizar el jitter frente al valor esperado.
+Genera el resumen estadistico en consola y figura_ws_latencia.png
+(histograma con linea vertical en el valor nominal, WS_PUSH_PERIOD_MS).
 
 Requisitos:
     pip install matplotlib
@@ -90,8 +77,8 @@ def plot_histogram(intervals, mean):
         print("\nFalta matplotlib para graficar. Instala con: pip install matplotlib")
         return
 
-    color_bars = "#2a78d6"    # slot 1 -- azul: distribucion medida (serie unica)
-    color_nominal = "#eb6834"  # slot 2 -- naranja: referencia nominal
+    color_bars = "#2a78d6"     # azul: distribucion medida
+    color_nominal = "#eb6834"  # naranja: referencia nominal
     color_grid = "#e1e0d9"
     color_ink = "#0b0b0b"
     color_muted = "#52514e"

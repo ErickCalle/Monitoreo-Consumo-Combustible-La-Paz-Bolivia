@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
 """
-Grafica de pastel para la Figura 5.1 del Capitulo 5 ("Distribucion
-porcentual del presupuesto total del proyecto por categoria"), a partir
-de los 4 subtotales YA CALCULADOS a mano en la Tabla 5.9 (presupuesto
-total) del propio capitulo -- no hay un CSV fuente para esta figura en
-particular, son solo 4 numeros ya sumados y validados directamente en
-el texto.
+Grafica de pastel para la Figura 5.1 (Cap. 5): distribucion porcentual
+del presupuesto total por categoria, con los 4 subtotales ya sumados en
+la Tabla 5.9.
 
-Si en algun momento cambian los subtotales de la Tabla 5.9, actualizar
-el diccionario CATEGORIAS de este script antes de volver a correrlo --
-deliberadamente no se leen de un CSV para evitar que este script y el
-texto del capitulo queden con numeros distintos sin que se note.
+Si cambian los subtotales de la Tabla 5.9, actualizar CATEGORIAS aqui
+para que no se desincronice con el capitulo.
 
 Uso:
     python presupuesto_pie.py
@@ -19,11 +14,12 @@ Requisitos:
     pip install matplotlib
 """
 
-# (subtotal en Bs) -- Tabla 5.9 del Capitulo 5
+# (subtotal en Bs) -- Tabla 5.9. "Fabricacion y ensamblaje" usa la placa
+# preliminar (Robokit, ya soldada a mano), no la cotizacion JLCPCB.
 CATEGORIAS = {
-    "Componentes\nelectrónicos": 386.66,
+    "Componentes\nelectrónicos": 235.79,
     "Desarrollo y\nsoftware": 0.00,
-    "Fabricación y\nensamblaje": 1927.80,
+    "Fabricación y\nensamblaje": 150.00,
     "Pruebas y\nvalidación": 316.32,
 }
 
@@ -54,8 +50,7 @@ def plot():
     fig.patch.set_facecolor(color_surface)
     ax.set_facecolor(color_surface)
 
-    # Una categoria (Desarrollo y software) es 0,00%: una cuna de 0 grados
-    # no es visible, asi que se anota aparte en vez de fingir un gajo.
+    # Desarrollo y software es 0%: una cuna de 0 grados no se ve, se anota aparte
     plot_values = [v if v > 0 else 1e-9 for v in values]
 
     def autopct_fmt(pct):
@@ -72,8 +67,7 @@ def plot():
         textprops={"color": "white", "fontsize": 10, "fontweight": "bold"},
     )
 
-    # La cuna de 0% no tiene area, asi que su etiqueta autopct queda flotando
-    # sin gajo asociado; se retira y se anota aparte en su lugar.
+    # quitar la etiqueta autopct flotante de la cuna de 0%
     for i, v in enumerate(values):
         if v <= 0:
             autotexts[i].set_text("")

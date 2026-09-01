@@ -1,19 +1,13 @@
 #!/usr/bin/env python3
 """
-Logger de ajustes de combustible (STFT/LTFT) y lambda comandado -- SOLO
-para el Changan Honor, que NO soporta el PID 0x10 (MAF). Ver
-Apendice O / DATASHEET/CHANGAN.pdf: este vehiculo si soporta 0x06
-(STFT), 0x07 (LTFT) y 0x44 (relacion de equivalencia aire-combustible
-comandada), que es la via indirecta que usa
-ve_curve_calibrator_indirect.py para refinar su curva VE (Seccion
-"Caso sin MAF" del Capitulo 3, Diseno de software).
+Logger de STFT/LTFT y lambda comandado para el Changan Honor, que no
+soporta PID 0x10 (MAF). Usa 0x06/0x07/0x44 en su lugar -- via indirecta
+que despues usa ve_curve_calibrator_indirect.py para refinar su VE.
 
-Protocolo (igual estructura que speed_density_bench.py, pero SIN
-referencia real que comparar -- este script solo registra, no valida):
-sostener el motor en varios regimenes (ralenti detectado automaticamente,
-luego 1500/2500/3500 rpm u otros que el motor alcance con normalidad),
-uno a la vez, unos 20-30 s cada uno. La consola sirve de tacometro en
-vivo igual que en speed_density_bench.py.
+Mismo protocolo que speed_density_bench.py pero sin referencia real
+para comparar (solo registra, no valida): sostener el motor en varios
+regimenes (ralenti auto-detectado, luego 1500/2500/3500 rpm), uno a la
+vez, unos 20-30 s cada uno.
 
 Uso:
     python changan_trim_logger.py

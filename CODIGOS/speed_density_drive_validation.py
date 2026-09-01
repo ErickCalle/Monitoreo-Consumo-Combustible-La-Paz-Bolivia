@@ -1,19 +1,15 @@
 #!/usr/bin/env python3
 """
-Validacion dinamica del modelo Speed-Density -- SOLO para la Tabla y
-Figura de la Seccion 4.4.2 del Capitulo 4 ("Resultados de precision del
-modelo Speed-Density"), a partir del registro de una ruta real generado
-por speed_density_drive_log.py (Nissan Vanette).
+Validacion dinamica del modelo Speed-Density -- Tabla y Figura de la
+Seccion 4.4.2, a partir del registro de una ruta real generado por
+speed_density_drive_log.py (Nissan Vanette).
 
-A diferencia de la prueba estatica (calibrate_ve_table.py /
-ve_curve_calibrator.py, que ajustan la tabla VE), este script NO
-calibra nada -- solo mide que tan bien predice el modelo YA calibrado
-sobre datos de una ruta real que nunca participaron en esa calibracion.
-Es la validacion independiente documentada como pendiente en el
-Capitulo 6.
+A diferencia de la prueba estatica (que ajusta la tabla VE), este
+script no calibra nada: solo mide que tan bien predice el modelo YA
+calibrado sobre datos que nunca participaron en esa calibracion --
+es la validacion independiente pendiente del Capitulo 6.
 
-Metricas, con las mismas formulas ya documentadas en la Seccion
-"Herramientas y procesamiento de datos para el analisis" del Capitulo 4:
+Metricas:
     RMSE  = sqrt(mean((est-ref)^2))
     MAE   = mean(abs(est-ref))
     MAPE  = mean(abs((est-ref)/ref)) * 100   (excluye ref ~ 0)
@@ -22,14 +18,12 @@ Metricas, con las mismas formulas ya documentadas en la Seccion
 Uso:
     python speed_density_drive_validation.py speed_density_drive_log.csv
 
-Genera:
-    - Resumen de metricas impreso en consola.
-    - figura_dispersión_dinamica.png: diagrama de dispersion
-      estimado vs. referencia, con la recta 1:1 de referencia.
+Genera el resumen en consola y figura_dispersión_dinamica.png
+(estimado vs. referencia, con recta 1:1).
 
 Requisitos:
     pip install matplotlib
-    (no requiere scipy: el coeficiente de Pearson se calcula manual)
+    (no requiere scipy, Pearson se calcula manual)
 """
 import csv
 import math

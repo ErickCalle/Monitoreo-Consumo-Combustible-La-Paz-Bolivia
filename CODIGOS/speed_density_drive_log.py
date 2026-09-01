@@ -1,37 +1,20 @@
 #!/usr/bin/env python3
 """
-Registro continuo del modelo Speed-Density durante una ruta real -- SOLO
-para la prueba DINAMICA de la Seccion 4.3.3 del Capitulo 4 (Nissan
-Vanette, unico vehiculo con PID 0x10/MAF real de referencia).
+Registro continuo del modelo Speed-Density en una ruta real -- prueba
+DINAMICA de la Seccion 4.3.3 (Nissan Vanette, unico vehiculo con MAF
+real PID 0x10).
 
-Diferencia con speed_density_bench.py: aquel esta pensado para la prueba
-ESTATICA de pasos de RPM (motor detenido, sosteniendo 800/1500/2500/3500
-rpm) y por eso agrupa muestras por punto objetivo y corta solo al
-completar los 4. Ese mismo criterio, aplicado a una ruta real, cortaria
-la prueba antes de tiempo apenas el RPM de manejo normal pase cerca de
-cualquiera de esos 4 puntos. Este script no agrupa nada: registra TODAS
-las muestras tal como llegan, sin ningun punto objetivo ni corte
-automatico, pensado para ir en el asiento mientras alguien maneja una
-ruta real (arrancar, acelerar, crucero a distintas velocidades, frenar).
+A diferencia de speed_density_bench.py (pasos de RPM con el vehiculo
+detenido, agrupados por punto objetivo), este script no agrupa nada:
+registra todas las muestras tal como llegan mientras alguien maneja.
+Sirve como la validacion independiente pendiente del Capitulo 6, sobre
+datos que nunca participaron en la calibracion de la tabla VE.
 
-Por que esta prueba importa mas alla de llenar la tabla: la calibracion
-de la tabla VE (Capitulo 3, "Calculo general de la eficiencia
-volumetrica") se valido sobre el MISMO dataset con el que se calibro, lo
-cual no prueba que el modelo generalice. Los datos de una ruta real,
-que nunca participaron en la calibracion, son la validacion
-independiente que quedo pendiente como trabajo futuro (Capitulo 6).
-
-Ademas del MAF (para la validacion), este script ya calcula el consumo
-de combustible en vivo -- fuel_gs, L/h, L/100km y los acumulados de
-viaje (litros y km) -- con la MISMA cadena de calculo de fuel_calc.cpp
-(Seccion~3.9.6 del Capitulo 3): MAF -> combustible via AFR -> volumen.
-Simplificacion deliberada frente al firmware real: aqui NO se aplica la
-correccion de AFR por STFT/LTFT (USE_FUEL_TRIM_CORRECTION en el
-firmware) -- se usa siempre el AFR estequiometrico fijo (14.7). Pedir
-tambien esos dos PID por ciclo alargaria cada muestra y no es
-indispensable para tener una cifra de consumo razonable en una ruta
-larga; si se necesita la cifra exacta que reportaria el dispositivo
-instalado, usar ese en paralelo.
+Ademas del MAF, calcula el consumo en vivo (fuel_gs, L/h, L/100km y
+acumulados de viaje) con la misma cadena de fuel_calc.cpp, pero sin la
+correccion de AFR por STFT/LTFT (usa AFR estequiometrico fijo 14.7) --
+suficiente para una cifra de consumo razonable, no la exactitud del
+dispositivo instalado.
 
 Uso:
     python speed_density_drive_log.py
@@ -39,10 +22,8 @@ Uso:
 Requisitos:
     pip install pyserial
 
-Antes de correr, cambiar PORT abajo por el puerto COM del ELM327.
-Iniciar el script con el motor ya encendido, antes de arrancar a
-manejar; Ctrl+C al terminar la ruta (o desconexion natural del ELM327
-al llegar). No requiere ninguna interaccion mientras se maneja.
+Antes de correr, cambiar PORT abajo. Iniciar con el motor ya encendido,
+antes de arrancar a manejar; Ctrl+C al terminar la ruta.
 """
 import csv
 import os
@@ -159,9 +140,7 @@ def main():
     print("\nRegistro continuo iniciado. Maneja la ruta con normalidad.")
     print("Ctrl+C para terminar cuando llegues.\n")
 
-    # Se escribe cada fila al toque (igual que el firmware real hace
-    # flush() por fila): si el Bluetooth se corta a mitad de la ruta, lo
-    # unico que se pierde es la fila en curso, no la hora completa.
+    # flush por fila: si se corta el Bluetooth, solo se pierde la fila en curso
     csv_path = os.path.abspath("speed_density_drive_log.csv")
     csv_file = open(csv_path, "w", newline="")
     writer = csv.writer(csv_file)
@@ -203,9 +182,7 @@ def main():
                     maf_est = maf_estimado_gs(rpm, map_kpa, iat_c)
                     fuel_gs, instant_Lh, instant_L100km = fuel_from_maf(maf_est, speed_kmh)
 
-                    # dt real entre muestras (no un valor fijo), igual que
-                    # fuel_calc.cpp -- acotado para no acumular de mas tras
-                    # una reconexion o pausa larga.
+                    # dt real entre muestras, acotado para no acumular de mas tras una pausa
                     dt = (now - last_t) if last_t is not None else SAMPLE_PERIOD_S
                     if dt > DT_MAX_S or dt <= 0:
                         dt = SAMPLE_PERIOD_S
@@ -239,9 +216,7 @@ def main():
             except KeyboardInterrupt:
                 raise
             except Exception as e:
-                # Corte de Bluetooth, timeout raro, etc: no se pierde lo ya
-                # guardado (cada fila anterior ya esta en disco). Se intenta
-                # reconectar y seguir, en vez de morir con toda la ruta perdida.
+                # corte de Bluetooth, timeout, etc: reintentar en vez de morir
                 print(f"  ... error de conexion ({e}); reintentando en 2 s...")
                 try:
                     ser.close()
