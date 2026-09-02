@@ -191,7 +191,7 @@ serializar cada trama CAN a través de otro periférico intermediario.
 \subsection{Transceptor CAN: SN65HVD230}
 El TWAI del ESP32-S3 solo genera niveles lógicos TTL; convertirlos a las
 señales diferenciales CAN\_H/CAN\_L del bus físico requiere un transceptor.
-Se eligió el SN65HVD230 \cite{ti2018sn65hvd230} en concreto porque opera
+Se eligió el SN65HVD230 \cite{sn65hvd230_datasheet} en concreto porque opera
 nativamente a 3.3\,V —el mismo nivel lógico del ESP32-S3—, evitando un
 \textit{level-shifter} que sí haría falta con transceptores clásicos de 5\,V
 como el MCP2551. CAN\_H y CAN\_L se conectan a los pines 6 y 14 del conector
@@ -319,7 +319,7 @@ superficie de error.
 El conjunto de PIDs se eligió por ser el mínimo necesario para el cálculo
 speed-density (Sección~\ref{sec:speeddensity}) más los que enriquecen el
 registro sin costo relevante de tiempo de bus, siguiendo el estándar SAE
-J1979 \cite{saej1979}:
+J1979 \cite{sae_j1979_2014}:
 
 \begin{table}[H]
 \centering
@@ -724,7 +724,7 @@ idea de orden de magnitud, no un valor exacto—.
 Nodo & Fuente & Aporte típico & Nota \\
 \midrule
 3.3\,V (riel 1) & ESP32-S3 en deep sleep & $\sim$0.02\,mA & 10-25\,$\mu$A \cite{espressif2024datasheet} \\
-3.3\,V (riel 1) & SN65HVD230, siempre activo & $\sim$5-10\,mA & Modo normal, no standby \cite{ti2018sn65hvd230} \\
+3.3\,V (riel 1) & SN65HVD230, siempre activo & $\sim$5-10\,mA & Modo normal, no standby \cite{sn65hvd230_datasheet} \\
 3.3\,V (riel 1) & Pulsos de despertar (cada 20\,s) & $\sim$1.5-2\,mA & Promediado: $\sim$150\,mA por $\sim$0.2-0.3\,s \\
 5\,V & \textbf{AMS1117}, corriente de reposo propia & \textbf{$\sim$5-8\,mA} & Casi independiente de la carga \\
 5\,V & AP2112, corriente de reposo propia & $\sim$0.06\,mA & Sin carga (MOSFET de salida abiertos) \\

@@ -9,19 +9,19 @@ La evolución de los sistemas de alimentación de combustible en los vehículos 
     Los primeros motores de gasolina utilizan mezcladores mecánicos rudimentarios; el carburador se consolida como dispositivo estándar para crear la mezcla aire–combustible\citep{web10, web14}.
 
     \item \textbf{1912 -- 1930s}:  
-    Primeros ensayos de bombas de inyección de gasolina en motores de aviación; en 1937 se aplica en serie la inyección de combustible en motores de avión, sentando las bases para los sistemas de inyección modernos\citep{web3, web14}.
+    Primeros ensayos de bombas de inyección de gasolina en motores de aviación; en 1937 se aplica en serie la inyección de combustible en motores de avión, sentando las bases para los sistemas de inyección modernos\citep{web14}.
 
     \item \textbf{1945 -- 1950s}:  
-    Primera aplicación en serie de inyección de gasolina en vehículos de carretera; se mantienen sistemas principalmente mecánicos o electromecánicos, usados en modelos deportivos o de alta gama\citep{web3,web14}.
+    Primera aplicación en serie de inyección de gasolina en vehículos de carretera; se mantienen sistemas principalmente mecánicos o electromecánicos, usados en modelos deportivos o de alta gama\citep{web14}.
 
     \item \textbf{1967}:  
-    Bosch introduce el sistema D‑Jetronic, el primer sistema de inyección electrónica de gasolina de producción masiva, sustituyendo parcialmente al carburador en Europa\citep{web3, web1}.
+    Bosch introduce el sistema D‑Jetronic, el primer sistema de inyección electrónica de gasolina de producción masiva, sustituyendo parcialmente al carburador en Europa\citep{web1}.
 
     \item \textbf{1970s}:  
-    La crisis del petróleo y las normas de emisiones obligan a abandonar parcialmente el carburador; se extienden sistemas de inyección electrónica continuos (por ejemplo KE‑Jetronic) y se empiezan a usar en modelos de serie de fabricantes como Mercedes‑Benz y otros\citep{web1,web3,web14}.
+    La crisis del petróleo y las normas de emisiones obligan a abandonar parcialmente el carburador; se extienden sistemas de inyección electrónica continuos (por ejemplo KE‑Jetronic) y se empiezan a usar en modelos de serie de fabricantes como Mercedes‑Benz y otros\citep{web1,web14}.
 
     \item \textbf{1980s}:  
-    Aparecen sistemas digitales de gestión del motor (por ejemplo Motronic de Bosch), integrando inyección electrónica multipunto y encendido electrónico; marcas como Volkswagen, BMW y Mercedes adoptan estos sistemas en múltiples modelos\citep{web3,web7}.
+    Aparecen sistemas digitales de gestión del motor (por ejemplo Motronic de Bosch), integrando inyección electrónica multipunto y encendido electrónico; marcas como Volkswagen, BMW y Mercedes adoptan estos sistemas en múltiples modelos\citep{web7}.
 
     \item \textbf{1990}:  
     Se difunden sistemas de inyección electrónica monopunto y multipunto indirecta en vehículos comerciales de bajo costo (por ejemplo Suzuki Samurai 1990 y Suzuki Jimny 2000)\citep{web10}.
@@ -50,7 +50,7 @@ La evolución de los sistemas de alimentación de combustible en los vehículos 
 	
 	% 3. La nota de la figura según APA 7 (Con descripción técnica)
 	\begin{flushleft}
-		\footnotesize \textit{Nota.} Cronología del desarrollo tecnológico en la dosificación de combustible, destacando la transición desde sistemas mecánicos por carburador hasta esquemas de inyección electrónica directa controlados por computadora. Elaboración propia con base en \citep{web1}, \citep{web3} y \citep{web7}.
+		\footnotesize \textit{Nota.} Cronología del desarrollo tecnológico en la dosificación de combustible, destacando la transición desde sistemas mecánicos por carburador hasta esquemas de inyección electrónica directa controlados por computadora. Elaboración propia con base en \citep{web1}, \citep{web10} y \citep{web7}.
 	\end{flushleft}
 \end{figure}
 
@@ -793,7 +793,7 @@ Estos últimos se detallan en la Tabla \ref{tab:arqui}
 Dentro de la CPU se encuentran la unidad de control, que coordina el ciclo de instrucción, y la unidad aritmético‑lógica (ALU), que realiza operaciones aritméticas y lógicas sobre los datos. Los registros internos almacenan temporalmente direcciones, datos de trabajo e información de estado (flag de condición), lo que permite una ejecución rápida sin necesidad de acceder continuamente a la memoria principal.
 
 \subsubsection{Memoria on‑chip}
-Los microcontroladores integran en el mismo chip varios tipos de memoria, cada uno orientado a una función específica. La memoria de programa, típicamente Flash o ROM, almacena el código ejecutable del firmware, permitiendo leer e, idealmente, reprogramar el dispositivo en campo. La memoria de datos (SRAM) guarda variables temporales, pilas de ejecución y estructuras de datos mientras el sistema está activo, aunque su contenido se pierde al desconectar la alimentación \citep{MicroprocesadorComponentes}, mas detalle acerca de estas memorias en la Tabla \ref{tab:memo}.
+Los microcontroladores integran en el mismo chip varios tipos de memoria, cada uno orientado a una función específica. La memoria de programa, típicamente Flash o ROM, almacena el código ejecutable del firmware, permitiendo leer e, idealmente, reprogramar el dispositivo en campo. La memoria de datos (SRAM) guarda variables temporales, pilas de ejecución y estructuras de datos mientras el sistema está activo, aunque su contenido se pierde al desconectar la alimentación, mas detalle acerca de estas memorias en la Tabla \ref{tab:memo}.
 
 \begin{table}[h]
 	\centering
@@ -1056,7 +1056,7 @@ tiempo real, los algoritmos de:
 	cambio o corrección de estabilidad.
 	\item \textbf{Control de emisiones:} regeneración del filtro de partículas
 	(DPF), dosificación de AdBlue para reducción catalítica selectiva (SCR)
-	y monitorización del sistema OBD-II conforme a ISO~15031 \citep{SAE_J1979_2017}.
+	y monitorización del sistema OBD-II conforme a ISO~15031 \citep{sae_j1979_2014}.
 \end{itemize}
 
 \subsubsection{Requerimientos computacionales}
@@ -1583,7 +1583,7 @@ SAE~J1979 más empleados en proyectos de medición de consumo:
 	\vspace{0.2cm}
 	
 	\begin{flushleft}
-		\footnotesize \textit{Nota.} Especificación de identificadores de parámetros (PIDs) estandarizados bajo la norma SAE~J1979 utilizados para la adquisición de datos de diagnóstico a bordo en tiempo real. Adaptado de~\citep{SAE_J1979_2017, Rimpas2020}.
+		\footnotesize \textit{Nota.} Especificación de identificadores de parámetros (PIDs) estandarizados bajo la norma SAE~J1979 utilizados para la adquisición de datos de diagnóstico a bordo en tiempo real. Adaptado de~\citep{sae_j1979_2014, Rimpas2020}.
 	\end{flushleft}
 \end{table}
 
@@ -1813,7 +1813,7 @@ Un resumen de estos sistemas en la Tabla~\ref{tab:xil_comparativa}.
 		etapas de validación en lazo (*In-the-Loop*)
 		aplicadas al ciclo de desarrollo en V para sistemas
 		electrónicos embebidos de grado automotriz.
-		Adaptado de~\citep{VVDNTech2024, LinkedIn_xIL2022}.
+		Adaptado de~\citep{VVDNTech2024}.
 	\end{flushleft}
 \end{table}
 

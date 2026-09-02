@@ -714,7 +714,7 @@ void solicitarPIDsSoportados() {
 	
 	\vspace{-3mm} % Ajuste de espaciado estándar para la nota	
 	\small
-	\textit{Nota.} Algoritmo estructurado para la inicialización y el control del periférico de comunicación automotriz mediante la inyección activa de tramas de diagnóstico funcional (ID \texttt{0x7DF}). Desarrollado a partir de las especificaciones de bajo nivel para el manejo del buffer y sincronización de bits con referencias de \citep{espressif_twai} y \citep{sae_j1979}.
+	\textit{Nota.} Algoritmo estructurado para la inicialización y el control del periférico de comunicación automotriz mediante la inyección activa de tramas de diagnóstico funcional (ID \texttt{0x7DF}). Desarrollado a partir de las especificaciones de bajo nivel para el manejo del buffer y sincronización de bits con referencias de \citep{espressif_twai} y \citep{sae_j1979_2014}.
 \end{figure}
 
 
@@ -722,16 +722,16 @@ void solicitarPIDsSoportados() {
 % SECCIÓN 3: RESULTADOS EN MONITOR SERIE
 % ==========================================
 \subsubsection{Resultados Obtenidos}
-Tras compilar el código y conectar el sistema al puerto OBD-II del vehículo con el contacto en posición \textit{ON}, el monitor serie arrojó la siguiente salida a $115200\text{ baudios}$ ver Figura \ref{fig:monitor_serie_obd2}:
+Tras compilar el código y conectar el sistema al puerto OBD-II del Changan Honor con el contacto en posición \textit{ON}, el monitor serie arrojó la siguiente salida a $115200\text{ baudios}$ ver Figura \ref{fig:monitor_serie_obd2}:
 
 \begin{figure}[H]
-	\caption{Captura de pantalla del monitor serie durante la ejecución del escáner de PIDs OBD-II.}
+	\caption{Captura de pantalla del monitor serie durante la ejecución del escáner de PIDs OBD-II (Changan Honor).}
 	\label{fig:monitor_serie_obd2}
 	\centering
 	\includegraphics[width=0.85\textwidth]{Images/Serial.png} % Reemplaza por el nombre de tu archivo de imagen
 	
 	\vspace{2mm} % Ajuste de espaciado para la nota bajo formato APA
-	\textit{Nota.} Registro de depuración en tiempo real que muestra la inicialización correcta del controlador TWAI, el envío de la solicitud funcional (PID 0x00) y la respuesta hexadecimal (\texttt{FE 3E B8 13}) emitida por la unidad de control del motor (ECU).
+	\textit{Nota.} Registro de depuración en tiempo real, tomado sobre el Changan Honor, que muestra la inicialización correcta del controlador TWAI, el envío de la solicitud funcional (PID 0x00) y la respuesta hexadecimal (\texttt{FE 3E B8 13}) emitida por la unidad de control del motor (ECU).
 
 \end{figure}
 
@@ -964,16 +964,14 @@ módulo. La gestión del display se realizó mediante la biblioteca
 \texttt{Adafruit\_SSD1306}, que abstrae el protocolo de comunicación y provee 
 funciones de renderizado de texto y gráficos primitivos.
 
-\subsubsection{Distribución de Pantallas y Navegación}
+\subsubsection{Distribución de la información en pantalla}
 
-La información adquirida del bus CAN se organizó en tres pantallas de 
-visualización, navegables mediante un pulsador físico conectado al ESP32. 
-La distribución de parámetros por pantalla se detalla en la Tabla \ref{tab:distribucion_pantallas}.
+A diferencia de un esquema de múltiples pantallas navegables, el firmware mantiene una única pantalla fija que se redibuja por completo cada \texttt{OLED\_REFRESH\_PERIOD\_MS} (400~ms por defecto), priorizando en todo momento los datos que más se consultan al conducir: el consumo y el costo acumulado del viaje. La distribución de la información en esa pantalla se detalla en la Tabla \ref{tab:distribucion_pantallas}.
 
 \begin{table}[H]
 	\centering
 	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
-	\caption{Distribución de parámetros OBD-II por pantalla OLED}
+	\caption{Distribución de la información en la pantalla OLED}
 	\label{tab:distribucion_pantallas}
 	\small
 	\renewcommand{\arraystretch}{1.3}
@@ -981,20 +979,24 @@ La distribución de parámetros por pantalla se detalla en la Tabla \ref{tab:dis
 	\begin{tabular}{p{3.0cm} p{11.2cm}}
 		\toprule
 		\rowcolor[rgb]{0.851, 0.851, 0.851}
-		\textbf{Pantalla} & \textbf{Parámetros mostrados} \\ 
+		\textbf{Zona} & \textbf{Contenido mostrado} \\
 		\midrule
-		Pantalla 1 & RPM del motor (PID \texttt{0x0C}), velocidad del vehículo (PID \texttt{0x0D}), carga calculada del motor (PID \texttt{0x04}) y temperatura del líquido de enfriamiento (PID \texttt{0x05}). \\
-		
-		Pantalla 2 & Consumo instantáneo de combustible, consumo acumulado de la sesión y eficiencia en L/100~km. \\
-		
-		Pantalla 3 & Ajuste de combustible a corto plazo STFT (PID \texttt{0x06}) y ajuste a largo plazo LTFT (PID \texttt{0x07}). \\
+		Línea superior & RPM del motor (PID \texttt{0x0C}) y velocidad del vehículo (PID \texttt{0x0D}), en texto pequeño. \\
+
+		Centro (texto grande) & Consumo instantáneo: L/100~km si el vehículo se mueve (velocidad $>2$~km/h), o L/h si está detenido o en ralentí, para no dividir entre una velocidad cercana a cero. \\
+
+		Centro (texto grande) & Costo acumulado del viaje, en bolivianos, calculado a partir del combustible ya consumido (\texttt{trip\_fuel\_L} $\times$ \texttt{FUEL\_PRICE\_BS\_PER\_L}), no de la tasa instantánea. \\
+
+		Línea inferior 1 & Distancia y combustible acumulados del viaje. \\
+
+		Línea inferior 2 & Estado de la comunicación CAN (\texttt{CAN:OK}/\texttt{CAN:--}) y estado del panel web: dirección IP del punto de acceso si está activo, o \texttt{srv:--} en caso contrario. \\
 		\bottomrule
 	\end{tabular}
 	\vspace{0.2cm}
 	\begin{flushleft}
 		\small
 		\begin{center}
-			\textit{Nota.} La navegación entre pantallas se implementó mediante interrupción por hardware (ISR) con rutina de antirrebote (\textit{debounce}) por software de 50~ms, evitando lecturas múltiples por un solo accionamiento del pulsador.
+			\textit{Nota.} No hay navegación entre pantallas ni pulsador físico asociado a la OLED: toda la información relevante para conducir se muestra simultáneamente en esta única vista, y el detalle adicional (MAP, IAT, eficiencia volumétrica, flujo de aire y combustible calculados, etc.) queda disponible en el panel web y en el registro de la tarjeta microSD (Tabla~\ref{tab:estructura_csv}).
 		\end{center}
 	\end{flushleft}
 \end{table}
@@ -1016,31 +1018,41 @@ activos en ese instante, con la estructura definida en la Tabla \ref{tab:estruct
 \begin{table}[H]
 	\centering
 	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
-	\caption{Estructura del registro CSV mediante el método Speed-Density (MAP+IAT)}
+	\caption{Estructura real del registro CSV escrito por \texttt{sdLoggerTask()} (\texttt{sd\_logger.cpp})}
 	\label{tab:estructura_csv}
 	\small
-	\renewcommand{\arraystretch}{1.3}
+	\renewcommand{\arraystretch}{1.15}
 	% Mantenemos la calibración exacta de anchos fijos (3.5cm + 2.0cm + 8.7cm = 14.2cm)
 	\begin{tabular}{p{3.5cm} p{2.0cm} p{8.7cm}}
 		\toprule
 		\rowcolor[rgb]{0.851, 0.851, 0.851}
 		\textbf{Campo} & \textbf{Tipo} & \textbf{Descripción} \\
 		\midrule
-		\texttt{timestamp\_ms} & uint32 & Tiempo transcurrido desde el arranque del sistema en milisegundos. \\
-		\texttt{rpm}           & float  & Revoluciones por minuto del motor (PID \texttt{0x0C}). \\
-		\texttt{velocidad}     & uint8  & Velocidad del vehículo en km/h (PID \texttt{0x0D}). \\
-		\texttt{map}           & uint8  & Presión absoluta del múltiple de admisión en kPa (PID \texttt{0x0B}). \\
-		\texttt{iat}           & int8   & Temperatura del aire de admisión en °C (PID \texttt{0x0F}). \\
-		\texttt{temp\_ref}     & int8   & Temperatura del líquido de enfriamiento en °C (PID \texttt{0x05}). \\
-		\texttt{stft\_b1}      & float  & Ajuste de combustible a corto plazo, banco 1 en \% (PID \texttt{0x06}). \\
-		\texttt{ltft\_b1}      & float  & Ajuste de combustible a largo plazo, banco 1 en \% (PID \texttt{0x07}). \\
+		\texttt{uptime\_ms}       & uint32 & Tiempo transcurrido desde el arranque del sistema, en milisegundos (\texttt{millis()}). \\
+		\texttt{rpm}              & uint16 & Revoluciones por minuto del motor (PID \texttt{0x0C}). \\
+		\texttt{speed\_kmh}       & float  & Velocidad del vehículo, en km/h (PID \texttt{0x0D}). \\
+		\texttt{map\_kpa}         & float  & Presión absoluta del colector de admisión, en kPa (PID \texttt{0x0B}). \\
+		\texttt{iat\_c}           & float  & Temperatura del aire de admisión, en °C (PID \texttt{0x0F}). \\
+		\texttt{coolant\_c}       & float  & Temperatura del líquido refrigerante del motor, en °C (PID \texttt{0x05}). \\
+		\texttt{ve\_pct}          & float  & Eficiencia volumétrica interpolada de \texttt{kVeTable} para el régimen actual, en \%. \\
+		\texttt{maf\_gs}          & float  & Flujo másico de aire estimado por el modelo Speed-Density, en g/s. \\
+		\texttt{fuel\_gs}         & float  & Flujo másico de combustible calculado, en g/s. \\
+		\texttt{instant\_Lh}      & float  & Consumo instantáneo en L/h (válido en ralentí o vehículo detenido). \\
+		\texttt{instant\_L100km}  & float  & Consumo instantáneo en L/100~km (válido con el vehículo en movimiento). \\
+		\texttt{trip\_km}         & float  & Distancia acumulada del viaje, en km. \\
+		\texttt{trip\_fuel\_L}    & float  & Combustible acumulado del viaje, en L. \\
+		\texttt{trip\_avg\_L100km} & float & Consumo promedio acumulado del viaje, en L/100~km. \\
+		\texttt{can\_status}      & uint8  & Estado de la comunicación CAN (\texttt{0}=INIT, \texttt{1}=OK, \texttt{2}=SIN\_RESPUESTA, \texttt{3}=ERROR\_BUS, \texttt{4}=BUS\_OFF). \\
+		\texttt{trip\_cost\_bs}   & float  & Costo acumulado del viaje, en bolivianos (\texttt{trip\_fuel\_L}~$\times$~\texttt{FUEL\_PRICE\_BS\_PER\_L}). \\
+		\texttt{baro\_kpa}        & float  & Presión barométrica de referencia, en kPa (PID \texttt{0x33} real, o estimación del modelo ISA si no está soportado). \\
+		\texttt{baro\_is\_estimated} & bool & \texttt{1} si \texttt{baro\_kpa} proviene de la estimación ISA; \texttt{0} si es una lectura real por PID \texttt{0x33}. \\
 		\bottomrule
 	\end{tabular}
 	\vspace{0.2cm}
 	\begin{flushleft}
 		\small
 		\begin{center}
-			\textit{Nota.} El archivo se escribe en modo \textit{append} con un intervalo de muestreo configurable (por defecto 500~ms), registrando de forma síncrona las variables de presión (MAP) y temperatura (IAT) requeridas por la ecuación de estado de los gases ideales para la aproximación del consumo de combustible. Al detectar ausencia del bus CAN, el sistema cierra el archivo de forma segura.
+			\textit{Nota.} Fila exacta escrita cada \texttt{SD\_LOG\_INTERVAL\_MS} (1000~ms por defecto) mientras hay una lectura CAN válida; el archivo se abre una sola vez por sesión y cada fila se escribe en modo \textit{append} con \texttt{flush()} inmediato, de forma que una pérdida de energía no descarta filas ya escritas. Los ajustes de combustible STFT/LTFT (PIDs \texttt{0x06}/\texttt{0x07}) se usan internamente para corregir el cálculo (Capítulo~3, lazo cerrado) pero no se registran como columnas propias de este CSV.
 		\end{center}
 	\end{flushleft}
 \end{table}
@@ -1373,7 +1385,7 @@ esquema electrónico del sistema de alimentación se ilustra en la Figura \ref{f
 
 \subsubsection{Sistema transceptor CAN}
 
-Para la comunicación en el bus CAN, se seleccionó el transceptor SN65HVD230 (ver Tabla \ref{tab:componentes_seleccionados}). La configuración del circuito se realizó siguiendo las recomendaciones técnicas detalladas en su hoja de datos \citep{ti_sn65hvd230}, la cual describe la implementación óptima para garantizar la integridad de la señal. La configuración del esquema de conexión se ilustra en la Figura \ref{fig:sn65}
+Para la comunicación en el bus CAN, se seleccionó el transceptor SN65HVD230 (ver Tabla \ref{tab:componentes_seleccionados}). La configuración del circuito se realizó siguiendo las recomendaciones técnicas detalladas en su hoja de datos \citep{sn65hvd230_datasheet}, la cual describe la implementación óptima para garantizar la integridad de la señal. La configuración del esquema de conexión se ilustra en la Figura \ref{fig:sn65}
 
 \begin{figure}[H]
 	% Se usa labelformat=simple para que LaTeX gestione la numeración automáticamente
@@ -1391,7 +1403,7 @@ Para la comunicación en el bus CAN, se seleccionó el transceptor SN65HVD230 (v
 	% Nota a la izquierda
 	\raggedright
 	\small
-	\textit{Nota.} Diagrama de conexión típica para el transceptor SN65HVD230, incluyendo la resistencia de terminación de 120 $\Omega$ entre las líneas CANH y CANL para evitar reflexiones en el bus, y la configuración de los pines de control para el modo de operación de alta velocidad. Adaptado de \citet{ti_sn65hvd230}.
+	\textit{Nota.} Diagrama de conexión típica para el transceptor SN65HVD230, incluyendo la resistencia de terminación de 120 $\Omega$ entre las líneas CANH y CANL para evitar reflexiones en el bus, y la configuración de los pines de control para el modo de operación de alta velocidad. Adaptado de \citet{sn65hvd230_datasheet}.
 \end{figure}
 
 Tras analizar el esquema de los módulos basados en el SN65HVD230, se identificó una resistencia adicional conectada al pin RS (Rate Select). Asimismo, se añadió un PediScan, cuya función es actuar como un escáner y herramienta de diagnóstico automotriz, permitiendo la comunicación con la ECU del vehículo a través del puerto OBD-II para la lectura de parámetros, códigos de diagnóstico (DTC) y datos en tiempo real. Su incorporación permitió tomar como referencia un dispositivo comercial ampliamente utilizado para validar el diseño de la interfaz CAN implementada. Al integrar esta configuración en el diseño, el sistema resultante se ilustra en la Figura \ref{fig:esquema_can}.
@@ -1622,6 +1634,18 @@ La fabricación de la placa preliminar se encargó a Robokit (La Paz); la Figura
 	\vspace{2pt}
 	\\
 	{\footnotesize\textit{Nota.} Placa de una sola cara fabricada por Robokit (La Paz), 150\,Bs (Capítulo~5, Tabla~\ref{tab:costo_pcb_preliminar}); el ensamblaje de los componentes se realizó manualmente. Elaboración propia.}
+\end{figure}
+
+Una vez soldados los componentes de la Tabla~\ref{tab:costo_placa_preliminar_bom} (Capítulo~5) sobre esta placa, y reutilizando el módulo ESP32-S3, el transceptor SN65HVD230 y la pantalla OLED ya validados en protoboard, se obtiene la placa ensamblada de la Figura~\ref{fig:ensamblada_pcb_preliminar}.
+
+\begin{figure}[H]
+	\centering
+	\caption{Placa preliminar ensamblada}
+	\label{fig:ensamblada_pcb_preliminar}
+	\includegraphics[width=0.6\textwidth]{Images/pcb_proto_ensamblada.jpeg}
+
+	\vspace{2pt}
+	{\footnotesize\textit{Nota.} Placa preliminar tras el ensamblaje manual de los componentes: se distinguen el módulo ESP32-S3-N16R8, el regulador 7805 con el transistor de paso TIP42C, el módulo transceptor SN65HVD230 (conectado mediante el header de 6 pines), el fusible reseteable F1 y el conector de entrada de 4 pines (GND, 12~V, CAN\_L, CAN\_H). Elaboración propia.}
 \end{figure}
 
 \subsection{Diseño de la PCB (Altium Designer)}
@@ -1983,17 +2007,28 @@ fabricación (huellas, designadores agrupados y códigos de parte LCSC) se
 presenta en el Apéndice~N.
 
 % --------------------- Tabla BOM ---------------------
-\begin{table}[H]
-	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+\begingroup
+\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+\small
+\begin{longtable}{c p{5.9cm} p{3.0cm} c c}
 	\caption{Lista de materiales (BOM) del dispositivo}
-	\label{bom}
-	\centering
-	\small
-	\begin{tabular}{c p{5.9cm} p{3.0cm} c c}
-		\toprule
-		\rowcolor[rgb]{0.851, 0.851, 0.851}
-		\textbf{Ref.} & \textbf{Componente} & \textbf{Valor / Parte} & \textbf{Encap.} & \textbf{Cant.} \\
-		\midrule
+	\label{bom} \\
+	\toprule
+	\rowcolor[rgb]{0.851, 0.851, 0.851}
+	\textbf{Ref.} & \textbf{Componente} & \textbf{Valor / Parte} & \textbf{Encap.} & \textbf{Cant.} \\
+	\midrule
+	\endfirsthead
+	\multicolumn{5}{l}{\textit{Tabla~\ref{bom} (continuación)}} \\
+	\toprule
+	\rowcolor[rgb]{0.851, 0.851, 0.851}
+	\textbf{Ref.} & \textbf{Componente} & \textbf{Valor / Parte} & \textbf{Encap.} & \textbf{Cant.} \\
+	\midrule
+	\endhead
+	\midrule
+	\multicolumn{5}{r}{\textit{Continúa en la siguiente página\ldots}} \\
+	\endfoot
+	\bottomrule
+	\endlastfoot
 		\multicolumn{5}{l}{\textit{Etapa de alimentación, riel 1 de 2 (12~V $\rightarrow$ 5~V, síncrona)}} \\
 		U1 & Convertidor reductor (buck) síncrono & TPS54302DDCR & SOT-23-6 & 1 \\
 		L1 & Inductor de potencia          & 10~\textmu H      & SMD    & 1 \\
@@ -2038,18 +2073,17 @@ presenta en el Apéndice~N.
 		LED1 & LED indicador de alimentación & Verde           & 0805 & 1 \\
 		LED2 & LED indicador de estado      & Azul             & 0805 & 1 \\
 		R12,R13 & Resistor limitador de LED & 1~k$\Omega$       & 0805 & 2 \\
-		\bottomrule
-	\end{tabular}
-	
-	\vspace{2pt}
-	{\footnotesize\textit{Nota.} Elaboración propia. Los valores de la etapa de
-		alimentación siguen el procedimiento de diseño del fabricante para el
-		TPS54302DDCR, detallado en la subsección de diseño de hardware de este
-		capítulo. $^{a}$El resistor de terminación de 120~$\Omega$ se
-		deja como \textit{footprint} opcional (no poblado por defecto), dado que el
-		dispositivo se conecta como nodo en derivación a un bus CAN que ya posee sus
-		terminaciones en el vehículo.}
-\end{table}
+\end{longtable}
+\endgroup
+
+\vspace{2pt}
+{\footnotesize\textit{Nota.} Elaboración propia. Los valores de la etapa de
+	alimentación siguen el procedimiento de diseño del fabricante para el
+	TPS54302DDCR, detallado en la subsección de diseño de hardware de este
+	capítulo. $^{a}$El resistor de terminación de 120~$\Omega$ se
+	deja como \textit{footprint} opcional (no poblado por defecto), dado que el
+	dispositivo se conecta como nodo en derivación a un bus CAN que ya posee sus
+	terminaciones en el vehículo.}
 
 % =====================================================================
 \subsection{Capacidades de fabricación de JLCPCB}
@@ -2151,7 +2185,7 @@ con qué prioridad.
 
 El método más directo parte de la medición del flujo másico de aire admitido por
 el motor, $\dot{m}_{air}$ [g/s], reportado por el sensor MAF (\textit{Mass Air
-	Flow}) a través del PID 0x10 \citep{SAEJ1979_2017}. La estimación de combustible
+	Flow}) a través del PID 0x10 \citep{sae_j1979_2014}. La estimación de combustible
 se fundamenta en la relación aire-combustible (\textit{Air-Fuel Ratio}, AFR),
 definida como el cociente entre la masa de aire y la masa de combustible de la
 mezcla \citep{Heywood2018}:
@@ -2415,7 +2449,7 @@ PIDs en tiempo de ejecución.
 	\vspace{2pt}
 	{\footnotesize\textit{Nota.} Elaboración propia. La evaluación se realiza una sola
 		vez durante la inicialización, a partir de la respuesta al PID 0x00
-		\citep{SAEJ1979_2017}.}
+		\citep{sae_j1979_2014}.}
 \end{table}
 
 El pseudocódigo del criterio de conmutación, en su forma más simple, es:
@@ -2444,7 +2478,7 @@ La decisión anterior exige conocer, en tiempo de ejecución, qué PIDs implemen
 cada vehículo. El estándar SAE J1979 resuelve esto mediante el PID 0x00, cuya
 respuesta es un campo de bits (\textit{bitmask}) de cuatro bytes (denominados A,
 B, C y D) que codifica el soporte de los PIDs 0x01 a 0x20
-\citep{SAEJ1979_2017}. La convención de codificación es la siguiente: el byte A es
+\citep{sae_j1979_2014}. La convención de codificación es la siguiente: el byte A es
 el más significativo, y dentro de cada byte el bit 7 es el más significativo y el
 bit 0 el menos significativo. El bit más significativo del byte A corresponde al
 PID 0x01, y así sucesivamente hasta el bit menos significativo del byte D, que
@@ -2479,7 +2513,7 @@ la estimación de consumo) y un ejemplo de decodificación.
 	\end{tabular}
 	
 	\vspace{2pt}
-	{\footnotesize\textit{Nota.} Codificación según SAE J1979 \citep{SAEJ1979_2017}.
+	{\footnotesize\textit{Nota.} Codificación según SAE J1979 \citep{sae_j1979_2014}.
 		En el ejemplo, $\mathrm{0x3E} = 0011\,1110_2$: el bit 0 (MAF) está en 0, por lo que
 		el vehículo \emph{no} soporta el PID 0x10 y el sistema conmuta a Speed-Density;
 		los PIDs MAP, RPM, velocidad e IAT (bits 5 a 1) sí están disponibles, habilitando
@@ -2518,7 +2552,7 @@ opcional.
 	
 	\vspace{2pt}
 	{\footnotesize\textit{Nota.} Elaboración propia con base en SAE J1979
-		\citep{SAEJ1979_2017}.}
+		\citep{sae_j1979_2014}.}
 \end{table}
 
 \textit{Conclusión sobre los PIDs.} El conjunto mínimo de PIDs que el dispositivo
@@ -2664,6 +2698,35 @@ Capítulo~6.
 \section{Sistema de estimación con retroalimentación en lazo cerrado}
 \label{sec:lazo-cerrado}
 
+\textit{Alcance de esta sección: estudio y diseño, no implementación.} Todo lo
+desarrollado a continuación —el factor de calibración adaptativo $K$ con
+filtro EMA (Subsección~\ref{subsec:factor-k}), la identificación en línea de
+la curva $\eta_v(N)$ por regresión (Subsección~\ref{subsec:curva-etav}) y la
+conmutación automática MAF/Speed-Density (Subsección~\ref{subsec:soporte_pids})—
+es un estudio y diseño formal de una arquitectura de estimador en
+lazo cerrado, no una implementación evaluada en este proyecto. Del
+contenido de esta sección, el firmware probado en el Capítulo~4 incorpora
+únicamente el corrector directo por ajustes de combustible del ECU
+($\mathrm{STFT}+\mathrm{LTFT}$ aplicados sobre el AFR efectivo, ya descrito en
+la Sección~\ref{sec:speeddensity} del \emph{Diseño de software}); el resto
+queda formalizado matemáticamente, pero sin construirse ni probarse en campo.
+
+No se implementó por dos razones concretas, no por falta de desarrollo
+matemático: primero, cada uno de los tres componentes exige su propio
+protocolo de validación experimental independiente —un banco de pruebas con
+carga controlada para calibrar y verificar el factor $K$, y sesiones de
+conducción dedicadas para identificar $\eta_v(N)$ en línea sin reutilizar los
+datos ya empleados en la calibración estática del Capítulo~4—, lo que excede
+el tiempo disponible de un proyecto de grado si se suma al protocolo de
+validación en lazo abierto ya reportado en ese capítulo. Segundo, se priorizó
+deliberadamente contar con un sistema simple e íntegramente verificable,
+coherente con lo efectivamente probado en campo, en vez de uno más
+sofisticado pero sin evidencia experimental propia que respalde reportarlo
+como validado; el Capítulo~6 retoma los tres componentes como trabajo futuro
+concreto. Esta distinción entre lo formalizado y lo implementado se mantiene
+explícita a lo largo de toda la sección, para que el lector no infiera
+validación experimental de componentes que aún no se han puesto a prueba.
+
 El método Speed-Density desarrollado en la sección anterior entrega una estimación
 \emph{en lazo abierto} del flujo de aire y, por consiguiente, del consumo de
 combustible. Esta sección formaliza por qué dicha estimación es insuficiente por sí
@@ -2671,23 +2734,6 @@ sola y cómo se la corrige incorporando la realimentación que el propio ECU del
 vehículo expone a través del puerto OBD-II. El resultado es un \textbf{estimador en
 	lazo cerrado} cuyo modelo matemático final, con todas sus variables de entrada y de
 salida, se consolida al cierre de la sección.
-
-\textit{Alcance de la implementación evaluada.} Esta sección formaliza la
-\textbf{arquitectura de estimador en lazo cerrado propuesta} para el sistema,
-completa con su análisis de estabilidad y su procedimiento de identificación de
-parámetros. De ella, el firmware evaluado en el Capítulo~4 implementa
-únicamente el corrector directo por ajustes de combustible del ECU
-($\mathrm{STFT}+\mathrm{LTFT}$ aplicados sobre el AFR efectivo, descrito en la
-Sección~\ref{sec:speeddensity} como parte del \emph{Diseño de software}). El
-factor de calibración adaptativo $K$ con filtro EMA
-(Subsección~\ref{subsec:factor-k}), la identificación en línea de la curva
-$\eta_v(N)$ por regresión (Subsección~\ref{subsec:curva-etav}) y la
-conmutación automática MAF/Speed-Density (Subsección~\ref{subsec:soporte_pids})
-no están implementados en el prototipo probado; se presentan aquí como el
-diseño formal de la extensión y se retoman como recomendaciones concretas de
-trabajo futuro en el Capítulo~6. Esta distinción se mantiene explícita a lo
-largo de la sección para que el lector no infiera validación experimental de
-componentes que aún no se han puesto a prueba.
 
 % ------------------------------------------------------------------------------
 \subsection{Justificación del enfoque en lazo cerrado}
@@ -3481,6 +3527,8 @@ requisitos de exactitud y confiabilidad de largo plazo del proyecto.
 \section{Diseño de software}
 \label{sec:software}
 
+El código completo del firmware descrito en esta sección está disponible en el repositorio de GitHub del proyecto \citep{CalleGitHub2026}, carpeta \texttt{CODIGOS/esp32s3\_obd2\_speeddensity/}.
+
 Esta sección retoma el capítulo de diseño de software y describe, parte por
 parte, el firmware que corre en el ESP32-S3: las herramientas con las que se
 construyó, cómo reparte el trabajo entre tareas, el protocolo con el que
@@ -3639,7 +3687,7 @@ serializar cada trama CAN a través de otro periférico intermediario.
 \subsubsection{Transceptor CAN: SN65HVD230}
 El TWAI del ESP32-S3 solo genera niveles lógicos TTL; convertirlos a las
 señales diferenciales CAN\_H/CAN\_L del bus físico requiere un transceptor.
-Se eligió el SN65HVD230 \citep{ti2018sn65hvd230} en concreto porque opera
+Se eligió el SN65HVD230 \citep{sn65hvd230_datasheet} en concreto porque opera
 nativamente a 3.3\,V, el mismo nivel lógico del ESP32-S3; así se evita un
 \textit{level-shifter} que sí haría falta con transceptores clásicos de 5\,V
 como el MCP2551. CAN\_H y CAN\_L se conectan a los pines 6 y 14 del conector
@@ -3794,7 +3842,7 @@ superficie de error).
 El conjunto de PIDs se eligió por ser el mínimo necesario para el cálculo
 speed-density (Sección~\ref{sec:speeddensity}) más los que enriquecen el
 registro sin costo relevante de tiempo de bus, siguiendo el estándar SAE
-J1979 \citep{saej1979}:
+J1979 \citep{sae_j1979_2014}:
 
 \begin{table}[H]
 	\centering
@@ -4440,7 +4488,7 @@ idea de orden de magnitud, no un valor exacto).
 		Nodo & Fuente & Aporte típico & Nota \\
 		\midrule
 		3.3~V (riel 1) & ESP32-S3 en deep sleep & $\sim$0.02~mA & 10–25~$\mu$A \citep{espressif2024datasheet} \\
-		3.3~V (riel 1) & SN65HVD230, siempre activo & $\sim$5–10~mA & Modo normal, no standby \citep{ti2018sn65hvd230} \\
+		3.3~V (riel 1) & SN65HVD230, siempre activo & $\sim$5–10~mA & Modo normal, no standby \citep{sn65hvd230_datasheet} \\
 		3.3~V (riel 1) & Pulsos de despertar (cada 20~s) & $\sim$1.5–2~mA & Promediado: $\sim$150~mA por $\sim$0.2–0.3~s \\
 		5~V & \textbf{AMS1117}, corriente de reposo propia & \textbf{$\sim$5–8~mA} & Casi independiente de la carga \\
 		5~V & AP2112, corriente de reposo propia & $\sim$0.06~mA & Sin carga (MOSFET de salida abiertos) \\
@@ -4529,7 +4577,7 @@ solo la dejan pasar con caída de tensión). Los aportes por componente:
 	por debajo del modo \textit{modem-sleep} al no incluir el consumo
 	periódico de la banda base Wi-Fi.
 	\item \textbf{SN65HVD230, activo:} $\sim$8\,mA, punto medio del rango ya
-	usado en la Tabla~\ref{tab:consumo_sin_contacto} \citep{ti2018sn65hvd230}.
+	usado en la Tabla~\ref{tab:consumo_sin_contacto} \citep{sn65hvd230_datasheet}.
 	\item \textbf{OLED SSD1306, encendida:} $\sim$15\,mA, punto medio de
 	10--20\,mA \citep{solomon2008ssd1306}.
 	\item \textbf{MicroSD, activa (lectura/escritura):} $\sim$25\,mA, valor
@@ -4972,7 +5020,7 @@ botones.
 %
 %El controlador TWAI del ESP32 se configura a la velocidad estándar del enlace
 %OBD-II sobre CAN, 500 kbps (ISO~15765-4), con filtro abierto para
-%aceptar las respuestas de la ECU \citep{SAEJ1979_2017}. La Figura~\ref{fig:cod-caninit}
+%aceptar las respuestas de la ECU \citep{sae_j1979_2014}. La Figura~\ref{fig:cod-caninit}
 %resume la inicialización.
 %
 %\begin{figure}[H]

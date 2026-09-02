@@ -32,7 +32,7 @@ Esta sección desglosa el costo de los componentes electrónicos en los mismos c
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} Precio de referencia del módulo de desarrollo completo (\textit{DevKitC-1}) usado en el prototipo sobre protoboard (Tabla~\ref{tab:componentes_protoboard}); si la versión final en PCB propia usa el módulo ESP32-S3-WROOM-1-N16R8 suelto en vez del DevKit completo, el precio unitario es menor pero requiere programador externo para el primer flasheo.
+		\textit{Nota.} Precio del módulo de desarrollo completo (\textit{DevKitC-1}); la versión final en PCB propia podría usar el módulo suelto a menor costo, a cambio de requerir un programador externo para el primer flasheo.
 	\end{minipage}
 \end{table}
 
@@ -61,7 +61,7 @@ Esta sección desglosa el costo de los componentes electrónicos en los mismos c
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} Los pasivos (condensadores, resistencias) se cotizan casi siempre por cinta/carrete completo aunque el diseño solo use unas pocas unidades; a cantidad de prototipo (1 placa), su costo unitario efectivo suele ser mayor que en producción en volumen. Es algo esperable, que debería diluirse si el proyecto escala a una serie de unidades, según se discute en la Subsección~\ref{sec:costo_beneficio}.
+		\textit{Nota.} Los pasivos se cotizan por cinta/carrete completo, por lo que a cantidad de prototipo su costo unitario es mayor que en producción en volumen; se diluye al escalar (Subsección~\ref{sec:costo_beneficio}).
 	\end{minipage}
 \end{table}
 
@@ -87,7 +87,7 @@ Esta sección desglosa el costo de los componentes electrónicos en los mismos c
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} El resistor de terminación no se puebla por defecto (Tabla~\ref{bom}, nota $^{a}$), ya que el dispositivo se conecta en derivación a un bus CAN que el vehículo ya termina; se incluye en la tabla únicamente para dejar registrado el criterio de costo cero de esa partida, no por omisión.
+		\textit{Nota.} El resistor de terminación no se puebla por defecto (Tabla~\ref{bom}, nota $^{a}$): el dispositivo se conecta en derivación a un bus CAN que el vehículo ya termina, por eso su costo es cero y no una omisión.
 	\end{minipage}
 \end{table}
 
@@ -121,7 +121,7 @@ Esta sección desglosa el costo de los componentes electrónicos en los mismos c
 
 \section{Costos de desarrollo y software}
 
-El conjunto de herramientas de desarrollo empleado (Visual Studio Code, la extensión PlatformIO IDE, el \textit{framework} \texttt{arduino-esp32}, y el editor EasyEDA en su capa gratuita para el esquemático y la PCB) es de uso libre y sin costo de licenciamiento, criterio de selección ya justificado en la Sección de herramientas del Capítulo~3. El costo real de esta partida no está en licencias, entonces, sino en el tiempo de ingeniería invertido en el diseño de hardware, el firmware y la interfaz web.
+El conjunto de herramientas de desarrollo empleado (Visual Studio Code, la extensión PlatformIO IDE, el \textit{framework} \texttt{arduino-esp32}, y el editor EasyEDA en su capa gratuita para el esquemático y la PCB) es de uso libre y sin costo de licenciamiento, criterio de selección ya justificado en la Sección de herramientas del Capítulo~3. El costo real de esta partida no está en licencias, entonces, sino en el tiempo de ingeniería invertido en el diseño de hardware, el firmware y la interfaz web. La tarifa de la Tabla~\ref{tab:costo_horas} se deja deliberadamente en 0\,Bs/h: el objetivo de este capítulo es el costo de materiales y fabricación, no el valor de mercado de las horas de un proyecto de grado, así que el total de horas queda documentado como referencia de esfuerzo, no como partida monetaria.
 
 \begin{table}[H]
 	\centering
@@ -145,7 +145,7 @@ El conjunto de herramientas de desarrollo empleado (Visual Studio Code, la exten
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} Horas estimadas a partir de la dedicación real registrada por el autor ($\approx$4\,h/día): 2 días (PCB), 1 semana (firmware y panel web, 7 días cada uno) y 1 mes (calibración, 30 días). La tarifa se deja en 0\,Bs/h a propósito. Este capítulo lo permite porque el objetivo es el costo de materiales y fabricación, no el valor de mercado de las horas de un proyecto de grado; el total de 184\,h queda documentado como referencia de esfuerzo, no como partida monetaria del presupuesto.
+		\textit{Nota.} Horas estimadas a partir de la dedicación real del autor ($\approx$4\,h/día): 2 días para la PCB, 1 semana para firmware y panel web cada uno, y 1 mes para la calibración.
 	\end{minipage}
 \end{table}
 
@@ -176,11 +176,11 @@ La placa preliminar en EasyEDA descrita en la Sección~\ref{sec:placa_preliminar
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} Cotización y fabricación locales (La Paz), sin envío internacional ni aduana. El ensamblaje fue realizado por el propio autor, por lo que no tiene costo monetario adicional, consistente con el criterio ya aplicado en la Tabla~\ref{tab:costo_horas} (tarifa de horas propias en 0\,Bs/h).
+		\textit{Nota.} Cotización y fabricación locales (La Paz), sin envío internacional ni aduana; el ensamblaje manual, hecho por el propio autor, no tiene costo adicional (mismo criterio de tarifa 0\,Bs/h de la Tabla~\ref{tab:costo_horas}).
 	\end{minipage}
 \end{table}
 
-La lista de materiales real de esta placa (16 referencias, exportada desde EasyEDA) muestra que su etapa de alimentación es una regulación lineal simple (7805 + transistor de paso TIP42C) y no la conversión conmutada de dos rieles de la Tabla~\ref{tab:costo_alimentacion} —esa etapa es específica de la placa final—; el módulo ESP32-S3, el transceptor CAN, la pantalla OLED y la tarjeta microSD son los mismos ya presupuestados en las Tablas~\ref{tab:costo_procesamiento}, \ref{tab:costo_can} y~\ref{tab:costo_perifericos}, reutilizados desde la etapa de protoboard y conectados a esta placa mediante los conectores de la Tabla~\ref{tab:costo_placa_preliminar_bom} en vez de cableado suelto. Los indicadores LED y sus resistencias limitadoras también coinciden con los ya contabilizados en la Tabla~\ref{tab:costo_perifericos}, por lo que no se repiten aquí.
+La lista de materiales real de esta placa (16 referencias, exportada desde EasyEDA) muestra que su etapa de alimentación es una regulación lineal simple (7805 + transistor de paso TIP42C) y no la conversión conmutada de dos rieles de la Tabla~\ref{tab:costo_alimentacion} —esa etapa es específica de la placa final—; el módulo ESP32-S3, el transceptor CAN, la pantalla OLED y la tarjeta microSD son los mismos ya presupuestados en las Tablas~\ref{tab:costo_procesamiento}, \ref{tab:costo_can} y~\ref{tab:costo_perifericos}, reutilizados desde la etapa de protoboard y conectados a esta placa mediante los conectores de la Tabla~\ref{tab:costo_placa_preliminar_bom} en vez de cableado suelto. Los indicadores LED y sus resistencias limitadoras también coinciden con los ya contabilizados en la Tabla~\ref{tab:costo_perifericos}, por lo que no se repiten aquí. Los precios de la Tabla~\ref{tab:costo_placa_preliminar_bom} se tomaron de LCSC a partir de las referencias de fabricante exportadas desde EasyEDA; las tres partidas sin coincidencia exacta en el catálogo (capacitor de 22\,\textmu F, header de 8 pines y conector de 4 pines) se estiman por interpolación directa desde variantes de la misma familia con precio confirmado, no por un valor arbitrario.
 
 \begin{table}[H]
 	\centering
@@ -210,7 +210,7 @@ La lista de materiales real de esta placa (16 referencias, exportada desde EasyE
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} Precios de referencia LCSC para las referencias de fabricante exportadas desde EasyEDA (por ejemplo, \texttt{KS104M050C07RR0VH2FP0} para el capacitor de 100\,nF), convertidos a bolivianos al tipo de cambio de este capítulo (11,60\,Bs/USD); las referencias sin coincidencia exacta en el catálogo (capacitor de 22\,\textmu F, header de 8 pines y conector de 4 pines) se estiman por interpolación directa a partir de variantes de la misma familia con precio confirmado (por ejemplo, el conector WJ301V-5.0 sí tiene precio publicado en sus variantes de 2 y 3 pines), no por un valor arbitrario.
+		\textit{Nota.} Precios de referencia LCSC (por ejemplo, \texttt{KS104M050C07RR0VH2FP0} para el capacitor de 100\,nF), convertidos a bolivianos al tipo de cambio de este capítulo (11,60\,Bs/USD).
 	\end{minipage}
 \end{table}
 
@@ -238,7 +238,7 @@ A diferencia de la placa preliminar, la placa final documentada en el Capítulo~
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} El envío y la aduana suelen pesar más en el costo total que la fabricación misma para lotes de prototipo pequeños importados a Bolivia; conviene cotizar ambos conceptos por separado y no asumir que están incluidos en el precio de fabricación publicado por JLCPCB.
+		\textit{Nota.} El envío y la aduana suelen pesar más que la fabricación misma en lotes de prototipo pequeños importados a Bolivia; conviene cotizarlos por separado.
 	\end{minipage}
 \end{table}
 
@@ -266,11 +266,13 @@ Para la placa final, el ensamblaje de los componentes de montaje superficial pue
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} Elaboración propia. Comparación de referencia para cuando se mande a fabricar la placa final; la vía efectivamente utilizada para la placa preliminar ya construida (Tabla~\ref{tab:costo_pcb_preliminar}) fue la soldadura manual (columna derecha), con el mismo criterio de costo cero de mano de obra propia que el resto del capítulo.
+		\textit{Nota.} Comparación de referencia para la futura placa final; la placa preliminar ya construida (Tabla~\ref{tab:costo_pcb_preliminar}) usó soldadura manual (columna derecha). Elaboración propia.
 	\end{minipage}
 \end{table}
 
 \section{Costos de pruebas y validación}
+
+El precio del litro de gasolina (6,96\,Bs) es el mismo valor de referencia (\texttt{FUEL\_PRICE\_BS\_PER\_L}) que usa el firmware para calcular el costo del viaje (Capítulo~3), y los 22,03~L de combustible corresponden a la suma de los totales reales de aforo tanque lleno del Capítulo~4 (Nissan Vanette 12,96~L + Changan Honor 9,07~L, Tablas~\ref{tab:comparacion_consumo_vanette}/\ref{tab:comparacion_consumo_changan}): el consumo efectivamente gastado en los nueve tramos de prueba, no la capacidad de los tanques.
 
 \begin{table}[H]
 	\centering
@@ -294,7 +296,7 @@ Para la placa final, el ensamblaje de los componentes de montaje superficial pue
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} El precio del litro de gasolina (6,96~Bs) es el mismo valor de referencia (\texttt{FUEL\_PRICE\_BS\_PER\_L}) que usa el propio firmware para calcular el costo acumulado del viaje (Capítulo~3), de modo que lo que reporta el dispositivo en campo y lo que presupuesta este capítulo quedan alineados. Los 22,03~L de combustible son la suma de los dos totales reales de aforo tanque lleno del Capítulo~4 (Nissan Vanette 12,96~L + Changan Honor 9,07~L, Tablas~\ref{tab:comparacion_consumo_vanette}/\ref{tab:comparacion_consumo_changan}): el consumo efectivamente gastado en los nueve tramos de prueba de ambos vehículos, no la capacidad de los tanques.
+		\textit{Nota.} Elaboración propia.
 	\end{minipage}
 \end{table}
 
@@ -326,9 +328,11 @@ La Tabla~\ref{tab:presupuesto_total} consolida los subtotales de las secciones a
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} $^{a}$A diferencia del total del prototipo (que usa la placa preliminar de Robokit, ya fabricada), esta fila estima el costo de una unidad adicional producida por la vía de la placa final: excluye las horas de diseño de hardware/firmware (Tabla~\ref{tab:costo_horas}), que son un costo de desarrollo único (\textit{non-recurring engineering}) y no se repiten por unidad adicional fabricada. Incluye componentes (386,66\,Bs) más la fabricación de PCB y el ensamblaje PCBA a prorrata del lote mínimo de 5 unidades de JLCPCB (Tablas~\ref{tab:costo_pcb}/\ref{tab:costo_ensamblaje}: $(487{,}20+1\,440{,}60)/5 = 385{,}56$\,Bs), es decir $386{,}66+385{,}56=772{,}22$\,Bs por unidad adicional dentro del mismo lote.
+		\textit{Nota.} $^{a}$Estimado para la placa final (JLCPCB), no para el total del prototipo (placa preliminar de Robokit); detalle del cálculo a continuación.
 	\end{minipage}
 \end{table}
+
+El costo marginal excluye las horas de diseño de hardware/firmware (Tabla~\ref{tab:costo_horas}), un costo de desarrollo único (\textit{non-recurring engineering}) que no se repite por unidad fabricada, e incluye los componentes (386,66\,Bs) más la fabricación de PCB y el ensamblaje PCBA a prorrata del lote mínimo de 5 unidades de JLCPCB (Tablas~\ref{tab:costo_pcb}/\ref{tab:costo_ensamblaje}: $(487{,}20+1\,440{,}60)/5 = 385{,}56$\,Bs), es decir $386{,}66+385{,}56=772{,}22$\,Bs por unidad adicional dentro del mismo lote.
 
 \begin{figure}[H]
 	\centering
@@ -337,7 +341,7 @@ La Tabla~\ref{tab:presupuesto_total} consolida los subtotales de las secciones a
 	\includegraphics[width=0.85\textwidth]{Images/figura_presupuesto_pastel.png}
 
 	\vspace{2pt}
-	{\footnotesize\textit{Nota.} Se elige un gráfico de pastel porque las cuatro categorías son mutuamente excluyentes y suman el 100\,\% de un mismo presupuesto total; este tipo de gráfico comunica de forma directa qué proporción del gasto corresponde a componentes frente a mano de obra de desarrollo; una tabla de números no se lee con la misma claridad de un vistazo. Elaboración propia a partir de \texttt{CODIGOS/presupuesto\_pie.py} \citep{CalleGitHub2026}.}
+	{\footnotesize\textit{Nota.} Gráfico de pastel: las cuatro categorías son mutuamente excluyentes y suman el 100\,\% del presupuesto, lo que comunica de forma más directa que una tabla de números. Elaboración propia a partir de \texttt{CODIGOS/presupuesto\_pie.py} \citep{CalleGitHub2026}.}
 \end{figure}
 
 \section{Análisis de viabilidad económica}
@@ -368,9 +372,11 @@ El sistema propuesto se contrasta contra dos categorías de alternativas ya menc
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} Elaboración propia. $^{a}$Se usa el costo marginal por unidad adicional escalando a la placa final (Tabla~\ref{tab:presupuesto_total}) y no el presupuesto total del prototipo (702,11\,Bs, fabricado con la placa preliminar de Robokit), porque este segundo aún incluye los instrumentos de prueba del Capítulo~4 (ELM327, tester, combustible de validación) —costos de validación, no de una unidad desplegable—, mientras que la cifra de la placa final sí representa lo que costaría producir una unidad adicional a mayor escala, con un acabado más cercano al de un producto terminado y comparable con las alternativas comerciales de esta tabla. $^{b}$Precios de mercado internacional (no existe cotización pública para el mercado boliviano), tomados de \textit{Fleetio}, ``6 Best Fuel Monitoring Systems: 2025 Comparison Guide'' (\texttt{fleetio.com/blog/fuel-monitoring-systems}, consultado en agosto de 2026): Fleetio USD 4--10/vehículo/mes; Motive desde USD~25/vehículo/mes más costo de dispositivos ELD; Samsara USD 27--33/vehículo/mes (software; hardware facturado aparte); Geotab USD 35--100/vehículo/mes (software; hardware facturado aparte); FuelForce desde USD~5\,000 en modalidad de pago único por funcionalidad, en vez de suscripción. La conversión a bolivianos usa el mismo tipo de cambio de este capítulo (11,60\,Bs/USD).
+		\textit{Nota.} Elaboración propia. $^{a}$Costo marginal escalando a la placa final (Tabla~\ref{tab:presupuesto_total}), no el total del prototipo, que aún incluye instrumentos de validación ajenos a una unidad desplegable. $^{b}$Precios internacionales de referencia; fuentes detalladas a continuación.
 	\end{minipage}
 \end{table}
+
+Los precios de telemetría de flota no tienen cotización pública para el mercado boliviano; se tomaron de \textit{Fleetio}, ``6 Best Fuel Monitoring Systems: 2025 Comparison Guide'' (\texttt{fleetio.com/blog/fuel-monitoring-systems}, consultado en agosto de 2026): Fleetio USD 4--10/vehículo/mes; Motive desde USD~25/vehículo/mes más costo de dispositivos ELD; Samsara USD 27--33/vehículo/mes (software; hardware aparte); Geotab USD 35--100/vehículo/mes (software; hardware aparte); y FuelForce desde USD~5\,000 en pago único por funcionalidad, en vez de suscripción. La conversión a bolivianos usa el mismo tipo de cambio de este capítulo (11,60\,Bs/USD).
 
 \begin{figure}[H]
 	\centering
@@ -379,7 +385,7 @@ El sistema propuesto se contrasta contra dos categorías de alternativas ya menc
 	\includegraphics[width=0.85\textwidth]{Images/figura_comparacion_comercial.png}
 
 	\vspace{2pt}
-	{\footnotesize\textit{Nota.} Se elige un gráfico de barras horizontales, en vez de uno vertical, porque los nombres de las tres alternativas comparadas son largos y se leen mejor como etiquetas de eje horizontal; al ser solo tres categorías discretas comparadas por una única magnitud (costo), la barra es más directa de leer que un gráfico de líneas o de dispersión. El eje de costo usa escala logarítmica porque los tres valores abarcan casi tres órdenes de magnitud (85 a 58\,000\,Bs); cada barra conserva su valor exacto como etiqueta directa para que la escala no distorsione la lectura del monto real. El valor de telemetría de flota corresponde a un único proveedor (\textit{FuelForce}, pago único; Tabla~\ref{tab:comparacion_comercial}) y no a un promedio del rubro, ya que el resto de proveedores citados cobra por suscripción con hardware facturado aparte. Elaboración propia.}
+	{\footnotesize\textit{Nota.} Barras horizontales: los nombres de las tres alternativas se leen mejor como etiquetas de eje. Escala logarítmica en el costo porque los valores abarcan casi tres órdenes de magnitud (85 a 58\,000\,Bs), con el valor exacto en cada barra. El dato de telemetría de flota es de un único proveedor (\textit{FuelForce}, pago único; Tabla~\ref{tab:comparacion_comercial}), no un promedio del rubro. Elaboración propia.}
 \end{figure}
 
 \subsection{Análisis costo-beneficio}
@@ -395,6 +401,8 @@ El periodo de recuperación de la inversión (\textit{payback period}) se estima
 \end{equation}
 
 donde el ahorro mensual se obtiene de multiplicar la reducción porcentual de consumo por retroalimentación al conductor (valor de literatura, ya que no se midió en este proyecto) por el gasto mensual de combustible típico del vehículo evaluado, a su vez estimado a partir del kilometraje mensual habitual (también de literatura) y el consumo promedio real observado en el Capítulo~4 (totales de aforo de las Tablas~\ref{tab:comparacion_consumo_vanette}/\ref{tab:comparacion_consumo_changan}).
+
+El kilometraje mensual no se midió para estos vehículos: se usa un valor representativo (200\,km/día $\times$ 30 días) dentro del rango de 150 a 300\,km/día que reporta la literatura de operación de buses urbanos en servicio de todo el día \citep{PPIAF_UrbanBusToolkit_kpvpd}, igual para ambos vehículos al no existir un dato diferenciado por unidad. El consumo promedio sí es un dato real: el total de aforo de tanque lleno entre la distancia total recorrida en los nueve tramos de prueba del Capítulo~4. La reducción de consumo atribuible al monitoreo tampoco se midió en este proyecto —requeriría un diseño experimental adicional, por ejemplo contrastar el mismo trayecto con el panel visible frente al panel oculto para el conductor—; se usa en su lugar el efecto promedio reportado por un metaanálisis de 17 estudios sobre sistemas de retroalimentación \textit{eco-driving} a bordo, $6{,}6\,\%$ de mejora en economía de combustible \citep{Sanguinetti2020EcoDriving}.
 
 \begin{table}[H]
 	\centering
@@ -418,7 +426,7 @@ donde el ahorro mensual se obtiene de multiplicar la reducción porcentual de co
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} $^{a}$No se midió el kilometraje real de estos vehículos: se usa un valor representativo (200\,km/día $\times$ 30 días) dentro del rango de 150 a 300\,km/día que reporta la literatura de operación de buses urbanos en servicio de todo el día \citep{PPIAF_UrbanBusToolkit_kpvpd}, igual para ambos vehículos al no existir un dato diferenciado por unidad. $^{b}$Consumo real de referencia (tanque lleno, no la estimación del sistema propio): total de aforo entre distancia total recorrida en los nueve tramos de prueba (Tablas~\ref{tab:comparacion_consumo_vanette}/\ref{tab:comparacion_consumo_changan}, Capítulo~4): Nissan Vanette $12{,}96/124{,}26\times100$; Changan Honor $9{,}07/114{,}25\times100$. $^{c}$La fila de reducción de consumo es la variable crítica de esta tabla y no se midió en este proyecto (requeriría un diseño experimental adicional al del Capítulo~4, por ejemplo contrastar el mismo trayecto con el panel visible frente al panel oculto para el conductor); se usa en su lugar el efecto promedio reportado por un metaanálisis de 17 estudios sobre sistemas de retroalimentación \textit{eco-driving} a bordo, $6{,}6\,\%$ de mejora en economía de combustible \citep{Sanguinetti2020EcoDriving}, dejando explícito que es un valor de literatura y no una medición propia.
+		\textit{Nota.} $^{a}$Valor de literatura, no medido. $^{b}$Dato real: Nissan Vanette $12{,}96/124{,}26\times100$; Changan Honor $9{,}07/114{,}25\times100$ (Tablas~\ref{tab:comparacion_consumo_vanette}/\ref{tab:comparacion_consumo_changan}). $^{c}$Valor de literatura, no medido en este proyecto; ver detalle en el texto anterior.
 	\end{minipage}
 \end{table}
 
@@ -429,7 +437,7 @@ donde el ahorro mensual se obtiene de multiplicar la reducción porcentual de co
 	\includegraphics[width=0.85\textwidth]{Images/figura_breakeven.png}
 
 	\vspace{2pt}
-	{\footnotesize\textit{Nota.} Se elige un gráfico de líneas porque ambas magnitudes (costo fijo y ahorro acumulado) son funciones continuas del tiempo, y lo relevante para el lector es identificar visualmente el punto de cruce entre ambas curvas, algo que una tabla de valores puntuales no comunica con la misma inmediatez. Las rectas de ahorro acumulado y los periodos de recuperación (2,44 y 3,21 meses) se derivan del costo real del prototipo con la placa preliminar (Tabla~\ref{tab:presupuesto_total}) y de los valores de literatura de la Tabla~\ref{tab:payback} (kilometraje mensual y reducción de consumo atribuible al monitoreo); estos últimos no son una medición directa y el resultado debe leerse como una estimación, no como una garantía de recuperación en ese plazo exacto. Elaboración propia.}
+	{\footnotesize\textit{Nota.} Gráfico de líneas: costo fijo y ahorro acumulado son funciones continuas del tiempo, y lo relevante es el punto de cruce entre ambas. Los periodos de recuperación (2,44 y 3,21 meses) dependen de los valores de literatura de la Tabla~\ref{tab:payback} (kilometraje y reducción de consumo), así que deben leerse como una estimación, no como una garantía. Elaboración propia.}
 \end{figure}
 
 La viabilidad económica de este proyecto, para cerrar el capítulo, no depende únicamente de recuperar el costo de un prototipo individual: depende de su potencial de escalar a una pequeña serie de unidades para el transporte público de La Paz. En ese escenario, el costo marginal por unidad (Tabla~\ref{tab:presupuesto_total}), ya sin las horas de diseño amortizadas por este primer desarrollo, es la cifra económicamente relevante, y no el presupuesto total del prototipo aquí calculado.
