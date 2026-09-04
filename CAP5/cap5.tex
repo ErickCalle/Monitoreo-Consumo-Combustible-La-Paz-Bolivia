@@ -214,6 +214,34 @@ La lista de materiales real de esta placa (16 referencias, exportada desde EasyE
 	\end{minipage}
 \end{table}
 
+\subsection{Costo de la carcasa del prototipo}
+
+La carcasa impresa en 3D para la placa preliminar (Capítulo~3, Sección~\ref{sec:carcasa_prototipo}) se costea por peso de material: PLA a 130\,Bs el rollo de 1\,kg, impresión con impresora propia (sin costo de servicio de impresión).
+
+\begin{table}[H]
+	\centering
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption{Costo de material de la carcasa del prototipo}
+	\label{tab:costo_carcasa}
+	\begin{tabularx}{\textwidth}{X >{\centering\arraybackslash}p{2cm} >{\centering\arraybackslash}p{2.6cm}}
+		\toprule
+		\rowcolor[rgb]{0.851, 0.851, 0.851}
+		Pieza & Peso (g) & Subtotal (Bs) \\
+		\midrule
+		Base (impresa) & 21 & 2,73 \\
+		Tapa (pendiente de impresión) & 16 & 2,08 \\
+		\midrule
+		\textbf{Total} & \textbf{37} & \textbf{4,81} \\
+		\bottomrule
+	\end{tabularx}
+	\vspace{2mm}
+	\\
+	\begin{minipage}{\linewidth}
+		\small
+		\textit{Nota.} PLA a 130\,Bs/kg (0,13\,Bs/g); no incluye costo de mano de obra propia (Tabla~\ref{tab:costo_horas}) ni desgaste de la impresora.
+	\end{minipage}
+\end{table}
+
 \subsection{Costos de manufactura de la placa final (JLCPCB)}
 \label{sec:costo_pcb_final}
 
@@ -314,12 +342,12 @@ La Tabla~\ref{tab:presupuesto_total} consolida los subtotales de las secciones a
 		\rowcolor[rgb]{0.851, 0.851, 0.851}
 		Categoría & Subtotal (Bs) & \%~del total \\
 		\midrule
-		Componentes electrónicos (Tablas~\ref{tab:costo_procesamiento}, \ref{tab:costo_can}, \ref{tab:costo_perifericos} y~\ref{tab:costo_placa_preliminar_bom}) & 235,79 & 33,58\,\% \\
+		Componentes electrónicos (Tablas~\ref{tab:costo_procesamiento}, \ref{tab:costo_can}, \ref{tab:costo_perifericos} y~\ref{tab:costo_placa_preliminar_bom}) & 235,79 & 33,35\,\% \\
 		Desarrollo y software (Tabla~\ref{tab:costo_horas}) & 0,00 & 0,00\,\% \\
-		Fabricación y ensamblaje, placa preliminar (Tabla~\ref{tab:costo_pcb_preliminar}) & 150,00 & 21,36\,\% \\
-		Pruebas y validación (Tabla~\ref{tab:costo_pruebas}) & 316,32 & 45,05\,\% \\
+		Fabricación y ensamblaje, placa preliminar (Tablas~\ref{tab:costo_pcb_preliminar} y~\ref{tab:costo_carcasa}) & 154,81 & 21,90\,\% \\
+		Pruebas y validación (Tabla~\ref{tab:costo_pruebas}) & 316,32 & 44,75\,\% \\
 		\midrule
-		\textbf{Total del prototipo} & \textbf{702,11} & \textbf{100\,\%} \\
+		\textbf{Total del prototipo} & \textbf{706,92} & \textbf{100\,\%} \\
 		\midrule
 		Costo marginal estimado por unidad adicional, placa final$^{a}$ & 772,22 & --- \\
 		\bottomrule
@@ -341,8 +369,39 @@ El costo marginal excluye las horas de diseño de hardware/firmware (Tabla~\ref{
 	\includegraphics[width=0.85\textwidth]{Images/figura_presupuesto_pastel.png}
 
 	\vspace{2pt}
-	{\footnotesize\textit{Nota.} Gráfico de pastel: las cuatro categorías son mutuamente excluyentes y suman el 100\,\% del presupuesto, lo que comunica de forma más directa que una tabla de números. Elaboración propia a partir de \texttt{CODIGOS/presupuesto\_pie.py} \citep{CalleGitHub2026}.}
+	{\footnotesize\textit{Nota.} Gráfico de pastel: las cuatro categorías son mutuamente excluyentes y suman el 100\,\%~del presupuesto, lo que comunica de forma más directa que una tabla de números. Elaboración propia a partir de \texttt{CODIGOS/presupuesto\_pie.py} \citep{CalleGitHub2026}.}
 \end{figure}
+
+\subsection{Precio de venta estimado (utilidad e IVA)}
+
+Los costos anteriores son costos directos, sin margen de ganancia ni impuestos. Para estimar un precio de venta de referencia se parte del costo marginal por unidad adicional (772,22\,Bs; ver arriba) y no del total del prototipo, ya que este último incluye instrumentos de validación del Capítulo~4 que no formarían parte de una unidad efectivamente vendida. Se aplica una utilidad del 20\,\%, valor de referencia habitual en la formulación de proyectos de la carrera, y luego el Impuesto al Valor Agregado (IVA) vigente en Bolivia (13\,\%) sobre el precio ya con utilidad.
+
+\begin{table}[H]
+	\centering
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption{Precio de venta estimado por unidad adicional}
+	\label{tab:precio_venta}
+	\begin{tabularx}{\textwidth}{X >{\centering\arraybackslash}p{3cm}}
+		\toprule
+		\rowcolor[rgb]{0.851, 0.851, 0.851}
+		Concepto & Monto (Bs) \\
+		\midrule
+		Costo marginal por unidad adicional (Tabla~\ref{tab:presupuesto_total}) & 772,22 \\
+		Utilidad (20\,\%) & 154,44 \\
+		\midrule
+		Subtotal (costo + utilidad) & 926,66 \\
+		IVA (13\,\%) & 120,47 \\
+		\midrule
+		\textbf{Precio de venta estimado} & \textbf{1\,047,13} \\
+		\bottomrule
+	\end{tabularx}
+	\vspace{2mm}
+	\\
+	\begin{minipage}{\linewidth}
+		\small
+		\textit{Nota.} Utilidad y IVA aplicados de forma secuencial (utilidad sobre el costo directo, IVA sobre el precio ya con utilidad), no simultánea sobre el mismo costo base. El 20\,\%~de utilidad es un valor de referencia, no una cotización de mercado; puede ajustarse sin afectar el resto del capítulo.
+	\end{minipage}
+\end{table}
 
 \section{Análisis de viabilidad económica}
 
@@ -419,7 +478,7 @@ El kilometraje mensual no se midió para estos vehículos: se usa un valor repre
 		Gasto mensual de combustible (Bs) & 3\,315,74 & 4\,355,57 \\
 		Reducción de consumo atribuible al monitoreo (\%)$^{c}$ & 6,6 & 6,6 \\
 		Ahorro mensual estimado (Bs/mes) & 218,84 & 287,47 \\
-		Periodo de recuperación (meses) & 3,21 & 2,44 \\
+		Periodo de recuperación (meses) & 3,23 & 2,46 \\
 		\bottomrule
 	\end{tabularx}
 	\vspace{2mm}
@@ -437,7 +496,7 @@ El kilometraje mensual no se midió para estos vehículos: se usa un valor repre
 	\includegraphics[width=0.85\textwidth]{Images/figura_breakeven.png}
 
 	\vspace{2pt}
-	{\footnotesize\textit{Nota.} Gráfico de líneas: costo fijo y ahorro acumulado son funciones continuas del tiempo, y lo relevante es el punto de cruce entre ambas. Los periodos de recuperación (2,44 y 3,21 meses) dependen de los valores de literatura de la Tabla~\ref{tab:payback} (kilometraje y reducción de consumo), así que deben leerse como una estimación, no como una garantía. Elaboración propia.}
+	{\footnotesize\textit{Nota.} Gráfico de líneas: costo fijo y ahorro acumulado son funciones continuas del tiempo, y lo relevante es el punto de cruce entre ambas. Los periodos de recuperación (2,46 y 3,23 meses) dependen de los valores de literatura de la Tabla~\ref{tab:payback} (kilometraje y reducción de consumo), así que deben leerse como una estimación, no como una garantía. Elaboración propia.}
 \end{figure}
 
 La viabilidad económica de este proyecto, para cerrar el capítulo, no depende únicamente de recuperar el costo de un prototipo individual: depende de su potencial de escalar a una pequeña serie de unidades para el transporte público de La Paz. En ese escenario, el costo marginal por unidad (Tabla~\ref{tab:presupuesto_total}), ya sin las horas de diseño amortizadas por este primer desarrollo, es la cifra económicamente relevante, y no el presupuesto total del prototipo aquí calculado.

@@ -16,12 +16,12 @@ Requisitos:
     pip install matplotlib
 """
 
-COSTO_PROTOTIPO_BS = 702.11  # Tabla 5.9 (placa preliminar Robokit)
+COSTO_PROTOTIPO_BS = 706.92  # Tabla 5.9 (placa preliminar Robokit + carcasa)
 
 # (ahorro mensual Bs/mes, periodo de recuperacion meses) -- Tabla 5.11
 VEHICULOS = {
-    "Nissan Vanette": {"ahorro_mensual": 287.47, "payback_meses": 2.44, "color": "#2a78d6"},
-    "Changan Honor":  {"ahorro_mensual": 218.84, "payback_meses": 3.21, "color": "#eb6834"},
+    "Nissan Vanette": {"ahorro_mensual": 287.47, "payback_meses": 2.46, "color": "#2a78d6"},
+    "Changan Honor":  {"ahorro_mensual": 218.84, "payback_meses": 3.23, "color": "#eb6834"},
 }
 
 MESES_MAX = 5

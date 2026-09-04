@@ -19,7 +19,7 @@ Requisitos:
 CATEGORIAS = {
     "Componentes\nelectrónicos": 235.79,
     "Desarrollo y\nsoftware": 0.00,
-    "Fabricación y\nensamblaje": 150.00,
+    "Fabricación y\nensamblaje": 154.81,
     "Pruebas y\nvalidación": 316.32,
 }
 
