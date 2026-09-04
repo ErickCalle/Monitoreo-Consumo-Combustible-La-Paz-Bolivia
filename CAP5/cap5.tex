@@ -374,25 +374,25 @@ El costo marginal excluye las horas de diseño de hardware/firmware (Tabla~\ref{
 
 \subsection{Precio de venta estimado (utilidad e IVA)}
 
-Los costos anteriores son costos directos, sin margen de ganancia ni impuestos. Para estimar un precio de venta de referencia se parte del costo marginal por unidad adicional (772,22\,Bs; ver arriba) y no del total del prototipo, ya que este último incluye instrumentos de validación del Capítulo~4 que no formarían parte de una unidad efectivamente vendida. Se aplica una utilidad del 20\,\%, valor de referencia habitual en la formulación de proyectos de la carrera, y luego el Impuesto al Valor Agregado (IVA) vigente en Bolivia (13\,\%) sobre el precio ya con utilidad.
+Los costos anteriores son costos directos, sin margen de ganancia ni impuestos. La Tabla~\ref{tab:precio_venta} aplica una utilidad del 20\,\%, valor de referencia habitual en la formulación de proyectos de la carrera, y luego el Impuesto al Valor Agregado (IVA) vigente en Bolivia (13\,\%) sobre el precio ya con utilidad, sobre dos bases de costo distintas: el prototipo tal como se construyó (706,92\,Bs, Tabla~\ref{tab:presupuesto_total}, incluye los instrumentos de validación del Capítulo~4) y el costo marginal por unidad adicional si se escalara a la placa final (772,22\,Bs, misma tabla), la cifra más representativa de lo que costaría producir y vender una unidad futura sin repetir esos instrumentos de prueba.
 
 \begin{table}[H]
 	\centering
 	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
-	\caption{Precio de venta estimado por unidad adicional}
+	\caption{Precio de venta estimado, prototipo actual vs. unidad adicional}
 	\label{tab:precio_venta}
-	\begin{tabularx}{\textwidth}{X >{\centering\arraybackslash}p{3cm}}
+	\begin{tabularx}{\textwidth}{X >{\centering\arraybackslash}p{3.2cm} >{\centering\arraybackslash}p{3.2cm}}
 		\toprule
 		\rowcolor[rgb]{0.851, 0.851, 0.851}
-		Concepto & Monto (Bs) \\
+		Concepto & Este prototipo (Bs) & Unidad adicional, placa final (Bs) \\
 		\midrule
-		Costo marginal por unidad adicional (Tabla~\ref{tab:presupuesto_total}) & 772,22 \\
-		Utilidad (20\,\%) & 154,44 \\
+		Costo directo (Tabla~\ref{tab:presupuesto_total}) & 706,92 & 772,22 \\
+		Utilidad (20\,\%) & 141,38 & 154,44 \\
 		\midrule
-		Subtotal (costo + utilidad) & 926,66 \\
-		IVA (13\,\%) & 120,47 \\
+		Subtotal (costo + utilidad) & 848,30 & 926,66 \\
+		IVA (13\,\%) & 110,28 & 120,47 \\
 		\midrule
-		\textbf{Precio de venta estimado} & \textbf{1\,047,13} \\
+		\textbf{Precio de venta estimado} & \textbf{958,58} & \textbf{1\,047,13} \\
 		\bottomrule
 	\end{tabularx}
 	\vspace{2mm}
