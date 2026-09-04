@@ -374,32 +374,32 @@ El costo marginal excluye las horas de diseño de hardware/firmware (Tabla~\ref{
 
 \subsection{Precio de venta estimado (utilidad e IVA)}
 
-Los costos anteriores son costos directos, sin margen de ganancia ni impuestos. La Tabla~\ref{tab:precio_venta} aplica una utilidad del 20\,\%, valor de referencia habitual en la formulación de proyectos de la carrera, y luego el Impuesto al Valor Agregado (IVA) vigente en Bolivia (13\,\%) sobre el precio ya con utilidad, sobre dos bases de costo distintas: el prototipo tal como se construyó (706,92\,Bs, fila ``Total del prototipo'' de la Tabla~\ref{tab:presupuesto_total}) y el costo marginal por unidad adicional si se escalara a la placa final (772,22\,Bs, fila ``Costo marginal estimado por unidad adicional'' de la misma tabla). La diferencia entre ambas cifras es, precisamente, la Tabla~\ref{tab:costo_pruebas} completa (316,32\,Bs: ELM327, tester y la gasolina de las pruebas tanque a tanque): ese gasto sí se incurrió para construir y validar este prototipo, pero no se repetiría al vender una unidad adicional ya validada, así que solo aparece en la columna ``Este prototipo''.
+Los costos anteriores son costos directos, sin margen de ganancia ni impuestos. La Tabla~\ref{tab:precio_venta} aplica una utilidad del 20\,\%, valor de referencia habitual en la formulación de proyectos de la carrera, y luego el Impuesto al Valor Agregado (IVA) vigente en Bolivia (13\,\%) sobre el precio ya con utilidad, sobre tres bases de costo distintas. La primera y la tercera parten del prototipo tal como se construyó (706,92\,Bs, fila ``Total del prototipo'' de la Tabla~\ref{tab:presupuesto_total}); la tercera, además, resta el combustible de las pruebas tanque a tanque (153,33\,Bs, Tabla~\ref{tab:costo_pruebas}), bajo el supuesto de que esas pruebas ya se realizaron y ese gasto no se traslada a un comprador de esta misma unidad. La segunda es el costo marginal por unidad adicional si se escalara a la placa final (772,22\,Bs, fila ``Costo marginal estimado por unidad adicional'' de la misma tabla), que ya excluye por completo la Tabla~\ref{tab:costo_pruebas} (no solo el combustible, también ELM327 y el tester), al no ser un gasto que se repita al producir una unidad adicional.
 
 \begin{table}[H]
 	\centering
 	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
 	\caption{Precio de venta estimado, prototipo actual vs. unidad adicional}
 	\label{tab:precio_venta}
-	\begin{tabularx}{\textwidth}{X >{\centering\arraybackslash}p{3.2cm} >{\centering\arraybackslash}p{3.2cm}}
+	\begin{tabularx}{\textwidth}{X >{\centering\arraybackslash}p{2.4cm} >{\centering\arraybackslash}p{2.6cm} >{\centering\arraybackslash}p{2.6cm}}
 		\toprule
 		\rowcolor[rgb]{0.851, 0.851, 0.851}
-		Concepto & Este prototipo (Bs) & Unidad adicional, placa final (Bs) \\
+		Concepto & Este prototipo (Bs) & Unidad adicional, placa final (Bs) & Este prototipo, sin combustible de prueba$^{a}$ (Bs) \\
 		\midrule
-		Costo directo (Tabla~\ref{tab:presupuesto_total}) & 706,92 & 772,22 \\
-		Utilidad (20\,\%) & 141,38 & 154,44 \\
+		Costo directo (Tabla~\ref{tab:presupuesto_total}) & 706,92 & 772,22 & 553,59 \\
+		Utilidad (20\,\%) & 141,38 & 154,44 & 110,72 \\
 		\midrule
-		Subtotal (costo + utilidad) & 848,30 & 926,66 \\
-		IVA (13\,\%) & 110,28 & 120,47 \\
+		Subtotal (costo + utilidad) & 848,30 & 926,66 & 664,31 \\
+		IVA (13\,\%) & 110,28 & 120,47 & 86,36 \\
 		\midrule
-		\textbf{Precio de venta estimado} & \textbf{958,58} & \textbf{1\,047,13} \\
+		\textbf{Precio de venta estimado} & \textbf{958,58} & \textbf{1\,047,13} & \textbf{750,67} \\
 		\bottomrule
 	\end{tabularx}
 	\vspace{2mm}
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} Utilidad y IVA aplicados de forma secuencial (utilidad sobre el costo directo, IVA sobre el precio ya con utilidad), no simultánea sobre el mismo costo base. El 20\,\%~de utilidad es un valor de referencia, no una cotización de mercado; puede ajustarse sin afectar el resto del capítulo.
+		\textit{Nota.} Utilidad y IVA aplicados de forma secuencial (utilidad sobre el costo directo, IVA sobre el precio ya con utilidad), no simultánea sobre el mismo costo base. El 20\,\%~de utilidad es un valor de referencia, no una cotización de mercado; puede ajustarse sin afectar el resto del capítulo. $^{a}$706,92\,Bs $-$ 153,33\,Bs de combustible (Tabla~\ref{tab:costo_pruebas}) $=$ 553,59\,Bs; a diferencia de la columna del centro, aquí sí se conservan el ELM327 y el tester dentro del costo, ya que son instrumentos físicos y no un insumo consumido.
 	\end{minipage}
 \end{table}
 
