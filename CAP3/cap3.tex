@@ -1291,7 +1291,7 @@ garantizando fiabilidad frente a las exigentes condiciones eléctricas del entor
 	definidos por la norma ISO 7637-2 en entornos automotrices.
 	
 	\item \textbf{Regulador reductor de 5~V (TPS54302):} Inicialmente se evaluaron
-	reguladores lineales clásicos como el AMS1117-3.3, pero fueron descartados debido a su
+	reguladores lineales clásicos como el AMS1117-3,3, pero fueron descartados debido a su
 	ineficiente disipación térmica al intentar reducir directamente tensiones del bus
 	automotriz de 12~V a 3{,}3~V, ya que esto representaría disipar más del 72\%~de la potencia
 	en calor. En su lugar, se seleccionó el convertidor reductor síncrono
@@ -1320,7 +1320,7 @@ garantizando fiabilidad frente a las exigentes condiciones eléctricas del entor
 	
 	Este valor representa un error del $+1{,}56$\% respecto al valor nominal de 5~V, dentro
 	de la tolerancia aceptable para alimentar la etapa posterior de reguladores lineales
-	(AMS1117-3.3 y AP2112K-3.3), que a su vez entregan la tensión regulada de 3{,}3~V
+	(AMS1117-3,3 y AP2112K-3,3), que a su vez entregan la tensión regulada de 3{,}3~V
 	requerida por el microcontrolador ESP32-S3, cuyo rango de operación es de 3{,}0~V a
 	3{,}6~V \citep{espressif_esp32_datasheet}.
 	
@@ -1342,13 +1342,13 @@ garantizando fiabilidad frente a las exigentes condiciones eléctricas del entor
 	
 	\item \textbf{Regulación de 5~V a 3,3~V:} Para mejorar la eficiencia del convertidor DC-DC la regulación de 5~V a 3,3~V se realizara con 2 componentes muy usados los cuales se detallan:
 	\begin{itemize}
-		\item \textbf{AMS1117-3.3}
+		\item \textbf{AMS1117-3,3}
 		
-		Se seleccionó el regulador AMS1117-3.3 para alimentar exclusivamente el módulo ESP32 debido a su capacidad de suministrar hasta 1 A (ver Apéndice J)de corriente, proporcionando un margen suficiente para soportar los picos de consumo generados por el microcontrolador durante la transmisión Wi-Fi, el funcionamiento del servidor web local y el procesamiento de datos provenientes del sistema OBD-II. Aunque el consumo promedio del ESP32 es inferior, durante las comunicaciones inalámbricas puede presentar picos de corriente superiores a 400 mA, por lo que disponer de un regulador con mayor capacidad mejora la estabilidad del sistema y reduce la posibilidad de caídas de tensión.
+		Se seleccionó el regulador AMS1117-3,3 para alimentar exclusivamente el módulo ESP32 debido a su capacidad de suministrar hasta 1 A (ver Apéndice J)de corriente, proporcionando un margen suficiente para soportar los picos de consumo generados por el microcontrolador durante la transmisión Wi-Fi, el funcionamiento del servidor web local y el procesamiento de datos provenientes del sistema OBD-II. Aunque el consumo promedio del ESP32 es inferior, durante las comunicaciones inalámbricas puede presentar picos de corriente superiores a 400 mA, por lo que disponer de un regulador con mayor capacidad mejora la estabilidad del sistema y reduce la posibilidad de caídas de tensión.
 		
-		\item \textbf{AP2112K-3.3TRG1}
+		\item \textbf{AP2112K-3,3TRG1}
 		
-		El regulador AP2112K-3.3TRG1 fue destinado a la alimentación de los dispositivos periféricos, como la pantalla OLED, la memoria microSD y otros circuitos auxiliares. Este regulador puede suministrar hasta 600 mA (ver Apéndice K), corriente suficiente para estos dispositivos, además de ofrecer una baja caída de tensión (Low Dropout) y un bajo nivel de ruido, características que favorecen el correcto funcionamiento de los periféricos. Separar la alimentación del ESP32 y de los periféricos evita que los picos de corriente generados por el módulo Wi-Fi afecten el funcionamiento de los demás dispositivos, incrementando la estabilidad y confiabilidad del sistema.
+		El regulador AP2112K-3,3TRG1 fue destinado a la alimentación de los dispositivos periféricos, como la pantalla OLED, la memoria microSD y otros circuitos auxiliares. Este regulador puede suministrar hasta 600 mA (ver Apéndice K), corriente suficiente para estos dispositivos, además de ofrecer una baja caída de tensión (Low Dropout) y un bajo nivel de ruido, características que favorecen el correcto funcionamiento de los periféricos. Separar la alimentación del ESP32 y de los periféricos evita que los picos de corriente generados por el módulo Wi-Fi afecten el funcionamiento de los demás dispositivos, incrementando la estabilidad y confiabilidad del sistema.
 	\end{itemize}
 	
 \end{enumerate}
@@ -2052,7 +2052,7 @@ La lista de materiales (\textit{Bill of Materials}, BOM) consolida todos los
 componentes del dispositivo, organizados por bloque funcional: etapa de
 alimentación de dos rieles basada en el convertidor reductor síncrono
 TPS54302DDCR (12~V~$\rightarrow$~5~V) seguido de los reguladores lineales
-AMS1117-3.3 y AP2112K-3.3TRG1 (5~V~$\rightarrow$~3,3~V), unidad de
+AMS1117-3,3 y AP2112K-3,3TRG1 (5~V~$\rightarrow$~3,3~V), unidad de
 procesamiento ESP32-S3-WROOM-1-N16R8 \citep{espressif_esp32_datasheet},
 interfaz de bus CAN con el transceptor SN65HVD230
 \citep{sn65hvd230_datasheet}, almacenamiento en MicroSD, interfaz de usuario
@@ -2099,8 +2099,8 @@ presenta en el Apéndice~N.
 		R2 & Resistor divisor realim. (inf.) & 13,3~k$\Omega$  & 0603 & 1 \\
 		\midrule
 		\multicolumn{5}{l}{\textit{Etapa de alimentación, riel 2 de 2 (5~V $\rightarrow$ 3,3~V, dos rieles LDO)}} \\
-		U4 & LDO riel 1 (ESP32-S3, hasta 1~A), siempre activo & AMS1117-3.3 & SOT-223 & 1 \\
-		U5 & LDO riel 2 (periféricos, hasta 600~mA) & AP2112K-3.3TRG1 & SOT-23-5 & 1 \\
+		U4 & LDO riel 1 (ESP32-S3, hasta 1~A), siempre activo & AMS1117-3,3 & SOT-223 & 1 \\
+		U5 & LDO riel 2 (periféricos, hasta 600~mA) & AP2112K-3,3TRG1 & SOT-23-5 & 1 \\
 		C14,C15 & Desacople entrada/salida AMS1117 & 10~\textmu F & 1206 & 2 \\
 		C16,C17 & Desacople entrada/salida AP2112 & 1~\textmu F & 0603 & 2 \\
 		\midrule
