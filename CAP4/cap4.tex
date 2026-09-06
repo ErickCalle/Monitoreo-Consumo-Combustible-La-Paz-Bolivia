@@ -259,7 +259,19 @@ La integración se verifica de manera incremental: primero se confirma la comuni
 \subsection{Placa preliminar en EasyEDA}
 \label{sec:placa_preliminar}
 
-Una vez concluidas las pruebas de campo sobre el prototipo en protoboard, se diseñó en EasyEDA una placa preliminar que replica el mismo circuito funcional ya validado (mismo módulo ESP32-S3, mismo transceptor CAN, misma pantalla OLED y microSD), con el único fin de contar con una versión más robusta y cómoda de manejar que las conexiones sueltas de una protoboard, previa a la placa final documentada en el Capítulo~3 (diseñada en Altium Designer). A diferencia de esa placa final, la preliminar resuelve la alimentación con un regulador lineal simple en vez de la conversión conmutada de dos rieles, suficiente para las pruebas de campo dado que no corre con la misma restricción de autonomía en reposo; el esquemático completo, la simulación 3D y las fotografías de la placa fabricada se presentan en el Capítulo~3 (Sección~\ref{sec:pcb_preliminar_diseno}). La fabricación de esta placa preliminar se encargó a Robokit (La Paz) por 150\,Bs (Tabla~\ref{tab:costo_pcb_preliminar}, Capítulo~5), y el ensamblaje de los componentes se realizó manualmente. Al tratarse del mismo circuito ya probado, esta placa no requirió una nueva ronda de pruebas de campo: su función es exclusivamente de robustez física y comodidad de manejo, no de validación técnica adicional sobre lo ya reportado en este capítulo.
+Una vez concluidas las pruebas de campo sobre el prototipo en protoboard, se diseñó en EasyEDA una placa preliminar que replica el mismo circuito funcional ya validado (mismo módulo ESP32-S3, mismo transceptor CAN, misma pantalla OLED y microSD), con el único fin de contar con una versión más robusta y cómoda de manejar que las conexiones sueltas de una protoboard, previa a la placa final documentada en el Capítulo~3 (diseñada en Altium Designer). A diferencia de esa placa final, la preliminar resuelve la alimentación con un regulador lineal simple en vez de la conversión conmutada de dos rieles, suficiente para las pruebas de campo dado que no corre con la misma restricción de autonomía en reposo; el esquemático completo y la simulación 3D se presentan en el Capítulo~3 (Sección~\ref{sec:pcb_preliminar_diseno}). La fabricación de esta placa preliminar se encargó a Robokit (La Paz) por 150\,Bs (Tabla~\ref{tab:costo_pcb_preliminar}, Capítulo~5), y el ensamblaje de los componentes se realizó manualmente, reutilizando el mismo módulo ESP32-S3, el transceptor SN65HVD230 y la pantalla OLED ya validados en la etapa de protoboard. La Figura~\ref{fig:ensamblaje_pcb_cap4} muestra la placa resultante tras este ensamblaje.
+
+\begin{figure}[H]
+	\centering
+	\caption{Ensamblaje de la placa preliminar}
+	\label{fig:ensamblaje_pcb_cap4}
+	\includegraphics[width=0.6\textwidth]{Images/PROTO_ENSAMBLADA.jpeg}
+
+	\vspace{2pt}
+	{\footnotesize\textit{Nota.} Placa preliminar ensamblada, con el módulo ESP32-S3-N16R8, el regulador lineal, el módulo transceptor SN65HVD230 y el conector de entrada de 4 pines. Elaboración propia.}
+\end{figure}
+
+Al tratarse del mismo circuito ya probado, esta placa no requirió una nueva ronda de pruebas de campo: su función es exclusivamente de robustez física y comodidad de manejo, no de validación técnica adicional sobre lo ya reportado en este capítulo.
 
 \subsection{Conexión al bus CAN del vehículo}
 
