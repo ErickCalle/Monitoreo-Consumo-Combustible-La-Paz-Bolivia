@@ -686,7 +686,7 @@ En la práctica, la comparación del consumo debe realizarse en términos equiva
 
 La Figura \ref{fig:bifuel_sistema2} puede utilizarse para mostrar la arquitectura general de un sistema bi-fuel, incluyendo los componentes principales del circuito de gasolina y del circuito de gas. Y seguidamente en la Tabla \ref{tab:bifuel} su comparación con diferentes combustibles.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	
 	% 1. El caption automático estilo APA 7 (Título descriptivo arriba)
@@ -705,7 +705,7 @@ La Figura \ref{fig:bifuel_sistema2} puede utilizarse para mostrar la arquitectur
 	\end{flushleft}
 \end{figure}
 
-\begin{table}[h]
+\begin{table}[H]
 	\centering
 	% Título separado bajo norma estricta APA 7
 	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf}
@@ -838,6 +838,11 @@ Además, los microcontroladores incluyen módulos de comunicación serie como UA
 En el ámbito automotriz, los microcontroladores suelen integrar controladores de comunicación especializados para buses como CAN, LIN y, en algunos casos, FlexRay o Automotive Ethernet. El controlador CAN, por ejemplo, gestiona la trama CAN conforme a la norma ISO 11898, permitiendo la transmisión y recepción de mensajes sin que el núcleo tenga que gestionar cada bit, lo que alivia la carga de procesamiento y mejora la determinismo en la comunicación de datos entre ECUs \citep{ISO11898, AutomotiveEmbeddedHandbook}.
 
 Los módulos LIN permiten la creación de redes de bajo costo para subsistemas de confort y body electronics, mientras que módulos de Ethernet o FlexRay se utilizan en aplicaciones de mayor ancho de banda o requisitos de tiempo real estrictos, como sistemas de infoentretenimiento o ADAS. La presencia de estos controladores de comunicación integrados convierte al microcontrolador en un nodo de red listo para integrarse en la arquitectura de comunicación vehicular sin necesidad de circuitos externos complejos.
+
+\subsubsection{Sistema en chip (SoC): el caso del ESP32-S3}
+Un \textit{sistema en chip} (\textit{System on Chip}, SoC) constituye una evolución del microcontrolador clásico: además del núcleo de procesamiento, la memoria y los periféricos digitales típicos, integra en el mismo encapsulado subsistemas de radiofrecuencia (RF) completos, como transceptores de Wi-Fi y Bluetooth, junto con la circuitería analógica de acondicionamiento que estos requieren. Esta integración elimina la necesidad de módulos de comunicación inalámbrica externos, reduce el número de componentes discretos de la placa y el consumo asociado a las interfaces entre chips, a cambio de una mayor complejidad interna del silicio \citep{MikroE2018}.
+
+Un ejemplo representativo de esta arquitectura, y el empleado en el presente proyecto, es el ESP32-S3 de Espressif Systems, en su variante \textbf{ESP32-S3-WROOM-1-N16R8}. Este SoC integra un procesador de doble núcleo Xtensa\textsuperscript{\textregistered}~LX7 de hasta 240~MHz, un controlador de bus CAN nativo (TWAI, \textit{Two-Wire Automotive Interface}) compatible con ISO~11898-1, y radios integrados de Wi-Fi de 2,4~GHz y Bluetooth Low Energy (BLE) 5.0, además de 16~MB de memoria Flash y 8~MB de PSRAM integrados en el propio módulo, de donde proviene la nomenclatura ``N16R8'' (16~MB de Flash NOR, 8~MB de PSRAM) \citep{espressif_esp32_datasheet}. La disponibilidad de un controlador CAN nativo resulta particularmente relevante para este proyecto, ya que permite prescindir de un controlador CAN externo por SPI, como el MCP2515, reduciendo el conteo de componentes de la placa y eliminando una fuente adicional de fallas en la interfaz entre ambos circuitos integrados.
 
 \subsubsection{Subsistemas de energía y gestión}
 Los microcontroladores incluyen subsistemas de energía y gestión que permiten operar en entornos de alto consumo dinámico y garantizar la confiabilidad del sistema. Entre estos se encuentran módulos de regulación de voltaje interna, circuitos de brown‑out detection (que detectan caídas de tensión peligrosas), osciladores de reloj internos y externos, y módulos de bajo consumo que permiten activar distintos modos de ahorro de energía (sleep, standby, power‑down) según el estado de la aplicación \citep{MikroE2018}.
@@ -1479,127 +1484,6 @@ para alcanzar el nivel ASIL-D según ISO~26262 \citep{ISO16750}.
 %(p.\,ej., condiciones de iluminación extrema que degradan la percepción
 %de la cámara).
 
-% ============================================================
-\subsection{Ejemplos prácticos y casos de estudio}
-% ============================================================
-
-La literatura reporta múltiples implementaciones de sistemas
-embebidos para la adquisición de datos vehiculares mediante el
-protocolo OBD-II sobre bus CAN.  Estos casos de estudio
-constituyen antecedentes directos del presente proyecto.
-
-% -----------------------------------------------------------
-\subsection{Medidor de consumo de combustible con microcontrolador}
-% -----------------------------------------------------------
-
-Uno de los enfoques más consolidados para estimar el consumo
-de combustible en tiempo real utiliza los parámetros PID
-estándar del protocolo SAE~J1979 disponibles a través del
-conector OBD-II.  \citet{Rimpas2020} seleccionaron variables
-como el flujo másico de aire (MAF), el sensor de lambda
-($\lambda$), la temperatura del refrigerante (ECT) y la
-velocidad del vehículo (VSS) para estimar el consumo
-volumétrico instantáneo.  La fórmula fundamental empleada es:
-
-\begin{equation}
-	\dot{m}_{\text{fuel}} =
-	\frac{\dot{m}_{\text{air}}}{\lambda \cdot \text{AFR}_{\text{stoich}}}
-	\label{eq:fuel_mass}
-\end{equation}
-
-\noindent donde $\dot{m}_{\text{air}}$ es el flujo másico de
-aire en g/s proporcionado por el sensor MAF y
-$\text{AFR}_{\text{stoich}} = 14{,}7$ para gasolina.  La
-conversión volumétrica se obtiene dividiendo la masa de
-combustible entre su densidad energética
-($\rho \approx 770$~g/l):
-
-\begin{equation}
-	\dot{V}_{\text{fuel}} =
-	\frac{\dot{m}_{\text{fuel}}}{\rho_{\text{fuel}}}
-	\label{eq:fuel_volume}
-\end{equation}
-
-Para expresar el consumo en \mbox{L/100~km} se divide la
-distancia recorrida entre los litros consumidos y se invierte
-la relación.  Cuando el sensor MAF no está disponible, como
-ocurre en algunos vehículos Chrysler y Honda, se emplea el
-modelo \textit{Speed-Density} basado en la presión absoluta
-del múltiple de admisión (MAP) y la ley del gas ideal
-\citep{HEMData2021}.
-
-\citet{Ling2021} propusieron un sistema de adquisición de
-datos embebido orientado a flotas de transporte público,
-combinando un módulo OBD-II sobre CAN con un receptor GPS para
-correlacionar el estilo de conducción con el consumo.  Sus
-resultados mostraron que en condiciones urbanas la
-incertidumbre de medición del consumo puede alcanzar el 7~\%.
-\citet{FuelConsumptionSVM2020} validaron la estimación de
-consumo usando PIDs de RPM y posición del acelerador (TPS)
-sobre tres vehículos de distintas marcas (Ford~Fusion~2017,
-Mercedes-Benz~E280~2006 y Toyota~Camry~2016), logrando buenos
-ajustes con modelos de máquina de soporte vectorial (SVM).
-
-La Tabla~\ref{tab:pids_consumo} resume los PIDs del estándar
-SAE~J1979 más empleados en proyectos de medición de consumo:
-
-\begin{table}[h]
-	\centering
-	% Título separado bajo norma estricta APA 7
-	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf}
-	\caption{PIDs OBD-II relevantes para el cálculo de consumo de combustible}
-	\label{tab:pids_consumo}
-	
-	% Ajuste de espaciado vertical base de las filas
-	\renewcommand{\arraystretch}{1.3}
-	
-	% Forzamos a la tabla completa a ajustarse de forma compacta al ancho de página
-	\resizebox{\textwidth}{!}{%
-		\begin{tabular}{c l c p{8.5cm}}
-			\toprule % Línea superior APA 7
-			\rowcolor[rgb]{0.851, 0.851, 0.851}
-			\textbf{PID (hex)} & \textbf{Nombre} & \textbf{Unidad} & \textbf{Relevancia para el cálculo de consumo} \\
-			\midrule % Línea divisoria de encabezado APA 7
-			\texttt{0x10} & MAF (flujo másico de aire) & g/s & Variable principal para el cálculo directo de flujo másico mediante la ecuación~\ref{eq:fuel_mass}. \\
-			\addlinespace
-			\texttt{0x0B} & MAP (presión absoluta del múltiple) & kPa & Alternativa fundamental al sensor MAF bajo el modelo de estimación \textit{Speed-Density}. \\
-			\addlinespace
-			\texttt{0x0C} & RPM del motor & rpm & Variable cinemática necesaria para determinar el flujo volumétrico en el modelo \textit{Speed-Density}. \\
-			\addlinespace
-			\texttt{0x0D} & Velocidad del vehículo & km/h & Parámetro requerido para la conversión del consumo instantáneo a unidades relativas (L/100~km). \\
-			\addlinespace
-			\texttt{0x44} & Relación Lambda ($\lambda$) equivalente & --- & Factor de corrección para el ajuste estequiométrico real en la ecuación~\ref{eq:fuel_mass}. \\
-			\addlinespace
-			\texttt{0x06} & STFT (\textit{Short Term Fuel Trim}) & \% & Ajuste dinámico a corto plazo de la inyección en lazo cerrado (\textit{closed-loop}). \\
-			\addlinespace
-			\texttt{0x07} & LTFT (\textit{Long Term Fuel Trim}) & \% & Desviación adaptativa acumulada a largo plazo de la estrategia de inyección. \\
-			\addlinespace
-			\texttt{0x33} & Presión barométrica atmosférica & kPa & Variable crítica para la compensación de densidad del aire a alta altitud (ej. La~Paz, 3{,}640~m.s.n.m.). \\
-			\addlinespace
-			\texttt{0x5E} & Tasa de flujo del inyector & L/h & Lectura directa de consumo, de soporte limitado u opcional en ECUs comerciales. \\
-			\bottomrule % Línea inferior de cierre APA 7
-		\end{tabular}%
-	}
-	\vspace{0.2cm}
-	
-	\begin{flushleft}
-		\footnotesize \textit{Nota.} Especificación de identificadores de parámetros (PIDs) estandarizados bajo la norma SAE~J1979 utilizados para la adquisición de datos de diagnóstico a bordo en tiempo real. Adaptado de~\citep{sae_j1979_2014, Rimpas2020}.
-	\end{flushleft}
-\end{table}
-
-\subsubsection{Relevancia para el presente proyecto.}
-El sistema desarrollado utiliza el ATmega328P junto con el
-módulo MCP2515 para acceder al bus CAN vehicular y solicitar
-estos PIDs periódicamente.  Dado que el sistema opera en
-La~Paz (Bolivia) a aproximadamente 3{,}640~m.s.n.m., el
-\mbox{PID~\texttt{0x33}} adquiere especial importancia: la
-presión barométrica reducida ($\approx 64,4$~kPa frente a
-101,3~kPa al nivel del mar) representa una disminución del
-36,4~\% en la densidad del aire.  Esto impacta directamente
-en el modelo \textit{Speed-Density} y obliga a incorporar el
-factor de corrección altitudinal $Q_{\text{corr}}$ en el
-cálculo del flujo de combustible.
-
 % -----------------------------------------------------------
 \subsection{Registrador de datos vehiculares vía CAN/OBD-II con ESP32}
 % -----------------------------------------------------------
@@ -2069,6 +1953,8 @@ lo que convierte al LTS en un factor competitivo crítico.
 \subsection{Futuro y tendencias}
 % ============================================================
 
+En la actualidad, prácticamente todo vehículo moderno incorpora al menos una computadora embebida que gestiona su funcionamiento, independientemente de su tipo de propulsión: los vehículos de combustión interna la emplean para el control del motor y la inyección de combustible, los vehículos híbridos suman a esto la gestión de la transición entre el motor térmico y el eléctrico, y los vehículos eléctricos dependen por completo de ella para el control del motor eléctrico, la batería y la electrónica de potencia. La diferencia entre estas arquitecturas no radica, por tanto, en la presencia o ausencia de electrónica de control, sino en el número, la complejidad y el grado de centralización de dichas unidades de procesamiento, tendencia que se profundiza con la electrificación del tren motriz, tal como se describe a continuación.
+
 % -----------------------------------------------------------
 \subsubsection{Electrificación y arquitecturas de zona}
 % -----------------------------------------------------------
@@ -2082,7 +1968,7 @@ software (\textit{Software-Defined Vehicles}, SDV).
 \citet{TechBriefs2024} reportan que la electrificación y las
 presiones de sostenibilidad han motivado regulaciones
 gubernamentales que aceleran la adopción de vehículos
-eléctricos: en 2022, Noruega alcanzó el 80~\% de cuota de
+eléctricos: en 2022, Noruega alcanzó el 80~\%~de cuota de
 mercado EV, mientras las ventas globales de automóviles
 eléctricos totalizaron 14 millones de unidades en 2023 según
 la Agencia Internacional de Energía \citep{GMInsights2025}.
