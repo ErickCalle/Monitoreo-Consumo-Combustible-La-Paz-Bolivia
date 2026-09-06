@@ -1177,6 +1177,126 @@ ws.textAll(buildJSON(currentData));
 	de red local.
 \end{figure}
 
+\subsection{Placa preliminar (EasyEDA)}
+\label{sec:pcb_preliminar_diseno}
+
+Antes de proceder con el diseño de la placa final descrito en el resto de esta sección, se desarrolló en EasyEDA una placa preliminar que replica el mismo circuito ya validado sobre protoboard (Capítulo~4, Sección~4.1.3), con el fin de contar con una versión física más robusta que las conexiones sueltas de una protoboard para las pruebas de campo. A diferencia de la placa final, esta versión preliminar resuelve la alimentación con un regulador lineal simple (7805 más un transistor de paso TIP42C en configuración de refuerzo de corriente) en lugar de la conversión conmutada de dos rieles, y conecta el transceptor CAN, la pantalla OLED y el módulo microSD --ya validados en la etapa de protoboard-- mediante conectores de pines en vez de integrarlos directamente en la placa. El esquemático completo se muestra en la Figura~\ref{fig:esquematico_pcb_preliminar}.
+
+\begin{figure}[H]
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption[Esquemático de la placa preliminar en EasyEDA]{Esquemático completo de la placa preliminar.}
+	\label{fig:esquematico_pcb_preliminar}
+	\centering
+	\includegraphics[width=0.95\textwidth]{Images/esquematico_pcb_proto.jpg}
+
+	\vspace{2mm}
+	\small\raggedright
+	\textit{Nota.} Desarrollado en EasyEDA. El costo detallado de cada componente se presenta en el Capítulo~5 (Tabla~\ref{tab:costo_placa_preliminar_bom}).
+\end{figure}
+
+La Figura~\ref{fig:simulacion_pcb_preliminar} muestra la vista 3D generada por EasyEDA a partir de ese esquemático y del enrutado de la placa, previo al envío a fabricar.
+
+\begin{figure}[H]
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption[Vista 3D de la placa preliminar en EasyEDA]{Simulación 3D de la placa preliminar, generada en EasyEDA antes de la fabricación.}
+	\label{fig:simulacion_pcb_preliminar}
+	\centering
+	\includegraphics[width=0.55\textwidth]{Images/simulacion_pcb_proto.jpg}
+\end{figure}
+
+La fabricación de la placa preliminar se encargó a Robokit (La Paz); la Figura~\ref{fig:fisica_pcb_preliminar} muestra las caras superior e inferior de la placa recibida, previo al ensamblaje de los componentes.
+
+\begin{figure}[H]
+	\centering
+	\caption{Placa preliminar fabricada por Robokit, sin ensamblar}
+	\label{fig:fisica_pcb_preliminar}
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{Images/top_pcb_proto.jpeg}
+		\caption{Cara superior (\textit{top})}
+		\label{fig:top_pcb_preliminar}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{Images/bottom_pcb_proto.jpeg}
+		\caption{Cara inferior (\textit{bottom})}
+		\label{fig:bottom_pcb_preliminar}
+	\end{subfigure}
+	\vspace{2pt}
+	\\
+	{\footnotesize\textit{Nota.} Placa de una sola cara fabricada por Robokit (La Paz), 150\,Bs (Capítulo~5, Tabla~\ref{tab:costo_pcb_preliminar}); el ensamblaje de los componentes se realizó manualmente. Elaboración propia.}
+\end{figure}
+
+Una vez soldados los componentes de la Tabla~\ref{tab:costo_placa_preliminar_bom} (Capítulo~5) sobre esta placa, y reutilizando el módulo ESP32-S3, el transceptor SN65HVD230 y la pantalla OLED ya validados en protoboard, se obtiene la placa ensamblada de la Figura~\ref{fig:ensamblada_pcb_preliminar}.
+
+\begin{figure}[H]
+	\centering
+	\caption{Placa preliminar ensamblada}
+	\label{fig:ensamblada_pcb_preliminar}
+	\includegraphics[width=0.6\textwidth]{Images/pcb_proto_ensamblada.jpeg}
+
+	\vspace{2pt}
+	{\footnotesize\textit{Nota.} Placa preliminar tras el ensamblaje manual de los componentes: se distinguen el módulo ESP32-S3-N16R8, el regulador 7805 con el transistor de paso TIP42C, el módulo transceptor SN65HVD230 (conectado mediante el header de 6 pines), el fusible reseteable F1 y el conector de entrada de 4 pines (GND, 12~V, CAN\_L, CAN\_H). Elaboración propia.}
+\end{figure}
+
+\subsection{Diseño de la carcasa del prototipo (impresión 3D)}
+\label{sec:carcasa_prototipo}
+
+Para esta presentación se diseñó e imprimió una carcasa únicamente para la placa preliminar; la carcasa de la placa final queda pendiente y se elaborará si el tribunal la solicita. Como punto de partida se tomó un modelo STL de una caja de dos piezas (base y tapa) publicado en MakerWorld, el repositorio de modelos de Bambu Lab, mostrado en la Figura~\ref{fig:stl_makerworld}.
+
+\begin{figure}[H]
+	\centering
+	\caption{Modelo STL base, tomado de MakerWorld}
+	\label{fig:stl_makerworld}
+	\includegraphics[width=0.7\textwidth]{Images/STL_MAKEWORD.jpg}
+
+	\vspace{2pt}
+	{\footnotesize\textit{Nota.} Modelo de caja de dos piezas (base y tapa) publicado en MakerWorld (Bambu Lab), usado como punto de partida antes de la edición en SolidWorks.}
+\end{figure}
+
+La tapa del modelo original no contaba con una abertura para la pantalla OLED; se editó en SolidWorks para agregar el recorte rectangular necesario, manteniendo el resto de la geometría del modelo original (Figura~\ref{fig:tapa_editada}).
+
+\begin{figure}[H]
+	\centering
+	\caption{Tapa modificada en SolidWorks, con abertura para la pantalla OLED}
+	\label{fig:tapa_editada}
+	\includegraphics[width=0.6\textwidth]{Images/TAPA_EDITADA.jpg}
+\end{figure}
+
+La impresión se realizó en PLA, con una impresora propia Creality Ender V3 KE (Figura~\ref{fig:impresion_3d}). Se eligió PLA en vez de un material más resistente a la intemperie (por ejemplo, PETG o ABS) porque, al tratarse de una carcasa de prototipo, no está expuesta al sol de forma prolongada; esa consideración sí sería relevante para una carcasa de producción instalada de forma permanente en el vehículo.
+
+\begin{figure}[H]
+	\centering
+	\caption{Impresión 3D en la Creality Ender V3 KE}
+	\label{fig:impresion_3d}
+	\includegraphics[width=0.7\textwidth]{Images/IMPRESION_3D.jpg}
+\end{figure}
+
+La base ya impresa (21~g de PLA) se muestra en la Figura~\ref{fig:carcasa_3d}; la tapa (16~g) está pendiente de impresión al momento de escribir este capítulo. El costo del material se presenta en el Capítulo~5 (Tabla~\ref{tab:costo_carcasa}).
+
+\begin{figure}[H]
+	\centering
+	\caption{Carcasa impresa del prototipo}
+	\label{fig:carcasa_3d}
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{Images/CARCASA_3D.jpg}
+		\caption{Base (impresa, 21~g)}
+		\label{fig:carcasa_3d_base}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\fbox{\parbox[c][0.75\textwidth][c]{\textwidth}{\centering \textit{[Pendiente: fotografía de la tapa una vez impresa]}}}
+		\caption{Tapa (pendiente, 16~g)}
+		\label{fig:carcasa_3d_tapa}
+	\end{subfigure}
+	\vspace{2pt}
+	\\
+	{\footnotesize\textit{Nota.} Impresión propia en PLA. Elaboración propia.}
+\end{figure}
+
 \subsection{Diagrama esquemático general}
 % Tu contenido actual: 4 bloques funcionales con figuras.
 En esta sección se presentará el diseño esquemático del sistema, realizando el cálculo y selección de los valores óptimos para cada componente con base en las recomendaciones de sus respectivas hojas de datos. Para facilitar el análisis y diseño, el sistema se ha dividido en los siguientes subsistemas:
@@ -1583,126 +1703,6 @@ El esquemático correspondiente a esta etapa se desarrolló en Altium Designer y
 	\vspace{2mm}
 	\small\raggedright
 	\textit{Nota.} Diagrama esquemático desarrollado en Altium Designer para el sistema de indicadores visuales. Cada LED se encuentra conectado a un GPIO del módulo ESP32-S3-WROOM-1-N16R8 mediante una resistencia limitadora de 220~$\Omega$, la cual restringe la corriente que circula por el diodo, protege las salidas digitales del microcontrolador y prolonga la vida útil de los indicadores. Los cuatro LED permiten visualizar el estado de la comunicación CAN, la actividad de la memoria MicroSD, la conectividad Wi-Fi y la presencia de condiciones de error detectadas durante el funcionamiento del sistema.
-\end{figure}
-
-\subsection{Placa preliminar (EasyEDA)}
-\label{sec:pcb_preliminar_diseno}
-
-Antes de proceder con el diseño de la placa final descrito en el resto de esta sección, se desarrolló en EasyEDA una placa preliminar que replica el mismo circuito ya validado sobre protoboard (Capítulo~4, Sección~4.1.3), con el fin de contar con una versión física más robusta que las conexiones sueltas de una protoboard para las pruebas de campo. A diferencia de la placa final, esta versión preliminar resuelve la alimentación con un regulador lineal simple (7805 más un transistor de paso TIP42C en configuración de refuerzo de corriente) en lugar de la conversión conmutada de dos rieles, y conecta el transceptor CAN, la pantalla OLED y el módulo microSD --ya validados en la etapa de protoboard-- mediante conectores de pines en vez de integrarlos directamente en la placa. El esquemático completo se muestra en la Figura~\ref{fig:esquematico_pcb_preliminar}.
-
-\begin{figure}[H]
-	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
-	\caption[Esquemático de la placa preliminar en EasyEDA]{Esquemático completo de la placa preliminar.}
-	\label{fig:esquematico_pcb_preliminar}
-	\centering
-	\includegraphics[width=0.95\textwidth]{Images/esquematico_pcb_proto.jpg}
-
-	\vspace{2mm}
-	\small\raggedright
-	\textit{Nota.} Desarrollado en EasyEDA. El costo detallado de cada componente se presenta en el Capítulo~5 (Tabla~\ref{tab:costo_placa_preliminar_bom}).
-\end{figure}
-
-La Figura~\ref{fig:simulacion_pcb_preliminar} muestra la vista 3D generada por EasyEDA a partir de ese esquemático y del enrutado de la placa, previo al envío a fabricar.
-
-\begin{figure}[H]
-	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
-	\caption[Vista 3D de la placa preliminar en EasyEDA]{Simulación 3D de la placa preliminar, generada en EasyEDA antes de la fabricación.}
-	\label{fig:simulacion_pcb_preliminar}
-	\centering
-	\includegraphics[width=0.55\textwidth]{Images/simulacion_pcb_proto.jpg}
-\end{figure}
-
-La fabricación de la placa preliminar se encargó a Robokit (La Paz); la Figura~\ref{fig:fisica_pcb_preliminar} muestra las caras superior e inferior de la placa recibida, previo al ensamblaje de los componentes.
-
-\begin{figure}[H]
-	\centering
-	\caption{Placa preliminar fabricada por Robokit, sin ensamblar}
-	\label{fig:fisica_pcb_preliminar}
-	\begin{subfigure}[t]{0.48\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{Images/top_pcb_proto.jpeg}
-		\caption{Cara superior (\textit{top})}
-		\label{fig:top_pcb_preliminar}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.48\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{Images/bottom_pcb_proto.jpeg}
-		\caption{Cara inferior (\textit{bottom})}
-		\label{fig:bottom_pcb_preliminar}
-	\end{subfigure}
-	\vspace{2pt}
-	\\
-	{\footnotesize\textit{Nota.} Placa de una sola cara fabricada por Robokit (La Paz), 150\,Bs (Capítulo~5, Tabla~\ref{tab:costo_pcb_preliminar}); el ensamblaje de los componentes se realizó manualmente. Elaboración propia.}
-\end{figure}
-
-Una vez soldados los componentes de la Tabla~\ref{tab:costo_placa_preliminar_bom} (Capítulo~5) sobre esta placa, y reutilizando el módulo ESP32-S3, el transceptor SN65HVD230 y la pantalla OLED ya validados en protoboard, se obtiene la placa ensamblada de la Figura~\ref{fig:ensamblada_pcb_preliminar}.
-
-\begin{figure}[H]
-	\centering
-	\caption{Placa preliminar ensamblada}
-	\label{fig:ensamblada_pcb_preliminar}
-	\includegraphics[width=0.6\textwidth]{Images/pcb_proto_ensamblada.jpeg}
-
-	\vspace{2pt}
-	{\footnotesize\textit{Nota.} Placa preliminar tras el ensamblaje manual de los componentes: se distinguen el módulo ESP32-S3-N16R8, el regulador 7805 con el transistor de paso TIP42C, el módulo transceptor SN65HVD230 (conectado mediante el header de 6 pines), el fusible reseteable F1 y el conector de entrada de 4 pines (GND, 12~V, CAN\_L, CAN\_H). Elaboración propia.}
-\end{figure}
-
-\subsection{Diseño de la carcasa del prototipo (impresión 3D)}
-\label{sec:carcasa_prototipo}
-
-Para esta presentación se diseñó e imprimió una carcasa únicamente para la placa preliminar; la carcasa de la placa final queda pendiente y se elaborará si el tribunal la solicita. Como punto de partida se tomó un modelo STL de una caja de dos piezas (base y tapa) publicado en MakerWorld, el repositorio de modelos de Bambu Lab, mostrado en la Figura~\ref{fig:stl_makerworld}.
-
-\begin{figure}[H]
-	\centering
-	\caption{Modelo STL base, tomado de MakerWorld}
-	\label{fig:stl_makerworld}
-	\includegraphics[width=0.7\textwidth]{Images/STL_MAKEWORD.jpg}
-
-	\vspace{2pt}
-	{\footnotesize\textit{Nota.} Modelo de caja de dos piezas (base y tapa) publicado en MakerWorld (Bambu Lab), usado como punto de partida antes de la edición en SolidWorks.}
-\end{figure}
-
-La tapa del modelo original no contaba con una abertura para la pantalla OLED; se editó en SolidWorks para agregar el recorte rectangular necesario, manteniendo el resto de la geometría del modelo original (Figura~\ref{fig:tapa_editada}).
-
-\begin{figure}[H]
-	\centering
-	\caption{Tapa modificada en SolidWorks, con abertura para la pantalla OLED}
-	\label{fig:tapa_editada}
-	\includegraphics[width=0.6\textwidth]{Images/TAPA_EDITADA.jpg}
-\end{figure}
-
-La impresión se realizó en PLA, con una impresora propia Creality Ender V3 KE (Figura~\ref{fig:impresion_3d}). Se eligió PLA en vez de un material más resistente a la intemperie (por ejemplo, PETG o ABS) porque, al tratarse de una carcasa de prototipo, no está expuesta al sol de forma prolongada; esa consideración sí sería relevante para una carcasa de producción instalada de forma permanente en el vehículo.
-
-\begin{figure}[H]
-	\centering
-	\caption{Impresión 3D en la Creality Ender V3 KE}
-	\label{fig:impresion_3d}
-	\includegraphics[width=0.7\textwidth]{Images/IMPRESION_3D.jpg}
-\end{figure}
-
-La base ya impresa (21~g de PLA) se muestra en la Figura~\ref{fig:carcasa_3d}; la tapa (16~g) está pendiente de impresión al momento de escribir este capítulo. El costo del material se presenta en el Capítulo~5 (Tabla~\ref{tab:costo_carcasa}).
-
-\begin{figure}[H]
-	\centering
-	\caption{Carcasa impresa del prototipo}
-	\label{fig:carcasa_3d}
-	\begin{subfigure}[t]{0.48\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{Images/CARCASA_3D.jpg}
-		\caption{Base (impresa, 21~g)}
-		\label{fig:carcasa_3d_base}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.48\textwidth}
-		\centering
-		\fbox{\parbox[c][0.75\textwidth][c]{\textwidth}{\centering \textit{[Pendiente: fotografía de la tapa una vez impresa]}}}
-		\caption{Tapa (pendiente, 16~g)}
-		\label{fig:carcasa_3d_tapa}
-	\end{subfigure}
-	\vspace{2pt}
-	\\
-	{\footnotesize\textit{Nota.} Impresión propia en PLA. Elaboración propia.}
 \end{figure}
 
 \subsection{Diseño de la PCB (Altium Designer)}
