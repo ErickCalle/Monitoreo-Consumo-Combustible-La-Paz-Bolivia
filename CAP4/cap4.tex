@@ -40,7 +40,7 @@ Siguiendo el proceso de armado:
 
 \begin{itemize}
 	\item Colocar primeramente el ESP32-S3 en una ubicación fácil de programar y de alimentar por su puerto de comunicación.
-	\item Colocar estratégicamente el SN65HDV230 junto con el OLED, ya que estos componentes comparten una alimentación de 3.3~V.
+	\item Colocar estratégicamente el SN65HDV230 junto con el OLED, ya que estos componentes comparten una alimentación de 3,3~V.
 	\item Después para no arruinar un micro SD se usa un adaptador SD, el cual soldaremos para una mejor conexión al protoboard.
 	\item Y como ultimo se conecta una configuración de 4 leds para ayudar la visualización de los periféricos.
 	
@@ -600,7 +600,7 @@ Esta prueba verifica que el sistema propuesto decodifica correctamente las trama
 		\midrule
 		Tramas recibidas en 5 min & 2936 & 1712 & 1224 \\
 		Tramas con error de CRC & 0 & 34 & 34 \\
-		Latencia promedio (ms) & 2.2 & 231.4 & 229.2 \\
+		Latencia promedio (ms) & 2,2 & 231,4 & 229,2 \\
 		\bottomrule
 	\end{tabularx}
 	\vspace{2mm}
@@ -883,8 +883,8 @@ Al ser una prueba puntual (motor apagado, sin trayecto de por medio), esta fila 
 		\rowcolor[rgb]{0.851, 0.851, 0.851}
 		Vehículo & MAP en KOEO (kPa) & \texttt{baro\_kpa} (kPa) & Diferencia (\%) \\
 		\midrule
-		Changan Honor & 63.0 & 63.0 & 0.0 \\
-		Nissan Vanette & 63.0 & 64.6 & -2.5 \\
+		Changan Honor & 63,0 & 63,0 & 0,0 \\
+		Nissan Vanette & 63,0 & 64,6 & -2,5 \\
 		\bottomrule
 	\end{tabularx}
 	\vspace{2mm}
@@ -935,7 +935,7 @@ Ambas partes de la prueba se evalúan con \texttt{validate\_sd\_log.py}, un scri
 		\rowcolor[rgb]{0.851, 0.851, 0.851}
 		Sesión & Duración & Filas válidas & Filas corruptas & Tasa (Hz) & Tamaño / hora \\
 		\midrule
-		5 min (nominal)  & 5.2 min & 292 & 0 & 1.004 & 290.3\,KB \\
+		5 min (nominal)  & 5,2 min & 292 & 0 & 1,004 & 290,3\,KB \\
 		60 min (nominal) & 60,8 min & 3649 & 0 & 1,000 & 315,8\,KB \\
 		Corte abrupto de alimentación & 60,8 min & 3649 & 0 & 1,000 & --- \\
 		\bottomrule
@@ -1213,9 +1213,9 @@ Las tres rutas de la Figura~\ref{fig:ruta_corta}--\ref{fig:ruta_larga} se recorr
 		Trayecto & Distancia (km) & Sistema propuesto (L) & ELM327 + app (L)$^{a}$ & Real, tanque lleno (L) \\
 		\midrule
 		Viaje corto 1 (ida) & {}6,28 & 0,52 & 0,53 & --- \\
-		Viaje corto 1 (vuelta) & 6,14 & 0.58 & 0,57 & --- \\
+		Viaje corto 1 (vuelta) & 6,14 & 0,58 & 0,57 & --- \\
 		Viaje corto 2 (ida) & 6,74 & 0,60 & 0,56 & --- \\
-		Viaje corto 2 (vuelta) & 4.02 & 0,40 & 0,42 & --- \\
+		Viaje corto 2 (vuelta) & 4,02 & 0,40 & 0,42 & --- \\
 		Viaje medio 1 (ida) & 14,25 & 1,00 & 0,99 & --- \\
 		Viaje medio 1 (vuelta) & 15,04 & 1,39 & 1,31 & --- \\
 		Viaje medio 2 (ida) & 18,01 & 1,30 & 1,33 & --- \\

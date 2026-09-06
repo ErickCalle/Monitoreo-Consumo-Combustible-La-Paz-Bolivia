@@ -18,7 +18,7 @@ Con el propósito de mejorar la organización, modularidad y escalabilidad del d
 \begin{itemize}
 	\item \textbf{Sistema de protección eléctrica.} Etapa de aislamiento analógico encargada de salvaguardar los componentes lógicos frente a transitorios de tensión, picos de sobrecorriente, inversión de polaridad y ruido electromagnético (EMI) inherente a la red del vehículo.
 	
-	\item \textbf{Sistema de alimentación.} Módulo de acondicionamiento de potencia que convierte la tensión nominal de 12~V extraída del puerto OBD-II a niveles lógicos estables (ej. 3.3~V o 5~V) mediante regulación DC-DC.
+	\item \textbf{Sistema de alimentación.} Módulo de acondicionamiento de potencia que convierte la tensión nominal de 12~V extraída del puerto OBD-II a niveles lógicos estables (ej. 3,3~V o 5~V) mediante regulación DC-DC.
 	
 	\item \textbf{Sistema de adquisición de datos.} Capa física (\textit{PHY}) acoplada a las líneas diferenciales CAN~High y CAN~Low (pines 6 y 14 del conector OBD-II) para la intercepción, lectura y transmisión de las tramas de diagnóstico del automóvil.
 	
@@ -401,7 +401,7 @@ void loop() {
 \textit{Nota.} Algoritmo estructurado para la conversión asíncrona de tramas del bus de datos bajo el estándar \textit{slcan}. Utiliza el retorno de carro (\texttt{\textbackslash r}) con referencia de \citep{ocsaly2022canfuzzer}.
 \end{figure}
 
-Después de cargar el firmware al esp32 y montar el circuito planteado en la Figura \ref{fig:obd_conector_soldado} se procede a obtener tramas CAN, los siguientes son usados en el sistema operativo UBUNTU 22.4 para tener mas control de los comunicadores.
+Después de cargar el firmware al esp32 y montar el circuito planteado en la Figura \ref{fig:obd_conector_soldado} se procede a obtener tramas CAN, los siguientes son usados en el sistema operativo Ubuntu 22.04 para tener mas control de los comunicadores.
 
 \begin{itemize}
 	\item Primero se descarga el archivo ejecutable para Ubuntu de SAvvyCAN de la pagina oficial de la misma \citep{savvycan2026}.
@@ -610,7 +610,7 @@ En la Tabla~\ref{tab:comparativa_ids} se organizan los datos calculados frente a
 		\rowcolor[rgb]{0.851, 0.851, 0.851}
 		\textbf{CAN ID} & \textbf{Datos Hexadecimales} & \textbf{Valor Calculado} & \textbf{Desviación Absoluta} & \textbf{¿Es el ID de RPM?} \\
 		\midrule
-		\texttt{0x00255} & \texttt{0x1E 0x93} & \textbf{1956{,}75 RPM} & \textbf{43{,}25 RPM (2.1\%)} & \textbf{SÍ (Confirmado)} \\
+		\texttt{0x00255} & \texttt{0x1E 0x93} & \textbf{1956{,}75 RPM} & \textbf{43{,}25 RPM (2,1\%)} & \textbf{SÍ (Confirmado)} \\
 		\texttt{0x00218} & \texttt{0x00 0xFF} & 63{,}75 RPM            & 1936{,}25 RPM                & NO \\
 		\texttt{0x00275} & \texttt{0x00 0xAE} & 43{,}50 RPM            & 1956{,}50 RPM                & NO \\ 
 		\bottomrule
@@ -1212,7 +1212,7 @@ Con el propósito de mitigar perturbaciones eléctricas severas comunes en el en
 	\centering
 	% Formato APA 7 con alineación estricta a la izquierda y protección para el índice
 	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
-	\caption[Diagrama de bloques del sistema de protección y regulación de energía (12V a 3.3V)]{Diagrama de bloques del sistema de protección y regulación de energía}
+	\caption[Diagrama de bloques del sistema de protección y regulación de energía (12V a 3,3V)]{Diagrama de bloques del sistema de protección y regulación de energía}
 	\label{fig:esquema_potencia}
 	
 	% Escalamos el diagrama automáticamente para que ocupe el ancho del texto
@@ -1293,7 +1293,7 @@ garantizando fiabilidad frente a las exigentes condiciones eléctricas del entor
 	\item \textbf{Regulador reductor de 5~V (TPS54302):} Inicialmente se evaluaron
 	reguladores lineales clásicos como el AMS1117-3.3, pero fueron descartados debido a su
 	ineficiente disipación térmica al intentar reducir directamente tensiones del bus
-	automotriz de 12~V a 3{,}3~V, ya que esto representaría disipar más del 72\% de la potencia
+	automotriz de 12~V a 3{,}3~V, ya que esto representaría disipar más del 72\%~de la potencia
 	en calor. En su lugar, se seleccionó el convertidor reductor síncrono
 	(\textit{buck converter}) TPS54302 de Texas Instruments.
 	
@@ -1340,7 +1340,7 @@ garantizando fiabilidad frente a las exigentes condiciones eléctricas del entor
 
 	\item \textbf{Compensación del lazo de control:} A diferencia de otros reguladores de la familia TPS543xx que requieren una red de compensación externa tipo II en un pin COMP dedicado, el TPS54302DDCR emplea control en modo de corriente pico (\textit{peak	current-mode control}) con una red de compensación interna optimizada de fábrica. Esto elimina la necesidad de componentes externos de compensación, reduce el conteo de piezas y simplifica el diseño del lazo de control, según lo indicado en su hoja de datos. Como complemento al filtro de salida, se incorporó un condensador adicional de 75~pF en paralelo, cuya función es mejorar la respuesta ante transitorios de carga.
 	
-	\item \textbf{Regulación de 5~V a 3.3~V:} Para mejorar la eficiencia del convertidor DC-DC la regulación de 5~V a 3.3~V se realizara con 2 componentes muy usados los cuales se detallan:
+	\item \textbf{Regulación de 5~V a 3,3~V:} Para mejorar la eficiencia del convertidor DC-DC la regulación de 5~V a 3,3~V se realizara con 2 componentes muy usados los cuales se detallan:
 	\begin{itemize}
 		\item \textbf{AMS1117-3.3}
 		
@@ -1356,7 +1356,7 @@ garantizando fiabilidad frente a las exigentes condiciones eléctricas del entor
 Consolidada la selección y el dimensionamiento métrico de los componentes, se procedió a
 la transcripción topológica en el entorno de diseño electrónico profesional Altium
 Designer. El resultado es una arquitectura de alimentación robusta y desacoplada, cuyo
-esquema electrónico del sistema de alimentación se ilustra en la Figura \ref{fig:esquematico_final_dc}, junto con el convertidor a 3.3~V que se ilustra en la Figura \ref{fig:esquematico_reg_3v3}.
+esquema electrónico del sistema de alimentación se ilustra en la Figura \ref{fig:esquematico_final_dc}, junto con el convertidor a 3,3~V que se ilustra en la Figura \ref{fig:esquematico_reg_3v3}.
 \begin{figure}[H]
 	% Formato APA 7 con protección para el índice de figuras
 	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
@@ -1373,14 +1373,14 @@ esquema electrónico del sistema de alimentación se ilustra en la Figura \ref{f
 \begin{figure}[H]
 	% Formato APA 7 con protección para el índice de figuras
 	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
-	\caption[Esquemático de los reguladores LDO AMS1117 y AP2112 en Altium Designer]{Esquemático del circuito de regulación lineal para la alimentación de 3.3~V.}
+	\caption[Esquemático de los reguladores LDO AMS1117 y AP2112 en Altium Designer]{Esquemático del circuito de regulación lineal para la alimentación de 3,3~V.}
 	\label{fig:esquematico_reg_3v3}
 	\centering
 	\includegraphics[width=0.8\textwidth]{Images/regum.png} % Modifica el nombre de la imagen si es necesario
 	
 	\vspace{2mm}
 	\small\raggedright
-	\textit{Nota.} Diagrama eléctrico de la etapa de regulación lineal que reduce el voltaje de 5~V a 3.3~V. El diseño emplea los reguladores de baja caída de tensión (LDO, por sus siglas en inglés) AMS1117 y AP2112 para suministrar energía de forma estable al microcontrolador y periféricos de 3.3~V. 
+	\textit{Nota.} Diagrama eléctrico de la etapa de regulación lineal que reduce el voltaje de 5~V a 3,3~V. El diseño emplea los reguladores de baja caída de tensión (LDO, por sus siglas en inglés) AMS1117 y AP2112 para suministrar energía de forma estable al microcontrolador y periféricos de 3,3~V.
 \end{figure}
 
 \subsubsection{Sistema transceptor CAN}
@@ -1424,7 +1424,7 @@ Tras analizar el esquema de los módulos basados en el SN65HVD230, se identific�
 
 \subsubsection{Sistema de procesamiento}
 
-Para este sistema se optó por el módulo \textbf{ESP32-S3-WROOM-1-N16R8}, el cual integra el microcontrolador ESP32-S3 de Espressif Systems. Este dispositivo incorpora un procesador de doble núcleo basado en la arquitectura Xtensa\textsuperscript{\textregistered} LX7 de hasta 240 MHz, conectividad Wi-Fi de 2.4 GHz y Bluetooth Low Energy (BLE) 5.0, además de una memoria Flash integrada de 16 MB y 8 MB de PSRAM. Estas características proporcionan la capacidad de ejecutar simultáneamente las tareas de adquisición de datos del vehículo, almacenamiento en memoria microSD, comunicación mediante el protocolo CAN y la implementación de un servidor web local para la visualización de información en tiempo real; el desempeño del sistema se mantiene estable incluso con estas tareas corriendo en paralelo \citep{espressif_esp32_datasheet}. Para asegurar el correcto funcionamiento del microcontrolador se debe implementar, además, la configuración mínima de hardware recomendada por el fabricante, tal como se ilustra en la Figura \ref{fig:conexion_minima_esp32}.
+Para este sistema se optó por el módulo \textbf{ESP32-S3-WROOM-1-N16R8}, el cual integra el microcontrolador ESP32-S3 de Espressif Systems. Este dispositivo incorpora un procesador de doble núcleo basado en la arquitectura Xtensa\textsuperscript{\textregistered} LX7 de hasta 240 MHz, conectividad Wi-Fi de 2,4 GHz y Bluetooth Low Energy (BLE) 5.0, además de una memoria Flash integrada de 16 MB y 8 MB de PSRAM. Estas características proporcionan la capacidad de ejecutar simultáneamente las tareas de adquisición de datos del vehículo, almacenamiento en memoria microSD, comunicación mediante el protocolo CAN y la implementación de un servidor web local para la visualización de información en tiempo real; el desempeño del sistema se mantiene estable incluso con estas tareas corriendo en paralelo \citep{espressif_esp32_datasheet}. Para asegurar el correcto funcionamiento del microcontrolador se debe implementar, además, la configuración mínima de hardware recomendada por el fabricante, tal como se ilustra en la Figura \ref{fig:conexion_minima_esp32}.
 
 \begin{figure}[H]
 	% Formato APA 7 con numeración automática gestionada por LaTeX
@@ -1437,7 +1437,7 @@ Para este sistema se optó por el módulo \textbf{ESP32-S3-WROOM-1-N16R8}, el cu
 	
 	\vspace{2mm}
 	\small\raggedright
-	\textit{Nota.} Esquemático de la configuración de hardware requerida para el correcto funcionamiento del módulo ESP32-S3-WROOM-1-N16R8. Se muestra el circuito de habilitación y reinicio mediante el pin EN, los condensadores de desacoplamiento de la alimentación de 3.3 V ubicados próximos al módulo, así como la configuración recomendada de los pines de arranque y programación para garantizar una inicialización estable del sistema. Adaptado de \textit{ESP32-S3-WROOM-1 Datasheet}, por Espressif Systems, 2024.
+	\textit{Nota.} Esquemático de la configuración de hardware requerida para el correcto funcionamiento del módulo ESP32-S3-WROOM-1-N16R8. Se muestra el circuito de habilitación y reinicio mediante el pin EN, los condensadores de desacoplamiento de la alimentación de 3,3 V ubicados próximos al módulo, así como la configuración recomendada de los pines de arranque y programación para garantizar una inicialización estable del sistema. Adaptado de \textit{ESP32-S3-WROOM-1 Datasheet}, por Espressif Systems, 2024.
 \end{figure}
 
 La integración definitiva de la etapa de procesamiento se consolidó mediante el diseño del circuito impreso en la plataforma Altium Designer. Este esquema incorpora las recomendaciones establecidas por el fabricante para el módulo ESP32-S3-WROOM-1-N16R8 y la integración de los diferentes periféricos empleados en el sistema, optimizando la distribución de las señales de alimentación, comunicación y control para mejorar la estabilidad eléctrica y el rendimiento general del dispositivo. El resultado de esta integración y la topología eléctrica final del sistema basado en el microcontrolador se presentan detalladamente en la Figura \ref{fig:esp32fin}.
@@ -1507,7 +1507,7 @@ Definida el uso de este conector se procede a dibujar el esquemático (ver Figur
 
 Con el propósito de almacenar de forma local los datos obtenidos desde el sistema OBD-II, se incorporó una memoria MicroSD al diseño electrónico. Su utilización permite registrar de manera permanente las variables adquiridas por el ESP32-S3-WROOM-1-N16R8, facilitando el almacenamiento de grandes volúmenes de información para su posterior análisis sin depender de una conexión inalámbrica o de un servidor externo. Esta característica resulta especialmente útil durante las pruebas de campo, donde es necesario conservar el historial completo de los parámetros del vehículo para realizar comparaciones, validar modelos matemáticos y analizar el comportamiento del sistema en diferentes condiciones de operación.
 
-La implementación de esta etapa se basó en las especificaciones de la SD Card Association \citep{transcend_microsd_datasheet}. Debido a que tanto el módulo ESP32-S3-WROOM-1-N16R8 como las tarjetas MicroSD operan con niveles lógicos de 3.3 V, fue posible realizar la conexión directa entre ambos dispositivos sin necesidad de incorporar convertidores de nivel lógico, simplificando el diseño y reduciendo el número de componentes.
+La implementación de esta etapa se basó en las especificaciones de la SD Card Association \citep{transcend_microsd_datasheet}. Debido a que tanto el módulo ESP32-S3-WROOM-1-N16R8 como las tarjetas MicroSD operan con niveles lógicos de 3,3 V, fue posible realizar la conexión directa entre ambos dispositivos sin necesidad de incorporar convertidores de nivel lógico, simplificando el diseño y reduciendo el número de componentes.
 
 Para la comunicación entre el microcontrolador y la memoria se seleccionó el protocolo SPI (Serial Peripheral Interface), debido a su elevada velocidad de transferencia, simplicidad de implementación y reducido número de líneas de comunicación. En esta configuración se emplean las señales SCK, MOSI, MISO y CS para gestionar el acceso a la memoria durante las operaciones de lectura y escritura.
 
@@ -1535,7 +1535,7 @@ Con el propósito de optimizar el consumo energético del sistema y permitir una
 
 En el diseño propuesto, dos pines GPIO del ESP32-S3 controlan el estado lógico de habilitación del TPS22918, permitiendo energizar únicamente los dispositivos cuando son requeridos por la aplicación. Los principales periféricos alimentados mediante este circuito son la memoria MicroSD y la pantalla OLED, los cuales permanecen desenergizados durante el proceso de inicialización del sistema o cuando no se encuentran en uso; así se reduce el consumo de corriente y se evitan inicializaciones indeseadas.
 
-La utilización del TPS22918 también proporciona un encendido controlado de los periféricos gracias a su baja resistencia de conducción (\textit{R\textsubscript{ON}}) y a su mecanismo interno de control de la corriente de irrupción (\textit{Inrush Current}) (ver Apéndice L), evitando caídas bruscas de tensión sobre la línea de alimentación de 3.3 V durante la conexión de cargas capacitivas. Estas características contribuyen a mejorar la estabilidad del sistema y la confiabilidad del funcionamiento del microcontrolador durante el arranque y la operación normal.
+La utilización del TPS22918 también proporciona un encendido controlado de los periféricos gracias a su baja resistencia de conducción (\textit{R\textsubscript{ON}}) y a su mecanismo interno de control de la corriente de irrupción (\textit{Inrush Current}) (ver Apéndice L), evitando caídas bruscas de tensión sobre la línea de alimentación de 3,3 V durante la conexión de cargas capacitivas. Estas características contribuyen a mejorar la estabilidad del sistema y la confiabilidad del funcionamiento del microcontrolador durante el arranque y la operación normal.
 
 El esquemático correspondiente a la etapa de control de alimentación se presenta en la Figura \ref{fig:esquematico_programacion}.
 
@@ -1548,7 +1548,7 @@ El esquemático correspondiente a la etapa de control de alimentación se presen
 	
 	\vspace{2mm}
 	\small\raggedright
-	\textit{Nota.} Diagrama esquemático desarrollado en Altium Designer para el control de alimentación de los periféricos del sistema. El circuito emplea un interruptor electrónico TPS22918, controlado mediante señales GPIO del módulo ESP32-S3-WROOM-1-N16R8, para habilitar o deshabilitar la alimentación de la memoria MicroSD y la pantalla OLED. Esta estrategia permite reducir el consumo energético, controlar la secuencia de encendido de los periféricos y mejorar la estabilidad de la línea de alimentación de 3.3 V al limitar la corriente de irrupción durante la conexión de las cargas.
+	\textit{Nota.} Diagrama esquemático desarrollado en Altium Designer para el control de alimentación de los periféricos del sistema. El circuito emplea un interruptor electrónico TPS22918, controlado mediante señales GPIO del módulo ESP32-S3-WROOM-1-N16R8, para habilitar o deshabilitar la alimentación de la memoria MicroSD y la pantalla OLED. Esta estrategia permite reducir el consumo energético, controlar la secuencia de encendido de los periféricos y mejorar la estabilidad de la línea de alimentación de 3,3 V al limitar la corriente de irrupción durante la conexión de las cargas.
 \end{figure}
 
 \subsubsection{Sistema de monitoreo y estado}
@@ -2202,9 +2202,9 @@ producción).
 \end{figure}
 
 
-\subsection{Diseño de la carcasa (impresión 3D)}
+%\subsection{Diseño de la carcasa (impresión 3D)}
 
-Aquí realizare el envase al PCB , cuando pida la PCB pondré aquí información.
+%Aquí realizare el envase al PCB , cuando pida la PCB pondré aquí información.
 
 % ────────────────────────────────────────────────────────────
 % =====================================================================
@@ -3441,6 +3441,7 @@ Figura~\ref{fig:curva-etav} muestra la curva resultante.
 			grid=both, grid style={gray!25},
 			legend pos=south east, legend cell align=left,
 			tick label style={font=\small}, label style={font=\small},
+			/pgf/number format/1000 sep=,
 			]
 			\addplot[only marks, mark=*, mark size=1.6pt]
 			coordinates {(800,0.72)(1500,0.80)(2500,0.87)(3500,0.91)
@@ -3745,7 +3746,7 @@ serializar cada trama CAN a través de otro periférico intermediario.
 El TWAI del ESP32-S3 solo genera niveles lógicos TTL; convertirlos a las
 señales diferenciales CAN\_H/CAN\_L del bus físico requiere un transceptor.
 Se eligió el SN65HVD230 \citep{sn65hvd230_datasheet} en concreto porque opera
-nativamente a 3.3\,V, el mismo nivel lógico del ESP32-S3; así se evita un
+nativamente a 3,3\,V, el mismo nivel lógico del ESP32-S3; así se evita un
 \textit{level-shifter} que sí haría falta con transceptores clásicos de 5\,V
 como el MCP2551. CAN\_H y CAN\_L se conectan a los pines 6 y 14 del conector
 OBD2 (J1962).
@@ -3979,13 +3980,13 @@ adicional):
 
 \begin{equation}
 	\dot{m}_{aire} \;[\text{g/s}] =
-	\frac{\dfrac{VE}{100} \cdot RPM \cdot MAP\,[\text{kPa}] \cdot V_d\,[\text{L}] \cdot 28.97}
-	{2 \cdot 8.314 \cdot T_{IAT}\,[\text{K}] \cdot 60}
+	\frac{\dfrac{VE}{100} \cdot RPM \cdot MAP\,[\text{kPa}] \cdot V_d\,[\text{L}] \cdot 28{,}97}
+	{2 \cdot 8{,}314 \cdot T_{IAT}\,[\text{K}] \cdot 60}
 \end{equation}
 
 donde $VE$ es la eficiencia volumétrica (\%) interpolada de una tabla
-calibrable (Sección~\ref{sec:ve}); $V_d$ la cilindrada en litros; $28.97$ la
-masa molar del aire (g/mol); $8.314$ la constante universal de los gases
+calibrable (Sección~\ref{sec:ve}); $V_d$ la cilindrada en litros; $28{,}97$ la
+masa molar del aire (g/mol); $8{,}314$ la constante universal de los gases
 (L$\cdot$kPa/(mol$\cdot$K)); el factor $2$ corresponde a que un motor de 4
 tiempos completa una admisión cada 2 vueltas de cigüeñal; y $T_{IAT}$ la
 temperatura de admisión en Kelvin, con guarda de rango
@@ -4019,7 +4020,7 @@ ENGINE_DISPLACEMENT_L * MM_AIR /(2.0f * R * iat_K * 60.0f);
 \end{equation}
 
 $AFR$ es la relación aire/combustible, por defecto el valor estequiométrico
-de la gasolina ($AFR_{stoich} = 14.7$), opcionalmente corregido con los
+de la gasolina ($AFR_{stoich} = 14{,}7$), opcionalmente corregido con los
 \textit{fuel trims} que reporta la ECU:
 
 \begin{equation}
@@ -4027,7 +4028,7 @@ de la gasolina ($AFR_{stoich} = 14.7$), opcionalmente corregido con los
 \end{equation}
 
 acotado a $[8, 25]$. $k_{cal}$ es \texttt{FUEL\_CALIBRATION\_FACTOR}
-(Sección~\ref{sec:calibracion}), $1.0$ por defecto. El criterio para incluir
+(Sección~\ref{sec:calibracion}), $1{,}0$ por defecto. El criterio para incluir
 la corrección por \textit{fuel trim} es que, sin ella, el cálculo asume que
 el motor siempre corre exactamente en estequiométrico, cosa que en la
 práctica no ocurre; usar los \textit{trims} que la propia ECU ya reporta es
@@ -4057,7 +4058,7 @@ con $\rho_{comb} = 745\,\text{g/L}$ y $v$ la velocidad en km/h.
 
 con $dt$ el paso de tiempo real entre ciclos (no un valor fijo, precisamente
 para no perder precisión si un ciclo de sondeo tarda más o menos de lo
-típico) y $P_L = 6.96$ (\texttt{FUEL\_PRICE\_BS\_PER\_L}) el precio de
+típico) y $P_L = 6{,}96$ (\texttt{FUEL\_PRICE\_BS\_PER\_L}) el precio de
 referencia del litro.
 
 \subsubsection{Tabla de eficiencia volumétrica (VE)}
@@ -4073,13 +4074,13 @@ referencia del litro.
 		\rowcolor[rgb]{0.851, 0.851, 0.851}
 		RPM & VE (\%) & Origen \\
 		\midrule
-		940  & 82.7 & Calibrado (Nissan Vanette) \\
-		1500 & 79.7 & Calibrado (Nissan Vanette) \\
-		2500 & 79.7 & Calibrado (Nissan Vanette) \\
-		3500 & 72.7 & Calibrado (Nissan Vanette) \\
-		4000 & 88.0 & Genérico, sin calibrar \\
-		5500 & 83.0 & Genérico, sin calibrar \\
-		7000 & 74.0 & Genérico, sin calibrar \\
+		940  & 82,7 & Calibrado (Nissan Vanette) \\
+		1500 & 79,7 & Calibrado (Nissan Vanette) \\
+		2500 & 79,7 & Calibrado (Nissan Vanette) \\
+		3500 & 72,7 & Calibrado (Nissan Vanette) \\
+		4000 & 88,0 & Genérico, sin calibrar \\
+		5500 & 83,0 & Genérico, sin calibrar \\
+		7000 & 74,0 & Genérico, sin calibrar \\
 		\bottomrule
 	\end{tabular}
 	\vspace{2mm}
@@ -4127,7 +4128,7 @@ $MAF_{ref}$ (el PID 0x10, cuando el vehículo lo soporta), se despeja
 algebraicamente la única incógnita:
 
 \begin{equation}
-	VE_{\text{requerida}} = \frac{MAF_{ref} \cdot 100 \cdot 2 \cdot 8.314 \cdot T_{IAT} \cdot 60}{RPM \cdot P_{MAP} \cdot V_d \cdot 28.97}
+	VE_{\text{requerida}} = \frac{MAF_{ref} \cdot 100 \cdot 2 \cdot 8{,}314 \cdot T_{IAT} \cdot 60}{RPM \cdot P_{MAP} \cdot V_d \cdot 28{,}97}
 	\label{eq:ve_general}
 \end{equation}
 
@@ -4371,7 +4372,7 @@ dos rieles y usa \textbf{deep sleep} real del ESP32-S3 mientras no hay
 contacto.
 
 \subsubsection{Dos rieles de alimentación}
-La PCB entrega dos salidas de 3.3\,V independientes desde el 12\,V
+La PCB entrega dos salidas de 3,3\,V independientes desde el 12\,V
 constante del OBD2:
 
 \begin{itemize}
@@ -4387,7 +4388,7 @@ constante del OBD2:
 \subsubsection{Circuito de \textit{power-gating}: MOSFET y pines}
 \label{sec:powergate}
 Cada riel 2 se controla con un MOSFET de \textbf{canal P, como interruptor
-	de alto lado} (corta el 3.3\,V que entra al periférico, no su GND). Se
+	de alto lado} (corta el 3,3\,V que entra al periférico, no su GND). Se
 prefiere sobre un N-MOSFET de bajo lado porque con este último el GND del
 periférico puede quedar ligeramente flotante mientras conduce, lo que
 genera problemas de integridad de señal en buses referenciados a GND como
@@ -4440,9 +4441,9 @@ Drain --- carga (OLED+LED, o microSD)
 \end{figure}
 
 El criterio detrás de cada componente: como el GPIO y el riel 2 comparten
-el mismo nivel lógico (3.3\,V), no hace falta un transistor adicional para
+el mismo nivel lógico (3,3\,V), no hace falta un transistor adicional para
 manejar la compuerta: GPIO en alto da $V_{gs}=0$ (MOSFET apagado); GPIO en
-bajo da $V_{gs}\approx-3.3\,\text{V}$, muy por debajo del umbral típico de
+bajo da $V_{gs}\approx-3{,}3\,\text{V}$, muy por debajo del umbral típico de
 un P-MOSFET de nivel lógico ($-1$ a $-2\,\text{V}$ aprox., p.\,ej. un
 AO3401A o equivalente). La resistencia de \textit{pull-up} en la
 compuerta asegura que el MOSFET arranque apagado por defecto durante el
@@ -4452,17 +4453,17 @@ compuerta.
 
 \subsubsection{Cadena de regulación}
 \label{sec:regchain}
-La alimentación completa, del 12\,V del OBD2 a los dos rieles de 3.3\,V,
+La alimentación completa, del 12\,V del OBD2 a los dos rieles de 3,3\,V,
 pasa por tres reguladores en cascada:
 
 \begin{enumerate}
 	\item \textbf{TPS54302}: convertidor \textit{buck} (conmutado) que baja
 	el 12\,V del pin 16 a 5\,V. Es la única etapa de conversión
 	conmutada del sistema; las dos siguientes son lineales.
-	\item \textbf{AMS1117} (5\,V $\rightarrow$ 3.3\,V): alimenta el
+	\item \textbf{AMS1117} (5\,V $\rightarrow$ 3,3\,V): alimenta el
 	\textbf{riel 1} (ESP32-S3 + SN65HVD230). Nunca se apaga.
-	\item \textbf{AP2112} (5\,V $\rightarrow$ 3.3\,V): alimenta el
-	\textbf{riel 2}; su salida de 3.3\,V entra a los dos MOSFET de la
+	\item \textbf{AP2112} (5\,V $\rightarrow$ 3,3\,V): alimenta el
+	\textbf{riel 2}; su salida de 3,3\,V entra a los dos MOSFET de la
 	Sección~\ref{sec:powergate}, que gatean OLED+LED y microSD por
 	separado. El AP2112 en sí mismo nunca se apaga (solo se corta lo
 	que hay \textit{después} de los MOSFET), pero al ser una LDO de
@@ -4544,12 +4545,12 @@ idea de orden de magnitud, no un valor exacto).
 		\rowcolor[rgb]{0.851, 0.851, 0.851}
 		Nodo & Fuente & Aporte típico & Nota \\
 		\midrule
-		3.3~V (riel 1) & ESP32-S3 en deep sleep & $\sim$0.02~mA & 10–25~$\mu$A \citep{espressif2024datasheet} \\
-		3.3~V (riel 1) & SN65HVD230, siempre activo & $\sim$5–10~mA & Modo normal, no standby \citep{sn65hvd230_datasheet} \\
-		3.3~V (riel 1) & Pulsos de despertar (cada 20~s) & $\sim$1.5–2~mA & Promediado: $\sim$150~mA por $\sim$0.2–0.3~s \\
+		3,3~V (riel 1) & ESP32-S3 en deep sleep & $\sim$0,02~mA & 10–25~$\mu$A \citep{espressif2024datasheet} \\
+		3,3~V (riel 1) & SN65HVD230, siempre activo & $\sim$5–10~mA & Modo normal, no standby \citep{sn65hvd230_datasheet} \\
+		3,3~V (riel 1) & Pulsos de despertar (cada 20~s) & $\sim$1,5–2~mA & Promediado: $\sim$150~mA por $\sim$0,2–0,3~s \\
 		5~V & \textbf{AMS1117}, corriente de reposo propia & \textbf{$\sim$5–8~mA} & Casi independiente de la carga \\
-		5~V & AP2112, corriente de reposo propia & $\sim$0.06~mA & Sin carga (MOSFET de salida abiertos) \\
-		12~V & TPS54302, corriente de reposo propia & $\sim$0.1–0.3~mA & \\
+		5~V & AP2112, corriente de reposo propia & $\sim$0,06~mA & Sin carga (MOSFET de salida abiertos) \\
+		12~V & TPS54302, corriente de reposo propia & $\sim$0,1–0,3~mA & \\
 		\midrule
 		\multicolumn{2}{l}{\textbf{Total aproximado, lado 12~V}} & \textbf{$\sim$7–9~mA} & Ver conversión abajo \\
 		\bottomrule
@@ -4569,18 +4570,18 @@ El \textit{deep sleep} resuelve la parte del ESP32-S3 casi por completo,
 pero no puede resolver la del transceptor ni la de su LDO con esta
 arquitectura de dos rieles fija.
 
-Convertir la corriente del lado 3.3\,V/5\,V al lado 12\,V: el AMS1117 y el
+Convertir la corriente del lado 3,3\,V/5\,V al lado 12\,V: el AMS1117 y el
 AP2112 son LDO (no reducen corriente, solo voltaje, disipando la diferencia
 como calor), así que la corriente que el TPS54302 debe entregar en su
 salida de 5\,V es aproximadamente la suma de lo que consumen el riel 1
-completo ($\sim$8.5\,mA de ESP32+SN65+pulsos) más la corriente de reposo
-propia del AMS1117 ($\sim$6.5\,mA punto medio) y del AP2112
-($\sim$0.06\,mA): $\approx$15\,mA a 5\,V. El TPS54302, al ser un
+completo ($\sim$8,5\,mA de ESP32+SN65+pulsos) más la corriente de reposo
+propia del AMS1117 ($\sim$6,5\,mA punto medio) y del AP2112
+($\sim$0,06\,mA): $\approx$15\,mA a 5\,V. El TPS54302, al ser un
 \textit{buck} conmutado, sí convierte potencia de forma más eficiente
 ($\sim$80\,\% en carga liviana, estimado):
 
 \begin{equation}
-	I_{12V} \approx \frac{5\,\text{V} \times 15\,\text{mA}}{12\,\text{V} \times 0.80} + 0.2\,\text{mA (I}_q\text{ TPS54302)} \approx 8\,\text{mA}
+	I_{12V} \approx \frac{5\,\text{V} \times 15\,\text{mA}}{12\,\text{V} \times 0{,}80} + 0{,}2\,\text{mA (I}_q\text{ TPS54302)} \approx 8\,\text{mA}
 	\label{eq:i12v_reposo}
 \end{equation}
 
@@ -4681,7 +4682,7 @@ separar:
 
 \begin{itemize}
 	\item \textbf{Sondeo CAN mientras hay contacto} (un ciclo completo de 8
-	PIDs cada $\sim$0.2-1.4\,s): el bus CAN a 500\,kbit/s tiene
+	PIDs cada $\sim$0,2-1,4\,s): el bus CAN a 500\,kbit/s tiene
 	capacidad de sobra para esto (cada trama de petición/respuesta son
 	unos 100 bits, así que incluso varias por segundo representan bien
 	menos del 1\,\% del ancho de banda del bus). Una ECU real está
@@ -4729,7 +4730,7 @@ vivo.
 El estado se empuja a los clientes por WebSocket cada 500\,ms
 (la Figura~\ref{fig:merge} ya mostró de dónde sale ese dato), con un
 mecanismo de respaldo: si el navegador detecta que el WebSocket no está
-abierto, recurre a pedir \texttt{/api/live} por HTTP cada 1.5\,s. El
+abierto, recurre a pedir \texttt{/api/live} por HTTP cada 1,5\,s. El
 criterio es la robustez: un WebSocket puede caerse por muchas razones ajenas
 al firmware (el navegador durmiendo la pestaña, un cambio de red en el
 celular), y el panel no debería quedar congelado solo porque ese canal se
@@ -4846,8 +4847,8 @@ CP2102/CH340 aparte). Esto tiene dos implicancias para una PCB propia:
 
 \subsubsection{Circuito mínimo para programar/arrancar}
 Cualquier placa propia con el ESP32-S3 necesita, como mínimo: \texttt{EN}
-(reset) con \textit{pull-up} a 3.3\,V y un capacitor de $\sim$1\,$\mu$F a
-GND; \texttt{GPIO0} (BOOT) con \textit{pull-up} a 3.3\,V y un botón a GND
+(reset) con \textit{pull-up} a 3,3\,V y un capacitor de $\sim$1\,$\mu$F a
+GND; \texttt{GPIO0} (BOOT) con \textit{pull-up} a 3,3\,V y un botón a GND
 para forzar el modo \textit{bootloader} manualmente; y, opcionalmente, un
 circuito de auto-reset (2 transistores desde DTR/RTS del adaptador UART
 hacia EN y GPIO0) para que PlatformIO entre solo al modo de programación sin

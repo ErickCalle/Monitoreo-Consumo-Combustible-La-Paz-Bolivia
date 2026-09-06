@@ -37,17 +37,17 @@
 	03 & 2 & Estado del sistema de combustible & -- & -- & bits \\
 	04 & 1 & Carga calculada del motor & 0 & 100 & \% \\
 	05 & 1 & Temperatura del líquido de enfriamiento & -40 & 215 & °C \\
-	06 & 1 & Ajuste de combustible corto plazo — Banco 1 & -100 & 99.2 & \% \\
-	07 & 1 & Ajuste de combustible largo plazo — Banco 1 & -100 & 99.2 & \% \\
-	08 & 1 & Ajuste de combustible corto plazo — Banco 2 & -100 & 99.2 & \% \\
-	09 & 1 & Ajuste de combustible largo plazo — Banco 2 & -100 & 99.2 & \% \\
+	06 & 1 & Ajuste de combustible corto plazo — Banco 1 & -100 & 99,2 & \% \\
+	07 & 1 & Ajuste de combustible largo plazo — Banco 1 & -100 & 99,2 & \% \\
+	08 & 1 & Ajuste de combustible corto plazo — Banco 2 & -100 & 99,2 & \% \\
+	09 & 1 & Ajuste de combustible largo plazo — Banco 2 & -100 & 99,2 & \% \\
 	0A & 1 & Presión del combustible & 0 & 765 & kPa \\
 	0B & 1 & Presión absoluta del colector de admisión & 0 & 255 & kPa \\
-	0C & 2 & RPM del motor & 0 & 16383.75 & rpm \\
+	0C & 2 & RPM del motor & 0 & 16383,75 & rpm \\
 	0D & 1 & Velocidad del vehículo & 0 & 255 & km/h \\
-	0E & 1 & Avance del tiempo de encendido & -64 & 63.5 & ° \\
+	0E & 1 & Avance del tiempo de encendido & -64 & 63,5 & ° \\
 	0F & 1 & Temperatura del aire de admisión & -40 & 215 & °C \\
-	10 & 2 & Velocidad de flujo de aire MAF & 0 & 655.35 & g/s \\
+	10 & 2 & Velocidad de flujo de aire MAF & 0 & 655,35 & g/s \\
 	11 & 1 & Posición del acelerador & 0 & 100 & \% \\
 	12 & 1 & Estado del aire secundario & -- & -- & bits \\
 	1C & 1 & Estándar OBD implementado & -- & -- & bits \\
@@ -57,14 +57,14 @@
 	2F & 1 & Nivel del tanque de combustible & 0 & 100 & \% \\
 	31 & 2 & Distancia recorrida desde borrado de fallas & 0 & 65535 & km \\
 	33 & 1 & Presión barométrica absoluta & 0 & 255 & kPa \\
-	3C & 2 & Temperatura del catalizador: Banco 1, Sensor 1 & -40 & 6513.5 & °C \\
-	42 & 2 & Voltaje del módulo de control & 0 & 65.535 & V \\
+	3C & 2 & Temperatura del catalizador: Banco 1, Sensor 1 & -40 & 6513,5 & °C \\
+	42 & 2 & Voltaje del módulo de control & 0 & 65,535 & V \\
 	45 & 1 & Posición relativa del acelerador & 0 & 100 & \% \\
 	46 & 1 & Temperatura del aire ambiental & -40 & 215 & °C \\
 	4D & 2 & Tiempo con MIL encendido & 0 & 65535 & min \\
 	5A & 1 & Posición relativa del pedal del acelerador & 0 & 100 & \% \\
 	5C & 1 & Temperatura del aceite del motor & -40 & 210 & °C \\
-	5E & 2 & Velocidad del combustible del motor & 0 & 3276.75 & L/h \\
+	5E & 2 & Velocidad del combustible del motor & 0 & 3276,75 & L/h \\
 	61 & 1 & Porcentaje de torque solicitado por conductor & -125 & 125 & \% \\
 	62 & 1 & Porcentaje de torque actual del motor & -125 & 125 & \% \\
 	63 & 2 & Torque de referencia del motor & 0 & 65535 & Nm \\
@@ -123,16 +123,16 @@ El TJA1050 se presenta en un encapsulado plástico de contorno reducido SO8 con 
 	\begin{supertabular}{p{1.5cm} p{1.5cm} p{10.5cm}}
 		TXD  & 1 & Entrada de datos de transmisión; lee los datos lógicos provenientes del controlador CAN. \\ 
 		GND  & 2 & Conexión de referencia a tierra (0~V). \\ 
-		VCC  & 3 & Voltaje de alimentación principal (4.75~V a 5.25~V). \\ 
+		VCC  & 3 & Voltaje de alimentación principal (4,75~V a 5,25~V). \\
 		RXD  & 4 & Salida de datos de recepción; envía los datos leídos desde el bus hacia el controlador CAN. \\ 
-		Vref & 5 & Salida de voltaje de referencia del circuito ($0.5 \cdot V_{CC}$ nominal). \\
+		Vref & 5 & Salida de voltaje de referencia del circuito ($0{,}5 \cdot V_{CC}$ nominal). \\
 		CANL & 6 & Línea de nivel bajo del bus CAN físico (\textit{LOW-level CAN bus line}). \\ 
 		CANH & 7 & Línea de nivel alto del bus CAN físico (\textit{HIGH-level CAN bus line}). \\ 
 		S    & 8 & Entrada de selección de modo: conectar a GND para modo de alta velocidad o a VCC para modo silencioso. \\ 
 	\end{supertabular}
 \end{center}
 
-{\raggedright\small\textit{Nota.} Datos técnicos adaptados de la especificación de producto de Philips Semiconductors para el encapsulado plástico SO8. Los pines lógicos de entrada (TXD y S) cuentan con tolerancia de nivel tanto para 3.3~V como para 5~V, facilitando el acoplamiento directo con el microcontrolador.\par}
+{\raggedright\small\textit{Nota.} Datos técnicos adaptados de la especificación de producto de Philips Semiconductors para el encapsulado plástico SO8. Los pines lógicos de entrada (TXD y S) cuentan con tolerancia de nivel tanto para 3,3~V como para 5~V, facilitando el acoplamiento directo con el microcontrolador.\par}
 
 \vspace{2mm}
 \subsection*{Especificaciones eléctricas de referencia}
@@ -156,11 +156,11 @@ La Tabla B2 resume las magnitudes límites y de operación indispensables para e
 
 \begin{center}
 	\begin{supertabular}{p{2.2cm} p{5.3cm} p{2.0cm} p{2.0cm} p{1.5cm}}
-		$V_{CC}$ & Voltaje de alimentación de operación & 4.75 & 5.25 & V \\ 
-		$V_{CC(abs)}$ & Voltaje de alimentación límite absoluto & -0.3 & +6.0 & V \\ 
-		$V_{CANH}$ & Voltaje continuo en pin CANH & -27 & +40 & V \\ 
-		$V_{CANL}$ & Voltaje continuo en pin CANL & -27 & +40 & V \\ 
-		$V_{i(dif)(bus)}$ & Voltaje de entrada diferencial (Dominante) & 1.5 & 3.0 & V \\ 
+		$V_{CC}$ & Voltaje de alimentación de operación & 4,75 & 5,25 & V \\
+		$V_{CC(abs)}$ & Voltaje de alimentación límite absoluto & -0,3 & +6,0 & V \\
+		$V_{CANH}$ & Voltaje continuo en pin CANH & -27 & +40 & V \\
+		$V_{CANL}$ & Voltaje continuo en pin CANL & -27 & +40 & V \\
+		$V_{i(dif)(bus)}$ & Voltaje de entrada diferencial (Dominante) & 1,5 & 3,0 & V \\
 		$t_{d(TXD-RXD)}$ & Retraso de propagación total (TXD a RXD) & — & 250 & ns \\
 		$T_{vj}$ & Temperatura de unión virtual de operación & -40 & +150 & °C \\ 
 		$V_{esd}$ & Voltaje de descarga electroestática (HBM) & -4000 & +4000 & V \\

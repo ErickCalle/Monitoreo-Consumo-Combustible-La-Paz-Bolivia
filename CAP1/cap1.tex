@@ -5,13 +5,13 @@
 
 En la actualidad, la incorporación de sistemas electrónicos en los vehículos ha permitido mejorar significativamente el control, diagnóstico y eficiencia en su funcionamiento. A través de diferentes sensores y unidades de control electrónico, es posible obtener información relevante sobre el desempeño del motor y otros subsistemas en tiempo real. En este contexto, el estándar OBD-II (On-Board Diagnostics) se ha consolidado como una herramienta fundamental para el acceso a datos vehiculares.
 
-El presente proyecto tiene como finalidad el desarrollo de un sistema de monitoreo del consumo de combustible en vehículos que no disponen de esta funcionalidad de forma nativa. Si bien algunos vehículos modernos ya incorporan sistemas que permiten visualizar este tipo de información directamente en el panel de instrumentos, existe una gran cantidad de automóviles en la ciudad de La Paz que carecen de esta característica, lo que limita el control del gasto energético de combustible por parte del usuario.
+El presente proyecto desarrolla un sistema de monitoreo del consumo de combustible para vehículos que no disponen de esta funcionalidad de forma nativa. Si bien algunos vehículos modernos ya incorporan sistemas que permiten visualizar este tipo de información directamente en el panel de instrumentos, existe una gran cantidad de automóviles en la ciudad de La Paz que carecen de esta característica, lo que limita el control del gasto energético de combustible por parte del usuario.
 
-Para dar solución a esta necesidad, se propone la implementación de un sistema basado en un microcontrolador ESP32, el cual, en conjunto con un módulo de comunicación CAN, permitirá la adquisición de datos desde el puerto OBD-II del vehículo. A partir de estos datos, se realizará el procesamiento necesario para estimar el consumo de combustible en tiempo real.
+Para dar solución a esta necesidad, se implementa un sistema basado en un microcontrolador ESP32, que en conjunto con un módulo de comunicación CAN, permite la adquisición de datos desde el puerto OBD-II del vehículo. A partir de estos datos, se realiza el procesamiento necesario para estimar el consumo de combustible en tiempo real.
 
-Adicionalmente, el sistema contará con una interfaz de monitoreo accesible mediante una página web generada por el propio ESP32, la cual estará disponible a través de una dirección IP local. Esto permitirá al usuario visualizar de manera sencilla e inmediata los parámetros obtenidos, sin necesidad de dispositivos adicionales o software especializado.
+Adicionalmente, el sistema cuenta con una interfaz de monitoreo accesible mediante una página web generada por el propio ESP32, disponible a través de una dirección IP local. Esto permite al usuario visualizar de manera sencilla e inmediata los parámetros obtenidos, sin necesidad de dispositivos adicionales o software especializado.
 
-En conjunto, este proyecto busca ofrecer una solución accesible y de bajo costo para el monitoreo del consumo de combustible, integrando conocimientos de electrónica, sistemas embebidos y comunicación de datos, con una aplicación directa en el ámbito automotriz.
+En conjunto, este proyecto ofrece una solución accesible y de bajo costo para el monitoreo del consumo de combustible, integrando conocimientos de electrónica, sistemas embebidos y comunicación de datos, con una aplicación directa en el ámbito automotriz.
 
 \section{Antecedentes}
 
@@ -23,7 +23,7 @@ En los últimos años, se han desarrollado diversas soluciones comerciales orien
 
 Por otro lado, el avance de los sistemas embebidos y microcontroladores, como el ESP32, ha permitido el desarrollo de soluciones de bajo costo con capacidades de procesamiento y conectividad inalámbrica \citep{putra2025real}. Esto ha facilitado la implementación de sistemas personalizados capaces de adquirir, procesar y transmitir información en tiempo real mediante redes locales o interfaces web.
 
-En este contexto, el presente proyecto se fundamenta en la integración de tecnologías existentes, tales como el estándar OBD-II, la comunicación CAN y el uso de microcontroladores con conectividad, con el propósito de desarrollar una solución accesible que permita el monitoreo del consumo de combustible en vehículos que no cuentan con esta funcionalidad incorporada.
+En este contexto, el presente proyecto se fundamenta en la integración de tecnologías existentes, tales como el estándar OBD-II, la comunicación CAN y el uso de microcontroladores con conectividad, y desarrolla una solución accesible que permite el monitoreo del consumo de combustible en vehículos que no cuentan con esta funcionalidad incorporada.
 
 \section{Planteamiento del problema}
 
@@ -59,7 +59,7 @@ Asimismo, una combustión ineficiente asociada a combustibles de calidad variabl
 
 En este escenario, surge una creciente preocupación sobre la eficiencia en el uso de la gasolina como fuente energética en el transporte, especialmente en vehículos que no cuentan con sistemas avanzados de monitoreo. La falta de herramientas accesibles que permitan analizar el consumo de combustible en tiempo real incrementa la incertidumbre del usuario respecto al rendimiento de su vehículo.
 
-Por lo tanto, se plantea la necesidad de desarrollar un sistema que permita monitorear y analizar el consumo de combustible de manera precisa y en tiempo real, con el objetivo de contribuir a la optimización de la eficiencia energética del vehículo y brindar al usuario información confiable para la toma de decisiones \citep{lamby2026giro}.
+Por lo tanto, se desarrolla un sistema que permite monitorear y analizar el consumo de combustible de manera precisa y en tiempo real, con el objetivo de contribuir a la optimización de la eficiencia energética del vehículo y brindar al usuario información confiable para la toma de decisiones \citep{lamby2026giro}.
 
 
 
@@ -69,7 +69,7 @@ En el transporte urbano de La Paz, los vehiculos con sistemas de inyección elec
 
 La ausencia de sistemas de monitoreo del consumo dificulta el análisis del comportamiento del motor, tales tramos recorridos y modos de conducción. Esta situación limita la posibilidad de optimizar el desempeño del vehículo y detectar posibles fallas asociadas a un consumo anómalo de combustible El proyecto ayuda a tener un patrón o un control que indica si el vehículo consume mas gasolina de la que debe, considerando las condiciones en la ciudad de La Paz.
 
-El desarrollo de un sistema permitirá generar información confiable sobre el comportamiento del motor. Esta información contribuirá a la mejora de la eficiencia operativa, al análisis técnico del consumo de combustible y al apoyo en procesos de mantenimiento y toma de decisiones técnicas.
+El sistema desarrollado genera información confiable sobre el comportamiento del motor. Esta información contribuye a la mejora de la eficiencia operativa, al análisis técnico del consumo de combustible y al apoyo en procesos de mantenimiento y toma de decisiones técnicas.
 \begin{itemize}
 	\item \textbf{Justificación técnica:}
 	El proyecto propone el desarrollo de un sistema de monitoreo del consumo de gasolina basado en la adquisición de parámetros del motor a través del puerto OBD-II y su procesamiento mediante un modelo físico-matemático del proceso de inyección de combustible. A diferencia de los métodos convencionales basados únicamente en mantenimiento correctivo o preventivo \citep{Reif2015}, la propuesta integra una plataforma telemétrica capaz de adquirir datos del vehículo, permitiendo el análisis casi en tiempo real del comportamiento del motor.
@@ -105,28 +105,28 @@ El desarrollo de un sistema permitirá generar información confiable sobre el c
 
 \section{Alcances y limites}
 \subsection{Alcances}
-El presente proyecto tiene como alcance el desarrollo de un sistema de monitoreo del 
-consumo de combustible basado en la adquisición de datos a través del puerto OBD-II 
-del vehículo, utilizando un microcontrolador ESP32C3 y un módulo de comunicación CAN.
-El sistema tendrá los siguientes alcances:
+El presente proyecto abarca el desarrollo de un sistema de monitoreo del
+consumo de combustible basado en la adquisición de datos a través del puerto OBD-II
+del vehículo, utilizando un microcontrolador ESP32-S3 y un módulo de comunicación CAN.
+El sistema comprende los siguientes alcances:
 
 \begin{itemize}
-	\item Lectura de parámetros vehiculares en tiempo real, tales como revoluciones 
-	del motor (RPM), velocidad del vehículo y otras variables disponibles mediante el 
-	protocolo OBD-II, las cuales serán utilizadas para la estimación del consumo 
+	\item Lectura de parámetros vehiculares en tiempo real, tales como revoluciones
+	del motor (RPM), velocidad del vehículo y otras variables disponibles mediante el
+	protocolo OBD-II, las cuales se utilizan para la estimación del consumo
 	de combustible.
-	
-	\item Procesamiento de los datos obtenidos con el fin de generar información 
-	comprensible para el usuario, permitiendo evaluar el rendimiento del vehículo 
+
+	\item Procesamiento de los datos obtenidos con el fin de generar información
+	comprensible para el usuario, permitiendo evaluar el rendimiento del vehículo
 	en función de su consumo energético.
-	
-	\item Desarrollo de una interfaz de monitoreo accesible mediante una página web 
-	generada por el propio ESP32, disponible a través de una dirección IP local, 
-	que permitirá la visualización de los datos en tiempo real sin necesidad de 
+
+	\item Desarrollo de una interfaz de monitoreo accesible mediante una página web
+	generada por el propio ESP32, disponible a través de una dirección IP local,
+	que permite la visualización de los datos en tiempo real sin necesidad de
 	software adicional.
-	
-	\item Diseño, implementación y validación del sistema en condiciones reales de 
-	funcionamiento, permitiendo verificar su desempeño en la estimación del consumo 
+
+	\item Diseño, implementación y validación del sistema en condiciones reales de
+	funcionamiento, permitiendo verificar su desempeño en la estimación del consumo
 	de combustible.
 \end{itemize}
 \subsection{Limites}
@@ -134,17 +134,16 @@ El sistema tendrá los siguientes alcances:
 La solución propuesta presenta ciertas limitaciones técnicas y de alcance que deben ser consideradas para una correcta interpretación de los resultados.
 
 \begin{itemize}
-	\item Una de las principales limitaciones está relacionada el tipo de combustible del vehículo.El desarrollo se enfoca exclusivamente a vehículos a gasolina con inyección electrónica, también no se enfoca a vehículos con diésel o con sistemas de combustible combinado, conocidos como vehículos \textit{bi-fuel}, los cuales pueden operar tanto con gasolina como con gas natural o GLP. Debido a que el comportamiento físico y energético de estos combustibles es diferente, el sistema propuesto se enfoca únicamente en vehículos que operan exclusivamente con gasolina, no siendo posible un control preciso del consumo en vehículos bi-fuel \citep{AFDC_BiFuelVehicles}.
+	\item Una de las principales limitaciones está relacionada con el tipo de combustible del vehículo. El desarrollo se enfoca exclusivamente en vehículos a gasolina con inyección electrónica; tampoco se enfoca en vehículos con diésel o con sistemas de combustible combinado, conocidos como vehículos \textit{bi-fuel}, los cuales pueden operar tanto con gasolina como con gas natural o GLP. Debido a que el comportamiento físico y energético de estos combustibles es diferente, el sistema propuesto se enfoca únicamente en vehículos que operan exclusivamente con gasolina, no siendo posible un control preciso del consumo en vehículos bi-fuel \citep{AFDC_BiFuelVehicles}.
 	\item Asimismo, los vehículos de modelos antiguos que cuentan con sistemas de diagnóstico OBD-I presentan una limitación importante, ya que no permiten el acceso a información estandarizada del motor. Por esta razón, el sistema se encuentra limitado a vehículos que disponen de puerto OBD-II o sistemas de diagnóstico compatibles.
-	\item En el contexto del transporte público en la ciudad de La Paz, la compatibilidad con sistemas de diagnóstico a bordo OBD-II se encuentra en vehiculos de fabricación relativamente reciente. En el presente trabajo se considerarán únicamente modelos que dispongan de esta tecnología, sin especificar marcas o versiones comerciales particulares.
-	No obstante, el análisis experimental se limitará exclusivamente a unidades seleccionadas que cumplan con el requisito de compatibilidad OBD-II.
+	\item En el contexto del transporte público en la ciudad de La Paz, la compatibilidad con sistemas de diagnóstico a bordo OBD-II se encuentra en vehículos de fabricación relativamente reciente. En el presente trabajo se consideran únicamente modelos que disponen de esta tecnología, sin especificar marcas o versiones comerciales particulares.
+	No obstante, el análisis experimental se limita exclusivamente a unidades seleccionadas que cumplen con el requisito de compatibilidad OBD-II.
 	\item Una de las limitaciones del presente estudio es la disponibilidad de
-	vehículos para la realización de las pruebas experimentales. Al no disponer
-	de acceso directo y permanente a unidades específicas como en el caso de los minibuses. Por esta razón, las pruebas experimentales podrán
-	realizarse también en otros vehículos con características mecánicas
-	similares que formen parte del parque automotor urbano y que
-	cuenten con sistemas de inyección electrónica compatibles con la
+	vehículos para la realización de las pruebas experimentales, al no disponerse
+	de acceso directo y permanente a unidades específicas como en el caso de los minibuses. Por esta razón, las pruebas experimentales se realizan también en otros vehículos con características mecánicas
+	similares que forman parte del parque automotor urbano y que
+	cuentan con sistemas de inyección electrónica compatibles con la
 	interfaz OBD-II.
-	\item Adicionalmente, la precisión del sistema dependerá del estado mecánico del vehículo . En vehículos con alto kilometraje o desgaste significativo, los valores obtenidos pueden presentar variaciones respecto a los valores ideales.
+	\item Adicionalmente, la precisión del sistema depende del estado mecánico del vehículo. En vehículos con alto kilometraje o desgaste significativo, los valores obtenidos pueden presentar variaciones respecto a los valores ideales.
 \end{itemize}
 \clearpage

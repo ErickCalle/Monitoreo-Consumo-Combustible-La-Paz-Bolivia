@@ -368,7 +368,7 @@ En este contexto en la Tabla \ref{tab:estim} se muestra, la selección del méto
 
 La relación aire-combustible, conocida como \textit{Air-Fuel Ratio} (AFR), expresa la proporción existente entre la masa de aire y la masa de combustible que ingresan al cilindro durante el proceso de combustión. Este parámetro es fundamental en el análisis del funcionamiento de los motores de combustión interna, ya que determina la calidad de la mezcla y condiciona directamente la eficiencia térmica, el consumo de combustible y la generación de emisiones contaminantes \citep{AFRLambdaHPAcademy, AFRAnsed}.
 
-En motores a gasolina, la relación estequiométrica de referencia es aproximadamente 14.7:1, lo que significa que se requieren 14.7 partes de aire por cada parte de combustible para lograr una combustión ideal \citep{AFRLambdaHPAcademy, Bosch_Automotive}. Bajo esta condición, el combustible puede oxidarse de manera más completa y se favorece el funcionamiento adecuado de los sistemas de postratamiento, como el convertidor catalítico.
+En motores a gasolina, la relación estequiométrica de referencia es aproximadamente 14,7:1, lo que significa que se requieren 14,7 partes de aire por cada parte de combustible para lograr una combustión ideal \citep{AFRLambdaHPAcademy, Bosch_Automotive}. Bajo esta condición, el combustible puede oxidarse de manera más completa y se favorece el funcionamiento adecuado de los sistemas de postratamiento, como el convertidor catalítico.
 
 Cuando la relación aire-combustible es inferior a la estequiométrica, la mezcla se considera rica, debido al exceso de combustible presente en la cámara de combustión. En este caso, aumenta la probabilidad de generar monóxido de carbono (CO) e hidrocarburos no quemados (HC), debido a una combustión incompleta \citep{AFRAnsed}. Por el contrario, cuando la relación aire-combustible es superior a la estequiométrica, la mezcla es pobre, lo que implica un exceso de aire. Esta condición puede disminuir el consumo de combustible, pero también puede afectar la potencia del motor y favorecer la formación de óxidos de nitrógeno (NO$_x$) \citep{AFRLambdaHPAcademy, Combustion_Emissions_2020}.
 
@@ -470,13 +470,13 @@ Uno de los métodos más utilizados para estimar el consumo de combustible en ti
 El consumo de combustible puede calcularse mediante la siguiente expresión:
 
 \begin{equation}
-	FuelConsumption_{(L/h)} = \frac{MAF_{(g/s)} \times 3600}{14.7 \times 745}
+	FuelConsumption_{(L/h)} = \frac{MAF_{(g/s)} \times 3600}{14{,}7 \times 745}
 \end{equation}
 
 En esta expresión, los valores constantes representan:
 \begin{itemize}
 	\item \textbf{3600}: Factor de conversión de segundos a horas.
-	\item \textbf{14.7}: Relación aire-combustible estequiométrica ideal para la gasolina.
+	\item \textbf{14,7}: Relación aire-combustible estequiométrica ideal para la gasolina.
 	\item \textbf{745}: Densidad aproximada de la gasolina en $g/L$ (este valor puede oscilar entre $720$ y $775$ $g/L$ según la temperatura y el octanaje).
 \end{itemize}
 
@@ -485,7 +485,7 @@ donde:
 Para el cálculo operativo en motores a gasolina, se asumen valores estándar que permiten simplificar la monitorización en tiempo real. En este modelo, se consideran las siguientes constantes:
 
 \begin{equation}
-	AFR_{estequiometrico} = 14.7
+	AFR_{estequiometrico} = 14{,}7
 \end{equation}
 
 \begin{equation}
@@ -497,7 +497,7 @@ Es importante destacar que la densidad de la gasolina es una variable sensible a
 Sustituyendo estos valores en la fórmula general, la ecuación de consumo instantáneo se simplifica mediante un factor de conversión aproximado:
 
 \begin{equation}
-	FuelConsumption_{(L/h)} \approx MAF_{(g/s)} \times 0.33
+	FuelConsumption_{(L/h)} \approx MAF_{(g/s)} \times 0{,}33
 \end{equation}
 
 \subsection{Ejemplo de Cálculo Instantáneo}
@@ -505,11 +505,11 @@ Sustituyendo estos valores en la fórmula general, la ecuación de consumo insta
 Para ilustrar la sensibilidad del modelo, se propone el siguiente escenario: si el sistema (vía sensores MAP+IAT o MAF) registra un flujo de masa de aire de $10 \, g/s$, el consumo instantáneo se calcula como:
 
 \begin{equation}
-	FuelConsumption = \frac{10 \times 3600}{14.7 \times 745}
+	FuelConsumption = \frac{10 \times 3600}{14{,}7 \times 745}
 \end{equation}
 
 \begin{equation}
-	FuelConsumption \approx 3.29 \, \mathrm{L/h}
+	FuelConsumption \approx 3{,}29 \, \mathrm{L/h}
 \end{equation}
 
 Este resultado permite al sistema de gestión o al usuario final visualizar el gasto volumétrico de combustible en función de la carga del motor en un momento determinado.
@@ -1509,7 +1509,7 @@ volumétrico instantáneo.  La fórmula fundamental empleada es:
 
 \noindent donde $\dot{m}_{\text{air}}$ es el flujo másico de
 aire en g/s proporcionado por el sensor MAF y
-$\text{AFR}_{\text{stoich}} = 14.7$ para gasolina.  La
+$\text{AFR}_{\text{stoich}} = 14{,}7$ para gasolina.  La
 conversión volumétrica se obtiene dividiendo la masa de
 combustible entre su densidad energética
 ($\rho \approx 770$~g/l):
@@ -2142,7 +2142,7 @@ histórica de las arquitecturas E/E:
 			\addlinespace
 			IMU (6 ejes) & --- & --- & --- & Muy alto & Bajo \\
 			\addlinespace
-			GNSS (RTK) & --- & 0.01\,m & Medio & Bajo (túneles) & Medio \\
+			GNSS (RTK) & --- & 0,01\,m & Medio & Bajo (túneles) & Medio \\
 			\bottomrule % Línea inferior de cierre APA 7
 		\end{tabular}%
 	}

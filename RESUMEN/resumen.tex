@@ -1,0 +1,12 @@
+\chapter*{RESUMEN}
+\addcontentsline{toc}{chapter}{RESUMEN}
+
+Este proyecto de grado desarrolla e implementa un sistema embebido de monitoreo del consumo de combustible orientado a la mejora de la eficiencia energética en el transporte público urbano de la ciudad de La Paz, dirigido a vehículos a gasolina con inyección electrónica que no cuentan con esta funcionalidad de forma nativa.
+
+El sistema se basa en un módulo ESP32-S3 con controlador CAN nativo (TWAI), que se conecta al puerto de diagnóstico OBD-II del vehículo mediante un transceptor SN65HVD230 para adquirir en tiempo real parámetros del motor como las revoluciones (RPM), la presión absoluta del colector de admisión (MAP), la temperatura del aire de admisión (IAT) y los ajustes de combustible que reporta la propia unidad de control (STFT/LTFT). A partir de estos datos, el consumo de combustible se estima mediante el modelo Speed-Density, corregido con los ajustes de combustible del ECU para reducir el error frente a la relación aire-combustible estequiométrica supuesta. El historial de cada viaje se registra en una tarjeta microSD, y el dispositivo expone un panel web propio a través de un punto de acceso WiFi local, sin depender de conectividad a internet ni de una aplicación de terceros.
+
+El sistema se calibró y validó experimentalmente sobre dos vehículos con arquitecturas de motor distintas: un Nissan Vanette (con sensor MAF) y un Changan Honor (sin sensor MAF, evaluado íntegramente con el método Speed-Density). Sobre nueve tramos de ruta real, el sistema propio concuerda con un adaptador ELM327 comercial dentro de un error porcentual absoluto medio (MAPE) de 2,75\,\%, y con el aforo real de tanque lleno dentro de un MAPE de 4,84\,\%, resultados que respaldan la viabilidad técnica de la propuesta.
+
+El análisis de costos, desarrollado en paralelo, estima un costo directo de 772,22\,Bs para producir una unidad adicional a partir de la placa final, y un precio de venta de referencia de 1\,047,13\,Bs (utilidad del 20\,\%~e IVA del 13\,\%), significativamente por debajo de las plataformas de telemetría de flota comerciales disponibles en el mercado, lo que respalda la pertinencia de una solución local, abierta y de bajo costo para el transporte público de La Paz.
+
+\textbf{Palabras clave:} consumo de combustible, OBD-II, ESP32-S3, Speed-Density, eficiencia energética, transporte público, La Paz.
