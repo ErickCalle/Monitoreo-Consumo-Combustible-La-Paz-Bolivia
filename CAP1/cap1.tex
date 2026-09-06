@@ -114,36 +114,46 @@ El sistema comprende los siguientes alcances:
 	\item Lectura de parámetros vehiculares en tiempo real, tales como revoluciones
 	del motor (RPM), velocidad del vehículo y otras variables disponibles mediante el
 	protocolo OBD-II, las cuales se utilizan para la estimación del consumo
-	de combustible.
+	de combustible. Este alcance se logra mediante el controlador CAN TWAI nativo
+	del ESP32-S3 y el transceptor SN65HVD230, que permiten sondear el bus OBD-II del
+	vehículo y obtener, entre otros, RPM, MAP, IAT y los ajustes de combustible
+	(STFT/LTFT) reportados por la propia ECU.
 
 	\item Procesamiento de los datos obtenidos con el fin de generar información
 	comprensible para el usuario, permitiendo evaluar el rendimiento del vehículo
-	en función de su consumo energético.
+	en función de su consumo energético. Este alcance se logra mediante el modelo
+	Speed-Density, corregido con los ajustes de combustible de la ECU, implementado
+	y calibrado sobre los dos vehículos de prueba (Nissan Vanette y Changan Honor).
 
 	\item Desarrollo de una interfaz de monitoreo accesible mediante una página web
 	generada por el propio ESP32, disponible a través de una dirección IP local,
 	que permite la visualización de los datos en tiempo real sin necesidad de
-	software adicional.
+	software adicional. Este alcance se logra mediante un panel web propio, servido
+	por el ESP32-S3 a través de un punto de acceso WiFi local (SoftAP), sin depender
+	de conectividad a internet ni de aplicaciones de terceros.
 
 	\item Diseño, implementación y validación del sistema en condiciones reales de
 	funcionamiento, permitiendo verificar su desempeño en la estimación del consumo
-	de combustible.
+	de combustible. Este alcance se logra mediante la validación experimental sobre
+	nueve tramos de ruta real, en la cual el sistema propio concuerda con un
+	adaptador ELM327 comercial dentro de un error porcentual absoluto medio (MAPE)
+	de 2,75\,\%, y con el aforo real de tanque lleno dentro de un MAPE de 4,84\,\%.
 \end{itemize}
 \subsection{Limites}
 
 La solución propuesta presenta ciertas limitaciones técnicas y de alcance que deben ser consideradas para una correcta interpretación de los resultados.
 
 \begin{itemize}
-	\item Una de las principales limitaciones está relacionada con el tipo de combustible del vehículo. El desarrollo se enfoca exclusivamente en vehículos a gasolina con inyección electrónica; tampoco se enfoca en vehículos con diésel o con sistemas de combustible combinado, conocidos como vehículos \textit{bi-fuel}, los cuales pueden operar tanto con gasolina como con gas natural o GLP. Debido a que el comportamiento físico y energético de estos combustibles es diferente, el sistema propuesto se enfoca únicamente en vehículos que operan exclusivamente con gasolina, no siendo posible un control preciso del consumo en vehículos bi-fuel \citep{AFDC_BiFuelVehicles}.
-	\item Asimismo, los vehículos de modelos antiguos que cuentan con sistemas de diagnóstico OBD-I presentan una limitación importante, ya que no permiten el acceso a información estandarizada del motor. Por esta razón, el sistema se encuentra limitado a vehículos que disponen de puerto OBD-II o sistemas de diagnóstico compatibles.
+	\item Una de las principales limitaciones está relacionada con el tipo de combustible del vehículo. El desarrollo se enfoca exclusivamente en vehículos a gasolina con inyección electrónica; tampoco se enfoca en vehículos con diésel o con sistemas de combustible combinado, conocidos como vehículos \textit{bi-fuel}, los cuales pueden operar tanto con gasolina como con gas natural o GLP. Debido a que el comportamiento físico y energético de estos combustibles es diferente, el sistema propuesto se enfoca únicamente en vehículos que operan exclusivamente con gasolina, no siendo posible un control preciso del consumo en vehículos bi-fuel \citep{AFDC_BiFuelVehicles}. Esta limitación se confirma en la práctica, ya que las pruebas experimentales se realizan exclusivamente sobre los dos vehículos a gasolina con inyección electrónica disponibles (Nissan Vanette y Changan Honor), sin evaluarse vehículos diésel ni bi-fuel.
+	\item Asimismo, los vehículos de modelos antiguos que cuentan con sistemas de diagnóstico OBD-I presentan una limitación importante, ya que no permiten el acceso a información estandarizada del motor. Por esta razón, el sistema se encuentra limitado a vehículos que disponen de puerto OBD-II o sistemas de diagnóstico compatibles. Esta limitación se confirma, dado que ambos vehículos empleados en las pruebas cuentan con puerto OBD-II, requisito verificado antes de iniciar cada sesión de adquisición.
 	\item En el contexto del transporte público en la ciudad de La Paz, la compatibilidad con sistemas de diagnóstico a bordo OBD-II se encuentra en vehículos de fabricación relativamente reciente. En el presente trabajo se consideran únicamente modelos que disponen de esta tecnología, sin especificar marcas o versiones comerciales particulares.
-	No obstante, el análisis experimental se limita exclusivamente a unidades seleccionadas que cumplen con el requisito de compatibilidad OBD-II.
+	No obstante, el análisis experimental se limita exclusivamente a unidades seleccionadas que cumplen con el requisito de compatibilidad OBD-II, limitación que se confirma en la práctica al restringirse las pruebas a los dos vehículos disponibles que cumplen dicho requisito.
 	\item Una de las limitaciones del presente estudio es la disponibilidad de
 	vehículos para la realización de las pruebas experimentales, al no disponerse
 	de acceso directo y permanente a unidades específicas como en el caso de los minibuses. Por esta razón, las pruebas experimentales se realizan también en otros vehículos con características mecánicas
 	similares que forman parte del parque automotor urbano y que
 	cuentan con sistemas de inyección electrónica compatibles con la
-	interfaz OBD-II.
-	\item Adicionalmente, la precisión del sistema depende del estado mecánico del vehículo. En vehículos con alto kilometraje o desgaste significativo, los valores obtenidos pueden presentar variaciones respecto a los valores ideales.
+	interfaz OBD-II. Esta limitación se confirma durante el desarrollo del proyecto, en el que, en efecto, no se dispuso de acceso a minibuses del transporte público, por lo que las pruebas se realizan sobre los dos vehículos mecánicamente similares ya indicados (Nissan Vanette y Changan Honor).
+	\item Adicionalmente, la precisión del sistema depende del estado mecánico del vehículo. En vehículos con alto kilometraje o desgaste significativo, los valores obtenidos pueden presentar variaciones respecto a los valores ideales. Esta limitación se confirma de forma indirecta en los propios resultados de validación: la exactitud del sistema se evalúa por separado en cada vehículo (Nissan Vanette y Changan Honor), precisamente porque el estado mecánico y la arquitectura del motor de cada unidad afectan de forma particular la calibración y el error de estimación obtenidos.
 \end{itemize}
 \clearpage
