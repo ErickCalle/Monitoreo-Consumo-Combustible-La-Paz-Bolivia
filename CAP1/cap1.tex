@@ -84,7 +84,7 @@ El sistema desarrollado genera información confiable sobre el comportamiento de
 \section{Objetivos del proyecto}
 \subsection{Objetivo General}
 \begin{itemize}
-	\item Desarrollar e implementar un sistema embebido capaz de adquirir datos en tiempo real desde el puerto de diagnóstico vehicular mediante el estándar OBD-II, con el fin de estimar el consumo instantáneo de combustible en vehículos a gasolina con inyección electrónica, generar un registro histórico de consumo y validar los resultados respecto a mediciones de referencia.
+	\item Implementar un sistema embebido capaz de adquirir datos en tiempo real desde el puerto de diagnóstico vehicular mediante el estándar OBD-II, con el fin de estimar el consumo instantáneo de combustible en vehículos a gasolina con inyección electrónica, generar un registro histórico de consumo y validar los resultados respecto a mediciones de referencia.
 \end{itemize}
 
 \subsection{Objetivos específicos}
@@ -93,11 +93,11 @@ El sistema desarrollado genera información confiable sobre el comportamiento de
 	
 	\item Desarrollar un modelo matemático para la estimación del consumo de combustible del transporte público de la ciudad de La Paz, utilizando parámetros obtenidos mediante el sistema OBD-II, basado en la relación aire--combustible del proceso de combustión.
 	
-	\item Adquirir y registrar datos del funcionamiento del motor mediante el sistema OBD-II, particularmente el flujo másico de aire (MAF) y/o presión de aire del motor (MAP), las revoluciones por minuto (RPM) y la velocidad del vehículo, para su posterior análisis en el modelo de estimación del consumo de combustible. Como se menciona en \citep{shaw2019fuel}, es posible estimar el consumo instantáneo de combustible utilizando datos obtenidos del vehículo mediante interfaces OBD-II.
+	\item Recopilar datos del funcionamiento del motor mediante el sistema OBD-II, particularmente el flujo másico de aire (MAF) y/o presión de aire del motor (MAP), las revoluciones por minuto (RPM) y la velocidad del vehículo, para su posterior análisis en el modelo de estimación del consumo de combustible. Como se menciona en \citep{shaw2019fuel}, es posible estimar el consumo instantáneo de combustible utilizando datos obtenidos del vehículo mediante interfaces OBD-II.
 	
 	\item Diseñar un sistema embebido de adquisición de datos para la captura, el guardado y posterior procesamiento de estos, facilitando la validación del modelo matemático de consumo de combustible del transporte público de La Paz.
 	
-	\item Diseñar e implementar una plataforma telemétrica basada en arquitectura IoT para la adquisición de parámetros del motor a través de la interfaz OBD-II utilizando un módulo ESP32  conectado a un adaptador , permitiendo la transmisión de los datos mediante un protocolo de comunicación hacia un servidor local donde serán almacenados en una base de datos estructurada para su posterior análisis del consumo de combustible.
+	\item Integrar una plataforma telemétrica basada en arquitectura IoT para la adquisición de parámetros del motor a través de la interfaz OBD-II utilizando un módulo ESP32 conectado a un adaptador, permitiendo la transmisión de los datos mediante un protocolo de comunicación hacia un servidor local donde serán almacenados en una base de datos estructurada para su posterior análisis del consumo de combustible.
 	
 	\item Evaluar el sistema integral del transporte público de La Paz bajo condiciones reales, validando su precisión en la estimación del consumo de combustible y su contribución a la mejora de la eficiencia energética.
 	
