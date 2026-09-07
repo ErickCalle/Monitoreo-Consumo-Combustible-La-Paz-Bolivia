@@ -31,3 +31,5 @@ __pycache__/
 # ---- Sistema operativo ----
 .DS_Store
 Thumbs.db
+~$*.docx
+~$*.doc
