@@ -1068,13 +1068,15 @@ conexión a internet ni infraestructura de red externa.
 
 \subsubsection{Arquitectura del Servidor Web Embebido}
 
-El servidor web se implementó con la biblioteca \texttt{ESPAsyncWebServer}, 
-que permite atender peticiones HTTP y mantener conexiones WebSocket de forma 
-asíncrona sin bloquear el bucle principal de adquisición CAN. La interfaz 
-gráfica HTML/CSS/JS se almacena en la partición SPIFFS del ESP32 y se sirve 
-estáticamente al cliente. La actualización de datos en tiempo real se realiza 
-mediante WebSocket, evitando el \textit{polling} HTTP y reduciendo la latencia 
-de visualización. El flujo de datos completo se ilustra en la 
+A diferencia del modelo tradicional de petición-respuesta de HTTP, en el que el cliente debe solicitar cada actualización de forma individual, el protocolo WebSocket \citep{rfc6455} establece un canal de comunicación bidireccional y persistente sobre una única conexión TCP. Una vez completado el saludo inicial (\textit{handshake}), que sí se realiza sobre HTTP, el servidor puede enviar datos al cliente en cualquier momento sin que este los solicite explícitamente, con un sobrecosto de encabezado mucho menor que el de una petición HTTP completa repetida. Esta característica lo hace especialmente adecuado para la actualización en tiempo real del panel web del presente sistema, donde el ESP32-S3 necesita empujar el estado del vehículo al navegador de forma periódica sin que este tenga que preguntar repetidamente si hay datos nuevos.
+
+El servidor web se implementó con la biblioteca \texttt{ESPAsyncWebServer},
+que permite atender peticiones HTTP y mantener conexiones WebSocket de forma
+asíncrona sin bloquear el bucle principal de adquisición CAN. La interfaz
+gráfica HTML/CSS/JS se almacena en la partición SPIFFS del ESP32 y se sirve
+estáticamente al cliente. La actualización de datos en tiempo real se realiza
+mediante WebSocket, evitando el \textit{polling} HTTP y reduciendo la latencia
+de visualización. El flujo de datos completo se ilustra en la
 Figura~\ref{fig:flujo_web}.
 
 \begin{figure}[htbp]
