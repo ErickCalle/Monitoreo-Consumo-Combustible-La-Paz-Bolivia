@@ -1,6 +1,6 @@
 # Monitoreo del consumo de combustible — La Paz, Bolivia
 
-Sistema embebido de monitoreo de consumo de combustible orientado a la mejora de la eficiencia energética en el transporte público urbano de La Paz. Se conecta al puerto OBD-II del vehículo, estima el consumo en tiempo real mediante el método Speed-Density, lo registra en una tarjeta microSD y lo muestra en una pantalla OLED y en un panel web propio (sin depender de internet ni de un servidor de terceros).
+Sistema embebido de monitoreo de consumo de combustible para el análisis de la autonomía en vehículos de transporte público urbano de La Paz. Se conecta al puerto OBD-II del vehículo, estima el consumo en tiempo real mediante el método Speed-Density, lo registra en una tarjeta microSD y lo muestra en una pantalla OLED y en un panel web propio (sin depender de internet ni de un servidor de terceros).
 
 Proyecto de grado — Carrera de Ingeniería Mecánica y Electromecánica (Ingeniería Mecatrónica), Facultad de Ingeniería, **Universidad Mayor de San Andrés (UMSA)**, La Paz, Bolivia.
 

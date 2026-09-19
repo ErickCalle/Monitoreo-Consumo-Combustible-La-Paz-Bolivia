@@ -59,7 +59,7 @@ Asimismo, una combustión ineficiente asociada a combustibles de calidad variabl
 
 En este escenario, surge una creciente preocupación sobre la eficiencia en el uso de la gasolina como fuente energética en el transporte, especialmente en vehículos que no cuentan con sistemas avanzados de monitoreo. La falta de herramientas accesibles que permitan analizar el consumo de combustible en tiempo real incrementa la incertidumbre del usuario respecto al rendimiento de su vehículo.
 
-Por lo tanto, se desarrolla un sistema que permite monitorear y analizar el consumo de combustible de manera precisa y en tiempo real, con el objetivo de contribuir a la optimización de la eficiencia energética del vehículo y brindar al usuario información confiable para la toma de decisiones \citep{lamby2026giro}.
+Por lo tanto, se desarrolla un sistema que permite monitorear y analizar el consumo de combustible de manera precisa y en tiempo real, con el objetivo de contribuir al análisis de la autonomía del vehículo y brindar al usuario información confiable para la toma de decisiones \citep{lamby2026giro}.
 
 
 
@@ -84,7 +84,7 @@ El sistema desarrollado genera información confiable sobre el comportamiento de
 \section{Objetivos del proyecto}
 \subsection{Objetivo General}
 \begin{itemize}
-	\item Implementar un sistema embebido capaz de adquirir datos en tiempo real desde el puerto de diagnóstico vehicular mediante el estándar OBD-II, con el fin de estimar el consumo instantáneo de combustible en vehículos a gasolina con inyección electrónica, generar un registro histórico de consumo y validar los resultados respecto a mediciones de referencia.
+	\item Implementar un sistema embebido capaz de adquirir datos en tiempo real desde el puerto de diagnóstico vehicular mediante el estándar OBD-II, con el fin de estimar el consumo instantáneo de combustible en vehículos a gasolina con inyección electrónica, generar un registro histórico de consumo, validar los resultados respecto a mediciones de referencia y analizar la autonomía resultante del vehículo.
 \end{itemize}
 
 \subsection{Objetivos específicos}
@@ -99,7 +99,7 @@ El sistema desarrollado genera información confiable sobre el comportamiento de
 	
 	\item Integrar una plataforma telemétrica basada en arquitectura IoT para la adquisición de parámetros del motor a través de la interfaz OBD-II utilizando un módulo ESP32 conectado a un adaptador, permitiendo la transmisión de los datos mediante un protocolo de comunicación hacia un servidor local donde serán almacenados en una base de datos estructurada para su posterior análisis del consumo de combustible.
 	
-	\item Evaluar el sistema integral del transporte público de La Paz bajo condiciones reales, validando su precisión en la estimación del consumo de combustible y su contribución a la mejora de la eficiencia energética.
+	\item Evaluar el sistema integral del transporte público de La Paz bajo condiciones reales, validando su precisión en la estimación del consumo de combustible y su contribución al análisis de la autonomía del vehículo.
 	
 \end{itemize}
 
