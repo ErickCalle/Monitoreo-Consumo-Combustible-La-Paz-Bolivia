@@ -5,7 +5,7 @@
 
 En la actualidad, la incorporación de sistemas electrónicos en los vehículos ha permitido mejorar significativamente el control, diagnóstico y eficiencia en su funcionamiento. A través de diferentes sensores y unidades de control electrónico, es posible obtener información relevante sobre el desempeño del motor y otros subsistemas en tiempo real. En este contexto, el estándar OBD-II (On-Board Diagnostics) se ha consolidado como una herramienta fundamental para el acceso a datos vehiculares.
 
-El presente proyecto desarrolla un sistema de monitoreo del consumo de combustible para vehículos que no disponen de esta funcionalidad de forma nativa. Si bien algunos vehículos modernos ya incorporan sistemas que permiten visualizar este tipo de información directamente en el panel de instrumentos, existe una gran cantidad de automóviles en la ciudad de La Paz que carecen de esta característica, lo que limita el control del gasto energético de combustible por parte del usuario.
+El presente proyecto desarrolla un sistema de monitoreo del consumo de combustible para vehículos a gasolina con inyección electrónica que no disponen de esta funcionalidad de forma nativa. Si bien algunos vehículos modernos ya incorporan sistemas que permiten visualizar este tipo de información directamente en el panel de instrumentos, existe una gran cantidad de automóviles que carecen de esta característica, como ocurre, por ejemplo, con buena parte del parque automotor de la ciudad de La Paz, lo que limita el control del gasto energético de combustible por parte del usuario.
 
 Para dar solución a esta necesidad, se implementa un sistema basado en un microcontrolador ESP32, que en conjunto con un módulo de comunicación CAN, permite la adquisición de datos desde el puerto OBD-II del vehículo. A partir de estos datos, se realiza el procesamiento necesario para estimar el consumo de combustible en tiempo real.
 
@@ -65,9 +65,9 @@ Por lo tanto, se desarrolla un sistema que permite monitorear y analizar el cons
 
 \section{Justificación}
 
-En el transporte urbano de La Paz, los vehiculos con sistemas de inyección electrónica operan sin herramientas que permitan conocer de manera precisa y continua el consumo real de gasolina durante su funcionamiento. En la práctica, la evaluación del consumo se realiza de forma empírica, sin información técnica que permita identificar ineficiencias en el uso del combustible.
+Los vehículos a gasolina con inyección electrónica operan, en general, sin herramientas que permitan conocer de manera precisa y continua el consumo real de gasolina durante su funcionamiento; esta carencia se observa, por ejemplo, en el transporte urbano de la ciudad de La Paz. En la práctica, la evaluación del consumo se realiza de forma empírica, sin información técnica que permita identificar ineficiencias en el uso del combustible.
 
-La ausencia de sistemas de monitoreo del consumo dificulta el análisis del comportamiento del motor, tales tramos recorridos y modos de conducción. Esta situación limita la posibilidad de optimizar el desempeño del vehículo y detectar posibles fallas asociadas a un consumo anómalo de combustible El proyecto ayuda a tener un patrón o un control que indica si el vehículo consume mas gasolina de la que debe, considerando las condiciones en la ciudad de La Paz.
+La ausencia de sistemas de monitoreo del consumo dificulta el análisis del comportamiento del motor, tales tramos recorridos y modos de conducción. Esta situación limita la posibilidad de optimizar el desempeño del vehículo y detectar posibles fallas asociadas a un consumo anómalo de combustible. El proyecto ayuda a tener un patrón o un control que indica si el vehículo consume más gasolina de la que debe, sin importar las condiciones particulares de uso.
 
 El sistema desarrollado genera información confiable sobre el comportamiento del motor. Esta información contribuye a la mejora de la eficiencia operativa, al análisis técnico del consumo de combustible y al apoyo en procesos de mantenimiento y toma de decisiones técnicas.
 \begin{itemize}
@@ -78,7 +78,7 @@ El sistema desarrollado genera información confiable sobre el comportamiento de
 	El acceso a información precisa y continua sobre el consumo de combustible permite a conductores y operadores de transporte optimizar el uso del vehículo, reduciendo gastos innecesarios asociados al consumo excesivo de gasolina. Asimismo, el sistema contribuye a la toma de decisiones relacionadas con el mantenimiento del motorizado y la planificación de rutas, generando un impacto económico positivo tanto para transportistas como para usuarios.
 	
 	\item \textbf{Justificación social:}
-	El sistema propuesto aporta a la mejora de la eficiencia del transporte urbano y vehículos de uso particular, al promover un uso más responsable del combustible. Esto contribuye indirectamente a una mayor transparencia en el desempeño de los vehículos, a la concienciación sobre el consumo energético y a la mejora de la calidad del servicio de transporte en la ciudad de La Paz.
+	El sistema propuesto aporta a la mejora de la eficiencia de los vehículos a gasolina con inyección electrónica, tanto de uso particular como de transporte urbano, al promover un uso más responsable del combustible. Esto contribuye indirectamente a una mayor transparencia en el desempeño de los vehículos, a la concienciación sobre el consumo energético y, en el caso del transporte público, a la mejora de la calidad del servicio, como ocurriría en la ciudad de La Paz.
 \end{itemize}
 
 \section{Objetivos del proyecto}
@@ -91,15 +91,15 @@ El sistema desarrollado genera información confiable sobre el comportamiento de
 \begin{itemize}
 	\item Determinar los parámetros del sistema OBD-II disponibles, particularmente el flujo de aire del motor (MAF) y/o presión de aire del motor (MAP), las RPM y la velocidad del vehículo, con el fin de estimar el consumo de combustible mediante un modelo matemático basado en la relación aire-combustible.
 	
-	\item Desarrollar un modelo matemático para la estimación del consumo de combustible del transporte público de la ciudad de La Paz, utilizando parámetros obtenidos mediante el sistema OBD-II, basado en la relación aire--combustible del proceso de combustión.
+	\item Desarrollar un modelo matemático para la estimación del consumo de combustible en vehículos a gasolina con inyección electrónica, utilizando parámetros obtenidos mediante el sistema OBD-II, basado en la relación aire--combustible del proceso de combustión.
 	
 	\item Recopilar datos del funcionamiento del motor mediante el sistema OBD-II, particularmente el flujo másico de aire (MAF) y/o presión de aire del motor (MAP), las revoluciones por minuto (RPM) y la velocidad del vehículo, para su posterior análisis en el modelo de estimación del consumo de combustible. Como se menciona en \citep{shaw2019fuel}, es posible estimar el consumo instantáneo de combustible utilizando datos obtenidos del vehículo mediante interfaces OBD-II.
 	
-	\item Diseñar un sistema embebido de adquisición de datos para la captura, el guardado y posterior procesamiento de estos, facilitando la validación del modelo matemático de consumo de combustible del transporte público de La Paz.
+	\item Diseñar un sistema embebido de adquisición de datos para la captura, el guardado y posterior procesamiento de estos, facilitando la validación del modelo matemático de consumo de combustible en vehículos a gasolina con inyección electrónica.
 	
 	\item Integrar una plataforma telemétrica basada en arquitectura IoT para la adquisición de parámetros del motor a través de la interfaz OBD-II utilizando un módulo ESP32 conectado a un adaptador, permitiendo la transmisión de los datos mediante un protocolo de comunicación hacia un servidor local donde serán almacenados en una base de datos estructurada para su posterior análisis del consumo de combustible.
 	
-	\item Evaluar el sistema integral del transporte público de La Paz bajo condiciones reales, validando su precisión en la estimación del consumo de combustible y su contribución al análisis de la autonomía del vehículo.
+	\item Evaluar el sistema integral en vehículos a gasolina con inyección electrónica bajo condiciones reales, validando su precisión en la estimación del consumo de combustible y su contribución al análisis de la autonomía del vehículo.
 	
 \end{itemize}
 
@@ -146,11 +146,11 @@ La solución propuesta presenta ciertas limitaciones técnicas y de alcance que 
 \begin{itemize}
 	\item Una de las principales limitaciones está relacionada con el tipo de combustible del vehículo. El desarrollo se enfoca exclusivamente en vehículos a gasolina con inyección electrónica; tampoco se enfoca en vehículos con diésel o con sistemas de combustible combinado, conocidos como vehículos \textit{bi-fuel}, los cuales pueden operar tanto con gasolina como con gas natural o GLP. Debido a que el comportamiento físico y energético de estos combustibles es diferente, el sistema propuesto se enfoca únicamente en vehículos que operan exclusivamente con gasolina, no siendo posible un control preciso del consumo en vehículos bi-fuel \citep{AFDC_BiFuelVehicles}. Esta limitación se confirma en la práctica, ya que las pruebas experimentales se realizan exclusivamente sobre los dos vehículos a gasolina con inyección electrónica disponibles (Nissan Vanette y Changan Honor), sin evaluarse vehículos diésel ni bi-fuel.
 	\item Asimismo, los vehículos de modelos antiguos que cuentan con sistemas de diagnóstico OBD-I presentan una limitación importante, ya que no permiten el acceso a información estandarizada del motor. Por esta razón, el sistema se encuentra limitado a vehículos que disponen de puerto OBD-II o sistemas de diagnóstico compatibles. Esta limitación se confirma, dado que ambos vehículos empleados en las pruebas cuentan con puerto OBD-II, requisito verificado antes de iniciar cada sesión de adquisición.
-	\item En el contexto del transporte público en la ciudad de La Paz, la compatibilidad con sistemas de diagnóstico a bordo OBD-II se encuentra en vehículos de fabricación relativamente reciente. En el presente trabajo se consideran únicamente modelos que disponen de esta tecnología, sin especificar marcas o versiones comerciales particulares.
+	\item En los vehículos a gasolina con inyección electrónica, la compatibilidad con sistemas de diagnóstico a bordo OBD-II se encuentra en unidades de fabricación relativamente reciente; esto es particularmente relevante, por ejemplo, en el parque automotor del transporte público de la ciudad de La Paz. En el presente trabajo se consideran únicamente modelos que disponen de esta tecnología, sin especificar marcas o versiones comerciales particulares.
 	No obstante, el análisis experimental se limita exclusivamente a unidades seleccionadas que cumplen con el requisito de compatibilidad OBD-II, limitación que se confirma en la práctica al restringirse las pruebas a los dos vehículos disponibles que cumplen dicho requisito.
 	\item Una de las limitaciones del presente estudio es la disponibilidad de
 	vehículos para la realización de las pruebas experimentales, al no disponerse
-	de acceso directo y permanente a unidades específicas como en el caso de los minibuses. Por esta razón, las pruebas experimentales se realizan también en otros vehículos con características mecánicas
+	de acceso directo y permanente a unidades específicas de un contexto de aplicación particular, como los minibuses del transporte público de la ciudad de La Paz, uno de los ejemplos de vehículos a gasolina con inyección electrónica a los que apunta este trabajo. Por esta razón, las pruebas experimentales se realizan también en otros vehículos con características mecánicas
 	similares que forman parte del parque automotor urbano y que
 	cuentan con sistemas de inyección electrónica compatibles con la
 	interfaz OBD-II. Esta limitación se confirma durante el desarrollo del proyecto, en el que, en efecto, no se dispuso de acceso a minibuses del transporte público, por lo que las pruebas se realizan sobre los dos vehículos mecánicamente similares ya indicados (Nissan Vanette y Changan Honor).

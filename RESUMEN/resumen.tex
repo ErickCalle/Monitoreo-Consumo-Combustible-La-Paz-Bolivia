@@ -1,7 +1,7 @@
 \chapter*{RESUMEN}
 \addcontentsline{toc}{chapter}{RESUMEN}
 
-Este proyecto de grado desarrolla e implementa un sistema embebido de monitoreo del consumo de combustible para el análisis de la autonomía en vehículos de transporte público urbano de la ciudad de La Paz, dirigido a vehículos a gasolina con inyección electrónica que carecen de esta funcionalidad de forma nativa.
+Este proyecto de grado desarrolla e implementa un sistema embebido de monitoreo del consumo de combustible para el análisis de la autonomía en vehículos a gasolina con inyección electrónica que carecen de esta funcionalidad de forma nativa, con aplicación, por ejemplo, en el transporte público urbano de la ciudad de La Paz.
 
 El sistema se basa en un módulo ESP32-S3 con controlador CAN nativo (TWAI) y un transceptor SN65HVD230, que adquieren en tiempo real los parámetros del motor disponibles por el puerto OBD-II del vehículo. El consumo se estima mediante el modelo Speed-Density, corregido con los ajustes de combustible que reporta la propia ECU, y se registra por viaje en una tarjeta microSD. El dispositivo expone además un panel web propio mediante un punto de acceso WiFi local, sin depender de internet ni de aplicaciones de terceros.
 
