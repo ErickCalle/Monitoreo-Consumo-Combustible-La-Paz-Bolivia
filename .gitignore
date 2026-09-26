@@ -25,7 +25,7 @@
 __pycache__/
 *.pyc
 
-# ---- Respaldos internos de edición (no forman parte de la tesis) ----
+# ---- Respaldos internos de edición (no forman parte del proyecto de grado) ----
 .backups_style_pass/
 
 # ---- Sistema operativo ----

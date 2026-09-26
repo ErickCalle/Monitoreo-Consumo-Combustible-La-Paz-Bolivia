@@ -87,14 +87,14 @@ El método speed-density **no mide** el aire, lo estima. Los dos parámetros
 de calibración están condicionados por vehículo, no se editan a mano:
 
 - `ENGINE_DISPLACEMENT_L` (`include/config.h`): cilindrada real de cada
-  motor (Vanette 1,626\,L, Changan 1,298\,L, Tabla 4.4 de la tesis).
+  motor (Vanette 1,626\,L, Changan 1,298\,L, Tabla 4.4 del proyecto de grado).
 - Tabla `kVeTable` (`src/fuel_calc.cpp`): eficiencia volumétrica (%) por
   RPM. La del Vanette está calibrada con datos reales contra su PID 0x10
   (MAF) — ver `CODIGOS/calibrate_ve_table.py` y
   `CODIGOS/ve_curve_calibrator.py`. La del Changan sigue siendo la tabla
   genérica de literatura, porque ese vehículo no soporta el PID 0x10 y
   no admite el mismo método de calibración directa (ver "Caso sin MAF"
-  en el Capítulo 3 de la tesis y `CODIGOS/ve_curve_calibrator_indirect.py`
+  en el Capítulo 3 del proyecto de grado y `CODIGOS/ve_curve_calibrator_indirect.py`
   para la alternativa vía STFT/LTFT).
 - `FUEL_AFR_STOICH` / `FUEL_DENSITY_G_PER_L`: casi no cambian para
   gasolina, pero están expuestos por si usas otro combustible; no están

@@ -34,16 +34,16 @@ Sobre nueve tramos de ruta real (dos vehículos, aforo de tanque lleno como refe
   <img src="Images/figura_comparacion_consumo.png" alt="Consumo por tramo: sistema propuesto vs. ELM327 + Car Scanner" width="700">
 </p>
 
-Detalle completo de la metodología, las pruebas y las métricas (incluida la validación dinámica contra un sensor MAF real y el análisis de concordancia de Bland-Altman) en el Capítulo 4 de la tesis.
+Detalle completo de la metodología, las pruebas y las métricas (incluida la validación dinámica contra un sensor MAF real y el análisis de concordancia de Bland-Altman) en el Capítulo 4 del proyecto de grado.
 
 ## Estructura del repositorio
 
 ```
-CAP1-CAP6/    Capítulos de la tesis (LaTeX)
+CAP1-CAP6/    Capítulos del proyecto de grado (LaTeX)
 APENDICE/     Apéndices
 GLOSARIO/     Glosario de términos técnicos
 main.tex      Documento raíz (compila con pdflatex + bibtex)
-main.pdf      Tesis compilada
+main.pdf      Proyecto de grado compilado
 
 CODIGOS/
   esp32s3_obd2_speeddensity/   Firmware de producción (PlatformIO)
