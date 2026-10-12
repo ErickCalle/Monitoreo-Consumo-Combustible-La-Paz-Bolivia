@@ -1,12 +1,15 @@
 #pragma once
 
 // K-Line (ISO 9141-2) OBD2 acquisition over an L9637D transceiver.
-// Mirrors can_obd2.h's public interface so it is a drop-in alternative
-// to canObd2Init/canObd2CheckContact/canObd2Task for a vehicle whose ECU
-// answers on K-Line (OBD-II pin 7) instead of CAN (pines 6/14).
+// Mismo rol que can_obd2.h/.cpp en CODIGOS/esp32s3_obd2_speeddensity/
+// (misma firma Init/CheckContact/Task, mismo VehicleData), pero para un
+// vehiculo cuya ECU responde por K-Line (OBD-II pin 7) en vez de CAN.
+// Este es el unico modulo realmente distinto entre ambos proyectos --
+// display_oled, sd_logger, web_server, status_leds, power_sleep y
+// fuel_calc son identicos o casi identicos, ver README.md.
 //
-// Ver README.md en esta misma carpeta para el pinout del L9637D y los
-// pasos de integracion con el firmware existente (config.h, main.cpp).
+// Ver README.md en esta misma carpeta para el pinout del L9637D, el
+// diagrama de conexion y como compilar este proyecto.
 
 // Initializes the K-Line UART (Serial1 sobre los pines PIN_KLINE_TX/RX)
 // and the raw GPIO used for the 5-baud bit-bang. No lleva a cabo la
