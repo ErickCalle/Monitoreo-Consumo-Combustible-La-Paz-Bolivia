@@ -1,5 +1,6 @@
 // ============================================================================
-// K-Line (ISO 9141-2) simple -- ESP32-S3 + L9637D -- lee solo RPM (PID 0x0C)
+// K-Line (ISO 9141-2 / ISO 14230 KWP2000) simple -- ESP32-S3 + L9637D --
+// lee solo RPM (PID 0x0C)
 // ============================================================================
 //
 // Version minima, un solo archivo, sin libreria externa ninguna (solo
@@ -11,8 +12,21 @@
 // estandar ISO 9141-2:1994(E) (ver CODIGOS/K_LINE/README.md para las
 // fuentes exactas).
 //
+// Intenta DOS metodos de inicializacion, uno despues del otro: el lento
+// a 5 baudios (ISO9141-2) y, si ese no contesta nada, el "fast init" de
+// ISO14230 (KWP2000). Esto no es opcional ni un capricho: el propio
+// estandar ISO 14230-4:2000 (clausula 4.4, "StartCommunication
+// service") dice textualmente que el ECU del vehiculo "shall only
+// support ONE of the two following methods of initialisation" (5 baud
+// o fast init, uno solo) -- por eso una herramienta de diagnostico
+// real like un ELM327 siempre prueba los dos. El formato del fast init
+// (bytes C1 33 F1 81 66 y su checksum) esta verificado cruzando varias
+// fuentes independientes, con el checksum confirmado a mano en dos
+// ejemplos reales distintos -- ver las notas junto a klineFastInit().
+//
 // Una vez que esto funcione y veas las RPM por el monitor serie, se
-// agregan mas PIDs copiando el patron de requestPid()/kPollPids[] --
+// agregan mas PIDs copiando el patron de requestPidSlowInit() /
+// requestPidFastInit() segun cual de los dos init haya contestado --
 // no hace falta reescribir nada del handshake.
 //
 // ----------------------------------------------------------------------
@@ -153,11 +167,12 @@ static bool klineSlowInit() {
   return true;
 }
 
-// ---- Pedido/respuesta Modo 01 (ISO9141-2 clausula 11, tabla 1) -----------
+// ---- Pedido/respuesta Modo 01 -- variante ISO9141-2 (clausula 11, tabla 1)
 // Pedido: [0x68, 0x6A, 0xF1, 0x01, PID, checksum]
 // Respuesta esperada: [0x48, 0x6B, SRC, 0x41, PID, datos..., checksum]
 // Checksum = suma de 8 bits de todos los bytes anteriores, modulo 256.
-static bool requestPid(uint8_t pid, uint8_t *outData, uint8_t &outLen) {
+// Se usa SOLO si el bus se inicializo con klineSlowInit().
+static bool requestPidSlowInit(uint8_t pid, uint8_t *outData, uint8_t &outLen) {
   uint8_t msg[6] = {0x68, 0x6A, 0xF1, 0x01, pid, 0x00};
   uint8_t cs = 0;
   for (int i = 0; i < 5; i++) cs += msg[i];
@@ -191,6 +206,113 @@ static bool requestPid(uint8_t pid, uint8_t *outData, uint8_t &outLen) {
   return true;
 }
 
+// ---- Fast init (ISO14230-4:2000 clausula 4.4 + ISO14230 KWP2000) --------
+// Patron de reactivacion: linea K en reposo, despues 25 ms en bajo + 25 ms
+// en alto (bit-banged, no por el UART -- nada que ver con los 5 baudios
+// del otro metodo). Inmediatamente despues, el StartCommunication Service
+// a 10400 baudios: pedido fijo [0xC1, 0x33, 0xF1, 0x81, 0x66] (format,
+// target=0x33 funcional, source=0xF1 tester, servicio 0x81, checksum).
+// El checksum 0x66 es siempre el mismo porque los 4 bytes anteriores son
+// fijos: 0xC1+0x33+0xF1+0x81 = 0x266, modulo 256 = 0x66.
+// Respuesta positiva esperada: [0x83, 0xF1, ECU, 0xC1, KB1, KB2, checksum]
+// (formato 0x83 = 0x80 | 3 bytes de datos: 0xC1 + 2 key words).
+static bool klineFastInit() {
+  KlineSerial.end();
+  pinMode(PIN_KLINE_TX, OUTPUT);
+  digitalWrite(PIN_KLINE_TX, HIGH); // reposo
+  delay(300); // bus en reposo antes del pulso de reactivacion
+
+  digitalWrite(PIN_KLINE_TX, LOW);
+  delay(25);
+  digitalWrite(PIN_KLINE_TX, HIGH);
+  delay(25);
+
+  KlineSerial.begin(10400, SERIAL_8N1, PIN_KLINE_RX, PIN_KLINE_TX);
+
+  const uint8_t req[5] = {0xC1, 0x33, 0xF1, 0x81, 0x66};
+  for (int i = 0; i < 5; i++) {
+    if (!klineWriteByteAndDiscardEcho(req[i], W4_ECHO_TIMEOUT_MS)) {
+      Serial.println("  fast init: no se pudo enviar/confirmar el pedido StartCommunication");
+      return false;
+    }
+    if (i < 4) delay(P4_BYTE_GAP_MS);
+  }
+
+  uint8_t buf[7];
+  uint8_t len = 0;
+  uint8_t b;
+  if (!klineReadByte(b, RESPONSE_FIRST_BYTE_TIMEOUT_MS)) {
+    Serial.println("  fast init: no llego respuesta al StartCommunication");
+    return false;
+  }
+  buf[len++] = b;
+  while (len < sizeof(buf)) {
+    if (!klineReadByte(b, RESPONSE_BYTE_GAP_TIMEOUT_MS)) break;
+    buf[len++] = b;
+  }
+
+  if (len < 6 || buf[1] != 0xF1 || buf[3] != 0xC1) {
+    Serial.println("  fast init: respuesta invalida o incompleta al StartCommunication");
+    return false;
+  }
+
+  uint8_t cs = 0;
+  for (int i = 0; i < len - 1; i++) cs += buf[i];
+  if (cs != buf[len - 1]) {
+    Serial.println("  fast init: checksum invalido en la respuesta");
+    return false;
+  }
+
+  delay(P3_MIN_MS);
+  Serial.printf("  fast init OK -- ECU addr=0x%02X KB1=0x%02X KB2=0x%02X\n", buf[2], buf[4], buf[5]);
+  return true;
+}
+
+// ---- Pedido/respuesta Modo 01 -- variante KWP2000 (ISO14230-4 clausula 4.2)
+// A diferencia de ISO9141-2, el byte de formato codifica la cantidad de
+// bytes de datos en sus 6 bits bajos (0xC0 | longitud para pedidos con
+// direccionamiento funcional, 0x80 | longitud para respuestas con
+// direccionamiento fisico) en vez de usar siempre 0x68/0x48 fijos.
+// Pedido Modo 01 + 1 PID -> 2 bytes de datos -> formato = 0xC0|2 = 0xC2.
+// Se usa SOLO si el bus se inicializo con klineFastInit().
+static bool requestPidFastInit(uint8_t pid, uint8_t *outData, uint8_t &outLen) {
+  uint8_t msg[6] = {0xC2, 0x33, 0xF1, 0x01, pid, 0x00};
+  uint8_t cs = 0;
+  for (int i = 0; i < 5; i++) cs += msg[i];
+  msg[5] = cs;
+
+  for (int i = 0; i < 6; i++) {
+    if (!klineWriteByteAndDiscardEcho(msg[i], W4_ECHO_TIMEOUT_MS)) return false;
+    if (i < 5) delay(P4_BYTE_GAP_MS);
+  }
+
+  uint8_t buf[11];
+  uint8_t len = 0;
+  uint8_t b;
+
+  if (!klineReadByte(b, RESPONSE_FIRST_BYTE_TIMEOUT_MS)) return false;
+  buf[len++] = b;
+  while (len < sizeof(buf)) {
+    if (!klineReadByte(b, RESPONSE_BYTE_GAP_TIMEOUT_MS)) break;
+    buf[len++] = b;
+  }
+
+  // buf[0] = formato (0x80|longitud, no se valida el valor exacto de
+  // longitud por si el ECU manda algun byte extra); buf[1] = target
+  // (deberia ser 0xF1, el tester); buf[3] = 0x41 (respuesta positiva a
+  // Modo 01); buf[4] = pid.
+  if (len < 6) return false;
+  if (buf[1] != 0xF1 || buf[3] != 0x41 || buf[4] != pid) return false;
+
+  cs = 0;
+  for (int i = 0; i < len - 1; i++) cs += buf[i];
+  if (cs != buf[len - 1]) return false;
+
+  outLen = len;
+  memcpy(outData, buf, len);
+  return true;
+}
+
 // ---------------------------------------------------------------------
 void setup() {
   Serial.begin(115200);
@@ -199,21 +321,34 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("Inicializando K-Line (5 baudios)...");
-  if (!klineSlowInit()) {
-    Serial.println("Sin contacto / init fallido. Reintentando en 2 s.\n");
-    delay(2000);
-    return;
+  bool usingFastInit = false;
+
+  Serial.println("Inicializando K-Line (5 baudios, ISO9141-2)...");
+  if (klineSlowInit()) {
+    usingFastInit = false;
+  } else {
+    Serial.println("Sin respuesta al init lento. Probando fast init (ISO14230/KWP2000)...");
+    if (klineFastInit()) {
+      usingFastInit = true;
+    } else {
+      Serial.println("Sin contacto por ninguno de los dos metodos. Reintentando en 2 s.\n");
+      delay(2000);
+      return;
+    }
   }
 
   // Con el bus ya inicializado, se puede pedir PID 0x0C varias veces
   // seguidas (con el espaciado P3 entre pedidos) sin tener que repetir
-  // el handshake de 5 baudios cada vez.
+  // el handshake cada vez.
   for (int i = 0; i < 20; i++) {
     uint8_t data[11];
     uint8_t len = 0;
-    if (requestPid(0x0C, data, len)) {
-      // PID 0x0C: RPM = ((A*256)+B)/4, A=data[5], B=data[6]
+    bool ok = usingFastInit ? requestPidFastInit(0x0C, data, len)
+                             : requestPidSlowInit(0x0C, data, len);
+    if (ok) {
+      // PID 0x0C: RPM = ((A*256)+B)/4, A=data[5], B=data[6] -- mismo
+      // offset en los dos formatos, ambos tienen header(3) + 0x41 + pid
+      // antes de los bytes de datos.
       uint16_t rpm = ((uint16_t)data[5] << 8 | data[6]) / 4;
       Serial.printf("RPM: %u\n", rpm);
     } else {
