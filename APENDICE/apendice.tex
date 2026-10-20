@@ -460,5 +460,186 @@ Controlador CAN independiente con interfaz SPI (Microchip), evaluado en la etapa
 \begin{center}
 	\includegraphics[page=1, width=0.89\textwidth]{DATASHEET/MCP2515.pdf}
 
-	
+
+\end{center}
+
+\newpage
+\cleardoublepage
+\refstepcounter{section}
+\def\thesection{Q}
+\label{anexo:trip_log}
+\begin{center}
+	\bfseries Apéndice Q \\
+	\normalfont\bfseries\itshape Registro de un viaje (trip\_003.csv) y ecuaciones fundamentales del modelo de estimación
+\end{center}
+\addcontentsline{toc}{section}{Apéndice Q: Registro de un viaje y ecuaciones fundamentales del modelo de estimación}
+
+\vspace{4mm}
+
+Este apéndice reproduce, a modo de ejemplo, el archivo real generado por el
+sistema en la tarjeta microSD con el formato descrito en la
+Sección~\ref{subsec:registro_microsd} del Capítulo~3
+(\texttt{/logs/trip\_003.csv}, vehículo Changan Honor), y presenta en un
+recuadro las dos ecuaciones centrales del modelo de estimación de consumo
+desarrollado en el Capítulo~3. El mismo archivo se emplea como fuente de
+datos en la prueba de integridad de registro en microSD (Tabla~\ref{tab:validacion_microsd},
+Sección~\ref{sec:pruebas_microsd} del Capítulo~4): se trata de una sesión de
+\textbf{60,8 minutos con el motor en ralentí} (el vehículo permaneció
+detenido, \texttt{speed\_kmh} = 0 durante toda la sesión, por lo que
+\texttt{trip\_km} y \texttt{trip\_avg\_L100km} se mantienen en cero), cortada
+de forma abrupta al final para validar el comportamiento del sistema ante un
+corte de alimentación durante la escritura.
+
+\subsection*{Q.1 Estructura del registro}
+
+La Tabla~\ref{tab:columnas_sd_logger} del Capítulo~3 describe 16 de las 18
+columnas escritas por \texttt{sdLoggerTask()}; las dos restantes, agregadas
+junto con la corrección por altitud (Sección~\ref{subsec:etav-altitud}), se
+detallan en la Tabla~\ref{tab:trip_cols_extra}.
+
+\begin{table}[H]
+	\centering
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption{Columnas adicionales de \texttt{trip\_NNN.csv} no incluidas en la Tabla~\ref{tab:columnas_sd_logger}.}
+	\label{tab:trip_cols_extra}
+	\begin{tabularx}{\textwidth}{l X}
+		\toprule
+		\rowcolor[rgb]{0.851, 0.851, 0.851}
+		Columna & Descripción \\
+		\midrule
+		\texttt{baro\_kpa}          & Presión barométrica, kPa: lectura real del PID 0x33 o, si el vehículo no lo soporta, estimación por el modelo ISA (Ecuación~\ref{eq:isa}) evaluado en \texttt{SITE\_ALTITUDE\_M}. \\
+		\texttt{baro\_is\_estimated} & Bandera (0/1): 1 si \texttt{baro\_kpa} proviene del modelo ISA en vez de una lectura real del PID 0x33. \\
+		\bottomrule
+	\end{tabularx}
+	\\
+	\vspace{2mm}
+	\begin{minipage}{\linewidth}
+		\small
+		\textit{Nota.} En \texttt{trip\_003.csv}, \texttt{baro\_is\_estimated} = 0 en todas las filas: el Changan Honor sí soporta el PID 0x33, por lo que \texttt{baro\_kpa} es una lectura real y no una estimación.
+	\end{minipage}
+\end{table}
+
+\subsection*{Q.2 Muestra del registro real}
+
+Las Tablas~\ref{tab:trip_sample_a}, \ref{tab:trip_sample_b} y~\ref{tab:trip_sample_c}
+reproducen seis filas representativas de las 3\,649 que contiene el archivo
+completo (inicio, dos puntos intermedios y el cierre de la sesión), divididas
+en tres tablas por razones de ancho de página; las filas se corresponden una
+a una por \texttt{uptime\_ms}.
+
+\begin{table}[H]
+	\centering
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption{\texttt{trip\_003.csv} — muestra real, parámetros del motor (columnas 1--9).}
+	\label{tab:trip_sample_a}
+	\scriptsize
+	\begin{tabular}{rrrrrrrrr}
+		\toprule
+		\rowcolor[rgb]{0.851, 0.851, 0.851}
+		\texttt{uptime\_ms} & \texttt{rpm} & \texttt{speed\_kmh} & \texttt{map\_kpa} & \texttt{iat\_c} & \texttt{coolant\_c} & \texttt{ve\_pct} & \texttt{maf\_gs} & \texttt{fuel\_gs} \\
+		\midrule
+		2\,491     & 0   & 0,0 & 63,0 & 8,0  & 7,0  & 60,0 & 0,00 & 0,000 \\
+		3\,491     & 0   & 0,0 & 63,0 & 8,0  & 7,0  & 60,0 & 0,00 & 0,000 \\
+		602\,491   & 891 & 0,0 & 20,0 & 14,0 & 71,0 & 63,3 & 1,48 & 0,105 \\
+		1\,802\,491 & 893 & 0,0 & 19,0 & 30,0 & 88,0 & 63,4 & 1,34 & 0,090 \\
+		3\,002\,491 & 896 & 0,0 & 19,0 & 49,0 & 87,0 & 63,4 & 1,26 & 0,088 \\
+		3\,650\,491 & 0   & 0,0 & 49,0 & 55,0 & 92,0 & 60,0 & 0,00 & 0,000 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption{\texttt{trip\_003.csv} — muestra real, consumo instantáneo y acumulado del viaje (columnas 10--14).}
+	\label{tab:trip_sample_b}
+	\scriptsize
+	\begin{tabular}{rrrrr}
+		\toprule
+		\rowcolor[rgb]{0.851, 0.851, 0.851}
+		\texttt{instant\_Lh} & \texttt{instant\_L100km} & \texttt{trip\_km} & \texttt{trip\_fuel\_L} & \texttt{trip\_avg\_L100km} \\
+		\midrule
+		0,00 & 0,00 & 0,000 & 0,0000 & 0,00 \\
+		0,00 & 0,00 & 0,000 & 0,0000 & 0,00 \\
+		0,51 & 0,00 & 0,000 & 0,1147 & 0,00 \\
+		0,44 & 0,00 & 0,000 & 0,2765 & 0,00 \\
+		0,43 & 0,00 & 0,000 & 0,4214 & 0,00 \\
+		0,00 & 0,00 & 0,000 & 0,4982 & 0,00 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption{\texttt{trip\_003.csv} — muestra real, estado CAN, costo y presión barométrica (columnas 15--18).}
+	\label{tab:trip_sample_c}
+	\scriptsize
+	\begin{tabular}{rrrr}
+		\toprule
+		\rowcolor[rgb]{0.851, 0.851, 0.851}
+		\texttt{can\_status} & \texttt{trip\_cost\_bs} & \texttt{baro\_kpa} & \texttt{baro\_is\_estimated} \\
+		\midrule
+		1 & 0,00 & 63,0 & 0 \\
+		1 & 0,00 & 63,0 & 0 \\
+		1 & 0,80 & 63,0 & 0 \\
+		1 & 1,92 & 63,0 & 0 \\
+		1 & 2,93 & 63,0 & 0 \\
+		1 & 3,47 & 63,0 & 0 \\
+		\bottomrule
+	\end{tabular}
+	\\
+	\vspace{2mm}
+	\begin{minipage}{\linewidth}
+		\small
+		\textit{Nota.} Datos reales extraídos de \texttt{reportes/trip\_003.csv}, mismo orden de filas que las Tablas~\ref{tab:trip_sample_a} y~\ref{tab:trip_sample_b}. El refrigerante sube de 7~°C a 92~°C conforme el motor se calienta en ralentí; \texttt{trip\_fuel\_L} y \texttt{trip\_cost\_bs} crecen de forma monótona durante toda la sesión ($0{,}4982$~L, Bs~3{,}47 al cierre, con \texttt{FUEL\_PRICE\_BS\_PER\_L} = 6,96), mientras que \texttt{trip\_km} y \texttt{trip\_avg\_L100km} permanecen en cero por tratarse de una prueba estática, no de un trayecto con desplazamiento.
+	\end{minipage}
+\end{table}
+
+\subsection*{Q.3 Ecuaciones fundamentales del modelo de estimación}
+
+De las expresiones cerradas obtenidas en la Sección de modelado matemático del
+Capítulo~3, dos resultan centrales para interpretar cualquier registro como el
+anterior: la fórmula general que convierte el caudal de combustible calculado
+en el indicador de consumo reportado al usuario, y la fórmula de estimación
+del flujo de aire que hace posible calcular ese caudal en vehículos —como el
+Changan Honor de este registro— que no soportan el sensor MAF (PID 0x10,
+Apéndice~O).
+
+\vspace{3mm}
+\begin{center}
+	\setlength{\fboxrule}{1.1pt}
+	\setlength{\fboxsep}{9pt}
+	\fcolorbox{black}{gray!8}{%
+		\begin{minipage}{0.86\textwidth}
+			\centering
+			\textbf{Fórmula general del consumo}\\[2mm]
+			\[
+				\mathrm{FC}\;[\mathrm{L/100\,km}]
+				= \frac{\mathrm{FuelRate}\;[\mathrm{L/h}]}{v\;[\mathrm{km/h}]} \cdot 100
+			\]
+		\end{minipage}%
+	}
+\end{center}
+\begin{center}
+	\small Ecuación~\ref{eq:fc} (Capítulo~3). Convierte el caudal instantáneo de combustible, válido para cualquiera de los dos métodos de estimación de aire (MAF o Speed-Density), en el consumo normalizado por distancia que se muestra en pantalla, en el panel web y en las columnas \texttt{instant\_L100km}/\texttt{trip\_avg\_L100km} del registro.
+\end{center}
+
+\vspace{4mm}
+\begin{center}
+	\setlength{\fboxrule}{1.1pt}
+	\setlength{\fboxsep}{9pt}
+	\fcolorbox{black}{gray!8}{%
+		\begin{minipage}{0.86\textwidth}
+			\centering
+			\textbf{Fórmula de estimación Speed-Density (la más importante del modelo)}\\[2mm]
+			\[
+				\dot{m}_{air}
+				= \eta_v \cdot \frac{\mathrm{MAP}}{R_{air}\cdot \mathrm{IAT}} \cdot V_d \cdot \frac{\mathrm{RPM}}{120}
+			\]
+		\end{minipage}%
+	}
+\end{center}
+\begin{center}
+	\small Ecuación~\ref{eq:speed_density} (Capítulo~3, Sección~\ref{subsec:etav-altitud}). Estima el flujo másico de aire admitido ($\dot{m}_{air}$) a partir de MAP, IAT y RPM —todos disponibles incluso sin sensor MAF—, la cilindrada $V_d$ y la eficiencia volumétrica $\eta_v$. Es la ecuación que permite que el sistema funcione en el Changan Honor, y la que alimenta la columna \texttt{maf\_gs} del registro reproducido en este apéndice.
 \end{center}
