@@ -84,7 +84,7 @@ La Figura~\ref{fig:prototipo} muestra la disposición física del prototipo, ref
 	\includegraphics[width=0.8\textwidth]{Images/compo.jpeg}
 	\\
 	\vspace{2pt}
-	{\footnotesize\textit{Nota.} Esquema detallado del patillaje y la comunicación serie entre el microcontrolador principal y los periféricos del sistema. Elaboración propia.}
+	{\footnotesize\textit{Nota.} Componentes individuales del prototipo, antes de su montaje sobre protoboard. De izquierda a derecha: la \textbf{pantalla OLED SSD1306} (128$\times$64~px, bus I2C), que muestra los parámetros del vehículo en tiempo real; el \textbf{módulo transceptor SN65HVD230} (con los pines CANL, CANH, CRX, CTX, GND y 3V3 visibles), que adapta los niveles eléctricos diferenciales del bus CAN del vehículo a niveles lógicos TTL; los cuatro \textbf{LEDs indicadores} de estado (amarillo, verde, rojo y azul); el \textbf{adaptador de tarjeta microSD} con pines soldados, que permite su conexión directa al protoboard para el registro de datos en CSV; y el módulo de desarrollo \textbf{ESP32-S3-DevKitC-1} (N16R8), que actúa como unidad de procesamiento principal del sistema. Elaboración propia.}
 	
 \end{figure}
 
@@ -250,7 +250,7 @@ La asignación de pines para el prototipo se resume en la Tabla~\ref{tab:asignac
 	\end{tikzpicture}
 	\vspace{2pt}
 	\\
-	{\footnotesize\textit{Nota.} Vista general del prototipo con etiquetas identificativas para cada módulo interactivo. Elaboración propia.}
+	{\footnotesize\textit{Nota.} Vista general del prototipo sobre protoboard, con etiquetas identificativas para cada módulo. El \textbf{ESP32-S3} (rojo) es el microcontrolador principal: sondea el bus OBD-II, ejecuta el cálculo de consumo por el método Speed-Density y sirve el panel web local. Los \textbf{LEDs} (verde) son indicadores de estado de montaje superficial que señalan de forma visual, sin necesidad de conectar una computadora, si hay comunicación CAN activa, si se está escribiendo en la microSD y si el servidor web está disponible. La \textbf{OLED} (azul) es una pantalla de 128$\times$64~px por bus I2C que muestra en tiempo real los parámetros principales del vehículo (RPM, velocidad, consumo instantáneo) directamente sobre el dispositivo. La \textbf{Tarjeta SD} (naranja), mediante su módulo lector por bus SPI, registra en un archivo CSV el historial completo de cada viaje para su análisis posterior. El \textbf{SN65HVD230} (violeta) es el transceptor CAN: adapta la señal diferencial de 2~V pico a pico del bus CAN del vehículo a los niveles lógicos TTL de 3,3~V que el controlador TWAI integrado del ESP32-S3 puede interpretar directamente. Elaboración propia.}
 	
 \end{figure}
 
@@ -268,7 +268,7 @@ Una vez concluidas las pruebas de campo sobre el prototipo en protoboard, se dis
 	\includegraphics[width=0.6\textwidth]{Images/PROTO_ENSAMBLADA.jpeg}
 
 	\vspace{2pt}
-	{\footnotesize\textit{Nota.} Placa preliminar ensamblada, con el módulo ESP32-S3-N16R8, el regulador lineal, el módulo transceptor SN65HVD230 y el conector de entrada de 4 pines. Elaboración propia.}
+	{\footnotesize\textit{Nota.} Placa preliminar ensamblada: el \textbf{módulo ESP32-S3-N16R8} actúa como unidad de procesamiento principal; el \textbf{regulador lineal} (7805 más el transistor de paso TIP42C) entrega los 5~V de alimentación a partir de los 12~V constantes del vehículo; el \textbf{módulo transceptor SN65HVD230} adapta la señal diferencial del bus CAN a los niveles lógicos TTL que el microcontrolador puede leer; y el \textbf{conector de entrada de 4 pines} (GND, 12~V, CAN\_L, CAN\_H) conecta la placa al puerto OBD-II del vehículo mediante el cable correspondiente. La descripción funcional completa de cada bloque de esta placa se presenta en el Capítulo~3 (Sección~\ref{sec:pcb_preliminar_diseno}). Elaboración propia.}
 \end{figure}
 
 Al tratarse del mismo circuito ya probado, esta placa no requirió una nueva ronda de pruebas de campo: su función es exclusivamente de robustez física y comodidad de manejo, no de validación técnica adicional sobre lo ya reportado en este capítulo.

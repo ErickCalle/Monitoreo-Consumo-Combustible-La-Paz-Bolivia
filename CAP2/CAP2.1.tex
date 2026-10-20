@@ -2131,3 +2131,62 @@ continuo en proyectos de integración de sensores y
 diagnóstico vehicular como el desarrollado en el presente
 trabajo.
 
+% =====================================================================
+\section{Manufactura aditiva: impresión 3D}
+\label{sec:manufactura_aditiva}
+% =====================================================================
+
+\subsection{Modelado por deposición fundida (FDM/FFF)}
+
+La manufactura aditiva, comúnmente conocida como impresión 3D, es un conjunto de procesos de fabricación que construyen piezas físicas de manera incremental, agregando material capa sobre capa a partir de un modelo digital, en contraposición a los procesos sustractivos tradicionales (mecanizado, fresado) que parten de un bloque de material y remueven el excedente. Entre las distintas tecnologías de manufactura aditiva, el \textit{modelado por deposición fundida} (\textit{Fused Deposition Modeling}, FDM, también referido como \textit{Fused Filament Fabrication}, FFF por su nombre genérico no registrado) es la más extendida en aplicaciones de prototipado de bajo costo, tanto a nivel industrial como de escritorio.
+
+El proceso FDM consiste en alimentar un filamento termoplástico sólido, típicamente de 1,75~mm de diámetro, hacia un cabezal de extrusión (\textit{hotend}) que lo calienta hasta su temperatura de fusión y lo deposita de forma controlada, capa por capa, sobre una plataforma de impresión, siguiendo la trayectoria definida por el modelo tridimensional (archivo STL) y procesada por un software de laminado (\textit{slicer}) que lo convierte en instrucciones de movimiento para la impresora (código G). Una vez depositado, el material se solidifica rápidamente por enfriamiento, y el proceso se repite capa tras capa hasta completar la geometría de la pieza \citep{Wevolver_PLAABSPETG2023}.
+
+\subsection{Materiales termoplásticos comunes en FDM}
+
+La elección del material termoplástico determina directamente las propiedades mecánicas, térmicas y de durabilidad de la pieza impresa, así como la dificultad del propio proceso de impresión (temperatura de extrusión, necesidad de cama caliente, propensión al alabeo). Los tres materiales más utilizados en impresión FDM de escritorio son el ácido poliláctico (PLA), el acrilonitrilo butadieno estireno (ABS) y el tereftalato de polietileno modificado con glicol (PETG), cuyas propiedades características se resumen en la Tabla~\ref{tab:comparativa_materiales_3d}.
+
+\begin{table}[H]
+	\centering
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption{Comparación de propiedades típicas de materiales termoplásticos para impresión FDM}
+	\label{tab:comparativa_materiales_3d}
+	\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.6cm} X X X}
+		\toprule
+		\rowcolor[rgb]{0.851, 0.851, 0.851}
+		\textbf{Propiedad} & \textbf{PLA} & \textbf{ABS} & \textbf{PETG} \\
+		\midrule
+		Temperatura de transición vítrea ($T_g$) & 55 -- 60~\textdegree C & 100 -- 105~\textdegree C & 75 -- 80~\textdegree C \\
+		\addlinespace
+		Resistencia a la tracción & 50 -- 70~MPa & 35 -- 50~MPa & 45 -- 53~MPa \\
+		\addlinespace
+		Rigidez (módulo de Young) & Alta (2300 -- 3000~MPa) & Media (1800 -- 2300~MPa) & Media-baja (1000 -- 2100~MPa) \\
+		\addlinespace
+		Elongación a la rotura & Baja ($\approx$6~\%, frágil) & Media-alta ($\approx$20~\%) & Alta (tenaz, absorbe impactos) \\
+		\addlinespace
+		Temperatura de impresión & 190 -- 220~\textdegree C & 220 -- 250~\textdegree C & 220 -- 250~\textdegree C \\
+		\addlinespace
+		Cama caliente & No estrictamente necesaria & Necesaria ($\approx$90 -- 110~\textdegree C) & Recomendada ($\approx$70 -- 80~\textdegree C) \\
+		\addlinespace
+		Alabeo (\textit{warping}) & Bajo & Alto (requiere recinto cerrado) & Bajo-medio \\
+		\addlinespace
+		Resistencia UV / intemperie & Baja (se degrada y fragiliza con el sol) & Media & Alta \\
+		\addlinespace
+		Resistencia química / humedad & Baja (biodegradable por hidrólisis) & Media & Alta \\
+		\bottomrule
+	\end{tabularx}
+	\vspace{0.2cm}
+
+	\begin{flushleft}
+		\footnotesize \textit{Nota.} Valores típicos reportados en la literatura técnica y por fabricantes de filamento; varían según la marca específica, los parámetros de impresión (temperatura, velocidad, orientación de capas) y el porcentaje de relleno de la pieza. Adaptado de~\citep{Wevolver_PLAABSPETG2023, All3DP_PLAABSPETG2023}.
+	\end{flushleft}
+\end{table}
+
+El \textbf{PLA} es un poliéster termoplástico derivado de recursos renovables (almidón de maíz o caña de azúcar), lo que lo hace parcialmente biodegradable bajo condiciones de compostaje industrial. Es el material más sencillo de imprimir en FDM: su baja temperatura de extrusión y su mínima contracción al enfriarse reducen drásticamente el alabeo, no requiere cama caliente ni recinto cerrado, y no emite vapores significativos durante la impresión. A cambio, es un material relativamente frágil (baja elongación a la rotura) y con baja resistencia a la temperatura y a la radiación ultravioleta: una pieza de PLA expuesta de forma prolongada al sol o a temperaturas sostenidas por encima de su $T_g$ (como el interior de un vehículo estacionado al sol, que puede superar los 60~\textdegree C) tiende a ablandarse, deformarse y volverse quebradiza con el tiempo \citep{Wevolver_PLAABSPETG2023, All3DP_PLAABSPETG2023}.
+
+El \textbf{ABS} es un terpolímero amorfo ampliamente utilizado en piezas automotrices e industriales (paneles interiores, carcasas de electrodomésticos) por su mayor resistencia al impacto y a la temperatura frente al PLA. Su principal desventaja en el contexto de impresión FDM de escritorio es su tendencia al alabeo durante el enfriamiento, lo que exige una cama caliente a temperatura elevada y, idealmente, un recinto cerrado que mantenga una temperatura ambiente estable alrededor de la pieza; además, su impresión libera vapores de estireno que requieren ventilación adecuada \citep{Wevolver_PLAABSPETG2023}.
+
+El \textbf{PETG} combina características de ambos materiales anteriores: conserva una temperatura de impresión y una facilidad de manejo similares a las del ABS, pero con un alabeo considerablemente menor (cercano al del PLA), a la vez que ofrece una resistencia química, a la humedad y a la radiación ultravioleta notablemente superior a la del PLA. Esta combinación lo convierte en una opción frecuente para piezas funcionales destinadas a permanecer a la intemperie o en ambientes con variaciones térmicas, como carcasas automotrices \citep{All3DP_PLAABSPETG2023}.
+
+La selección concreta de material para la carcasa del prototipo desarrollado en este proyecto, y la justificación de por qué un material distinto sería preferible para una carcasa de uso permanente dentro del vehículo, se detalla en la Sección~\ref{sec:carcasa_prototipo} del Capítulo~3.
+
