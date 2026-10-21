@@ -470,19 +470,18 @@ Controlador CAN independiente con interfaz SPI (Microchip), evaluado en la etapa
 \label{anexo:trip_log}
 \begin{center}
 	\bfseries Apéndice Q \\
-	\normalfont\bfseries\itshape Registro de un viaje (trip\_003.csv) y ecuaciones fundamentales del modelo de estimación
+	\normalfont\bfseries\itshape Registro de un viaje (trip\_003.csv)
 \end{center}
-\addcontentsline{toc}{section}{Apéndice Q: Registro de un viaje y ecuaciones fundamentales del modelo de estimación}
+\addcontentsline{toc}{section}{Apéndice Q: Registro de un viaje}
 
 \vspace{4mm}
 
 Este apéndice reproduce, a modo de ejemplo, el archivo real generado por el
 sistema en la tarjeta microSD con el formato descrito en la
 Sección~\ref{subsec:registro_microsd} del Capítulo~3
-(\texttt{/logs/trip\_003.csv}, vehículo Changan Honor), y presenta en un
-recuadro las dos ecuaciones centrales del modelo de estimación de consumo
-desarrollado en el Capítulo~3. El mismo archivo se emplea como fuente de
-datos en la prueba de integridad de registro en microSD (Tabla~\ref{tab:validacion_microsd},
+(\texttt{/logs/trip\_003.csv}, vehículo Changan Honor). El mismo archivo se
+emplea como fuente de datos en la prueba de integridad de registro en
+microSD (Tabla~\ref{tab:validacion_microsd},
 Sección~\ref{sec:pruebas_microsd} del Capítulo~4): se trata de una sesión de
 \textbf{60,8 minutos con el motor en ralentí} (el vehículo permaneció
 detenido, \texttt{speed\_kmh} = 0 durante toda la sesión, por lo que
@@ -595,51 +594,3 @@ a una por \texttt{uptime\_ms}.
 		\textit{Nota.} Datos reales extraídos de \texttt{reportes/trip\_003.csv}, mismo orden de filas que las Tablas~\ref{tab:trip_sample_a} y~\ref{tab:trip_sample_b}. El refrigerante sube de 7~°C a 92~°C conforme el motor se calienta en ralentí; \texttt{trip\_fuel\_L} y \texttt{trip\_cost\_bs} crecen de forma monótona durante toda la sesión ($0{,}4982$~L, Bs~3{,}47 al cierre, con \texttt{FUEL\_PRICE\_BS\_PER\_L} = 6,96), mientras que \texttt{trip\_km} y \texttt{trip\_avg\_L100km} permanecen en cero por tratarse de una prueba estática, no de un trayecto con desplazamiento.
 	\end{minipage}
 \end{table}
-
-\subsection*{Q.3 Ecuaciones fundamentales del modelo de estimación}
-
-De las expresiones cerradas obtenidas en la Sección de modelado matemático del
-Capítulo~3, dos resultan centrales para interpretar cualquier registro como el
-anterior: la fórmula general que convierte el caudal de combustible calculado
-en el indicador de consumo reportado al usuario, y la fórmula de estimación
-del flujo de aire que hace posible calcular ese caudal en vehículos —como el
-Changan Honor de este registro— que no soportan el sensor MAF (PID 0x10,
-Apéndice~O).
-
-\vspace{3mm}
-\begin{center}
-	\setlength{\fboxrule}{1.1pt}
-	\setlength{\fboxsep}{9pt}
-	\fcolorbox{black}{gray!8}{%
-		\begin{minipage}{0.86\textwidth}
-			\centering
-			\textbf{Fórmula general del consumo}\\[2mm]
-			\[
-				\mathrm{FC}\;[\mathrm{L/100\,km}]
-				= \frac{\mathrm{FuelRate}\;[\mathrm{L/h}]}{v\;[\mathrm{km/h}]} \cdot 100
-			\]
-		\end{minipage}%
-	}
-\end{center}
-\begin{center}
-	\small Ecuación~\ref{eq:fc} (Capítulo~3). Convierte el caudal instantáneo de combustible, válido para cualquiera de los dos métodos de estimación de aire (MAF o Speed-Density), en el consumo normalizado por distancia que se muestra en pantalla, en el panel web y en las columnas \texttt{instant\_L100km}/\texttt{trip\_avg\_L100km} del registro.
-\end{center}
-
-\vspace{4mm}
-\begin{center}
-	\setlength{\fboxrule}{1.1pt}
-	\setlength{\fboxsep}{9pt}
-	\fcolorbox{black}{gray!8}{%
-		\begin{minipage}{0.86\textwidth}
-			\centering
-			\textbf{Fórmula de estimación Speed-Density (la más importante del modelo)}\\[2mm]
-			\[
-				\dot{m}_{air}
-				= \eta_v \cdot \frac{\mathrm{MAP}}{R_{air}\cdot \mathrm{IAT}} \cdot V_d \cdot \frac{\mathrm{RPM}}{120}
-			\]
-		\end{minipage}%
-	}
-\end{center}
-\begin{center}
-	\small Ecuación~\ref{eq:speed_density} (Capítulo~3, Sección~\ref{subsec:etav-altitud}). Estima el flujo másico de aire admitido ($\dot{m}_{air}$) a partir de MAP, IAT y RPM —todos disponibles incluso sin sensor MAF—, la cilindrada $V_d$ y la eficiencia volumétrica $\eta_v$. Es la ecuación que permite que el sistema funcione en el Changan Honor, y la que alimenta la columna \texttt{maf\_gs} del registro reproducido en este apéndice.
-\end{center}

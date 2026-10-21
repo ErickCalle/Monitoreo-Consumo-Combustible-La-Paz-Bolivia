@@ -2287,11 +2287,19 @@ Finalmente, el consumo normalizado por distancia, métrica de referencia para el
 usuario, se obtiene relacionando el caudal con la velocidad del vehículo $v$
 [km/h] (PID 0x0D):
 
-\begin{equation}
-	\mathrm{FC}\;[\mathrm{L/100\,km}]
-	= \frac{\mathrm{FuelRate}\;[\mathrm{L/h}]}{v\;[\mathrm{km/h}]} \cdot 100
-	\label{eq:fc}
-\end{equation}
+\begin{center}
+	\setlength{\fboxrule}{1.1pt}
+	\setlength{\fboxsep}{9pt}
+	\fcolorbox{black}{gray!8}{%
+		\begin{minipage}{0.82\textwidth}
+			\begin{equation}
+				\mathrm{FC}\;[\mathrm{L/100\,km}]
+				= \frac{\mathrm{FuelRate}\;[\mathrm{L/h}]}{v\;[\mathrm{km/h}]} \cdot 100
+				\label{eq:fc}
+			\end{equation}
+		\end{minipage}%
+	}
+\end{center}
 
 \noindent donde:
 
@@ -2354,11 +2362,21 @@ $V_d$; la masa real admitida se corrige con la eficiencia volumétrica $\eta_v$.
 Combinando la densidad (Ecuación \ref{eq:rho_air}) y la frecuencia de ciclos
 (Ecuación \ref{eq:nciclos}), el flujo másico de aire estimado es:
 
-\begin{equation}
-	\dot{m}_{air} = \eta_v \cdot \rho_{air} \cdot V_d \cdot \frac{\mathrm{RPM}}{120}
-	= \eta_v \cdot \frac{\mathrm{MAP}}{R_{air}\cdot \mathrm{IAT}} \cdot V_d \cdot \frac{\mathrm{RPM}}{120}
-	\label{eq:speed_density}
-\end{equation}
+\begin{center}
+	\setlength{\fboxrule}{1.3pt}
+	\setlength{\fboxsep}{9pt}
+	\fcolorbox{black}{gray!8}{%
+		\begin{minipage}{0.84\textwidth}
+			\centering
+			\textbf{\footnotesize Ecuación más importante del modelo de estimación}\\[1mm]
+			\begin{equation}
+				\dot{m}_{air} = \eta_v \cdot \rho_{air} \cdot V_d \cdot \frac{\mathrm{RPM}}{120}
+				= \eta_v \cdot \frac{\mathrm{MAP}}{R_{air}\cdot \mathrm{IAT}} \cdot V_d \cdot \frac{\mathrm{RPM}}{120}
+				\label{eq:speed_density}
+			\end{equation}
+		\end{minipage}%
+	}
+\end{center}
 
 \noindent donde:
 
