@@ -80,13 +80,50 @@ La Figura~\ref{fig:prototipo} muestra la disposición física del prototipo, ref
 	\centering
 	\caption{Componentes del prototipo y elementos principales del sistema.}
 	\label{fig:prototipo}
-	
-	\includegraphics[width=0.8\textwidth]{Images/compo.jpeg}
-	\\
-	\vspace{2pt}
-	{\footnotesize\textit{Nota.} Componentes individuales del prototipo, antes de su montaje sobre protoboard. De izquierda a derecha: la \textbf{pantalla OLED SSD1306} (128$\times$64~px, bus I2C), que muestra los parámetros del vehículo en tiempo real; el \textbf{módulo transceptor SN65HVD230} (con los pines CANL, CANH, CRX, CTX, GND y 3V3 visibles), que adapta los niveles eléctricos diferenciales del bus CAN del vehículo a niveles lógicos TTL; los cuatro \textbf{LEDs indicadores} de estado (amarillo, verde, rojo y azul); el \textbf{adaptador de tarjeta microSD} con pines soldados, que permite su conexión directa al protoboard para el registro de datos en CSV; y el módulo de desarrollo \textbf{ESP32-S3-DevKitC-1} (N16R8), que actúa como unidad de procesamiento principal del sistema. Elaboración propia.}
-	
+
+	\begin{tikzpicture}
+		\node[inner sep=0pt] (foto) {
+			\includegraphics[width=0.8\textwidth]{Images/compo.jpeg}
+		};
+
+		\node[circle, draw=black, very thick, fill=white, font=\bfseries, inner sep=1pt, minimum size=0.6cm]
+			(c1) at ([xshift=0.1952\textwidth, yshift=-0.2052\textwidth]foto.north west) {1};
+		\node[circle, draw=black, very thick, fill=white, font=\bfseries, inner sep=1pt, minimum size=0.6cm]
+			(c2) at ([xshift=0.3728\textwidth, yshift=-0.1950\textwidth]foto.north west) {2};
+		\node[circle, draw=black, very thick, fill=white, font=\bfseries, inner sep=1pt, minimum size=0.6cm]
+			(c3) at ([xshift=0.5952\textwidth, yshift=-0.2802\textwidth]foto.north west) {3};
+		\node[circle, draw=black, very thick, fill=white, font=\bfseries, inner sep=1pt, minimum size=0.6cm]
+			(c4) at ([xshift=0.2000\textwidth, yshift=-0.3948\textwidth]foto.north west) {4};
+		\node[circle, draw=black, very thick, fill=white, font=\bfseries, inner sep=1pt, minimum size=0.6cm]
+			(c5) at ([xshift=0.3900\textwidth, yshift=-0.3900\textwidth]foto.north west) {5};
+	\end{tikzpicture}
+
 \end{figure}
+
+\begin{table}[H]
+	\centering
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption{Descripción de los componentes numerados en la Figura~\ref{fig:prototipo}.}
+	\label{tab:componentes_fig_prototipo}
+	\begin{tabularx}{\textwidth}{>{\centering\arraybackslash}p{0.8cm} >{\raggedright\arraybackslash}p{4.2cm} X}
+		\toprule
+		\rowcolor[rgb]{0.851, 0.851, 0.851}
+		\# & Componente & Qué es y qué hace \\
+		\midrule
+		1 & Pantalla OLED SSD1306 & Pantalla de 128$\times$64~px por bus I2C; muestra en tiempo real los parámetros del vehículo (RPM, velocidad, consumo instantáneo) directamente sobre el dispositivo. \\
+		2 & Módulo transceptor SN65HVD230 & Transceptor CAN de 3,3~V (pines CANL, CANH, CRX, CTX, GND y 3V3 visibles); adapta la señal diferencial del bus CAN del vehículo a los niveles lógicos TTL que el ESP32-S3 puede leer. \\
+		3 & Módulo de desarrollo ESP32-S3-DevKitC-1 (N16R8) & Microcontrolador principal del sistema; ejecuta el firmware completo: adquisición de datos por OBD-II, cálculo de consumo (Speed-Density), registro en microSD y servidor web. \\
+		4 & LEDs indicadores (amarillo, verde, rojo, azul) & Cuatro LEDs de estado que señalan de forma visual, sin necesidad de una computadora, si hay comunicación CAN activa, si se está escribiendo en la microSD y si el servidor web está disponible. \\
+		5 & Adaptador de tarjeta microSD & Adaptador con pines soldados para conexión directa al protoboard por bus SPI; permite el registro del historial de cada viaje en un archivo CSV. \\
+		\bottomrule
+	\end{tabularx}
+	\vspace{2mm}
+	\\
+	\begin{minipage}{\linewidth}
+		\small
+		\textit{Nota.} Componentes individuales del prototipo, antes de su montaje sobre protoboard, numerados en la Figura~\ref{fig:prototipo}. Elaboración propia.
+	\end{minipage}
+\end{table}
 
 
 
