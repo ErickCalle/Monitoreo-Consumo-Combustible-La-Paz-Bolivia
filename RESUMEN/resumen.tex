@@ -1,11 +1,11 @@
 \chapter*{RESUMEN}
 \addcontentsline{toc}{chapter}{RESUMEN}
 
-Este proyecto de grado desarrolla e implementa un sistema embebido de monitoreo del consumo de combustible para el análisis de la autonomía en vehículos a gasolina con inyección electrónica que carecen de esta funcionalidad de forma nativa, con aplicación, por ejemplo, en el transporte público urbano de la ciudad de La Paz.
+Este proyecto de grado desarrolla e implementa un sistema embebido de estimación y monitoreo del consumo de combustible mediante el protocolo OBD-II en vehículos a gasolina con inyección electrónica que carecen de esta funcionalidad de forma nativa, con aplicación, por ejemplo, en el transporte público urbano de la ciudad de La Paz.
 
 El sistema se basa en un módulo ESP32-S3 con controlador CAN nativo (TWAI) y un transceptor SN65HVD230, que adquieren en tiempo real los parámetros del motor disponibles por el puerto OBD-II del vehículo. El consumo se estima mediante el modelo Speed-Density, corregido con los ajustes de combustible que reporta la propia ECU, y se registra por viaje en una tarjeta microSD. El dispositivo expone además un panel web propio mediante un punto de acceso WiFi local, sin depender de internet ni de aplicaciones de terceros.
 
-El sistema se validó experimentalmente en un Nissan Vanette (con sensor MAF) y un Changan Honor (sin sensor MAF, evaluado con Speed-Density puro). Sobre nueve tramos de ruta real, concuerda con un adaptador ELM327 comercial dentro de un MAPE de 2,75\,\%, y con el aforo real de tanque lleno dentro de un MAPE de 4,84\,\%; a partir de estas cifras, estima una autonomía de 617\,km para el Vanette y 489\,km para el Changan Honor, cercana a la real de 575\,km y 504\,km respectivamente.
+El sistema se validó experimentalmente en un Nissan Vanette (con sensor MAF) y un Changan Honor (sin sensor MAF, evaluado con Speed-Density puro). Sobre nueve tramos de ruta real, concuerda con un adaptador ELM327 comercial dentro de un MAPE de 2,75\,\%, y con el aforo real de tanque lleno dentro de un MAPE de 4,84\,\%; a partir de estas cifras, estima además una autonomía por tanque lleno de 617\,km para el Vanette y 489\,km para el Changan Honor, cercana a la real de 575\,km y 504\,km respectivamente.
 
 El análisis de costos estima un costo directo de 772,22\,Bs por unidad adicional y un precio de venta de referencia de 1\,047,13\,Bs (utilidad del 20\,\%~e IVA del 13\,\%), muy por debajo de las plataformas de telemetría de flota comerciales disponibles en el mercado.
 
