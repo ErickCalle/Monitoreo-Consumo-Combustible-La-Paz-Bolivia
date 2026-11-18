@@ -810,7 +810,7 @@ En esta sección se describen los componentes seleccionados para el sistema, pri
 Para leer datos del puerto OBD-II del vehículo, se requiere una conexión estable al bus CAN (Controller Area Network). Los componentes clave son:
 
 \begin{enumerate}
-	\item \textbf{Conector OBD-II}: Se utiliza un conector extraído de un escáner defectuoso para garantizar fiabilidad. Alternativamente, dos cables directos a las líneas CANH y CANL podrían emplearse, pero presentan riesgos de falsos contactos o conexiones inestables.Este posteriormente sera remplazado para una versión final del sistema.
+	\item \textbf{Conector OBD-II}: Para el prototipo se reutiliza, por disponibilidad inmediata, el conector J1962 extraído de un escáner comercial defectuoso, en lugar de la alternativa de dos cables sueltos conectados directamente a las líneas CANH y CANL, que sí presentarían un riesgo mayor de falsos contactos o conexiones inestables. No obstante, al tratarse de un componente reciclado, no ofrece las mismas garantías mecánicas que un conector nuevo de grado automotriz frente a las vibraciones propias de la conducción; por ello, el diseño final del sistema contempla la adquisición de un conector J1962 de ensamble nuevo, cuyo costo se cuantifica en el Capítulo~5.
 	
 	\item \textbf{Transceptores CAN}: Para convertir las señales diferenciales CANH/CANL en líneas digitales RX/TX compatibles con el microcontrolador, se evaluaron dos opciones:
 	\begin{itemize}

@@ -242,6 +242,36 @@ La carcasa impresa en 3D para la placa preliminar (Capítulo~3, Sección~\ref{se
 	\end{minipage}
 \end{table}
 
+\subsection{Costo de la carcasa en PETG y del conector OBD-II nuevo (versión de producción)}
+\label{sec:costo_produccion}
+
+La Tabla~\ref{tab:costo_carcasa} y la Sección~\ref{sec:pcb_preliminar_diseno} (Capítulo~3) documentan dos materiales/componentes elegidos deliberadamente por conveniencia para \textbf{este prototipo}, pero no aptos para una versión de producción: la carcasa impresa en PLA y el conector OBD-II J1962 reutilizado de un escáner defectuoso (Sección~3.2.1). Esta subsección cuantifica el sobrecosto de reemplazar ambos por sus equivalentes de producción —PETG (Sección~\ref{sec:carcasa_prototipo}, Capítulo~3) y un conector J1962 nuevo—, de modo que el costo marginal por unidad adicional (Tabla~\ref{tab:presupuesto_total}) pueda expresarse también para un dispositivo 100\,\%~apto para producción, no solo para la réplica del prototipo tal como se construyó.
+
+\begin{table}[H]
+	\centering
+	\captionsetup{labelformat=simple, labelsep=newline, textfont=it, labelfont=bf, justification=raggedright, singlelinecheck=false}
+	\caption{Costo de material de la carcasa en PETG y del conector OBD-II nuevo}
+	\label{tab:costo_produccion}
+	\begin{tabularx}{\textwidth}{X >{\centering\arraybackslash}p{1.6cm} >{\centering\arraybackslash}p{2.2cm} >{\centering\arraybackslash}p{2.2cm} >{\centering\arraybackslash}p{2.2cm}}
+		\toprule
+		\rowcolor[rgb]{0.851, 0.851, 0.851}
+		Concepto & Cant. & Precio unit. (USD) & Precio unit. (Bs) & Subtotal (Bs) \\
+		\midrule
+		Carcasa en PETG, base (21\,g) & 1 & --- & 4,39 & 4,39 \\
+		Carcasa en PETG, tapa (16\,g) & 1 & --- & 3,35 & 3,35 \\
+		Conector OBD-II J1962 macho, cable nuevo de extremo abierto & 1 & 18,95 & 219,82 & 219,82 \\
+		\midrule
+		\textbf{Total} & --- & --- & --- & \textbf{227,56} \\
+		\bottomrule
+	\end{tabularx}
+	\vspace{2mm}
+	\\
+	\begin{minipage}{\linewidth}
+		\small
+		\textit{Nota.} PETG de referencia internacional a 18,03\,USD/kg (0,20915\,Bs/g; no se encontró un proveedor local en La Paz al momento de esta cotización, a diferencia del PLA de la Tabla~\ref{tab:costo_carcasa}), aplicado al mismo peso impreso que la carcasa en PLA (37\,g totales) por tratarse de densidades muy similares entre ambos polímeros (Tabla~\ref{tab:comparativa_materiales_3d}, Capítulo~2). El conector J1962 (cable con extremo abierto, listo para conectar al header de entrada de la placa) se cotiza a 18,95\,USD, ambos convertidos a bolivianos al tipo de cambio de este capítulo (11,60\,Bs/USD).
+	\end{minipage}
+\end{table}
+
 \subsection{Costos de manufactura de la placa final (JLCPCB)}
 \label{sec:costo_pcb_final}
 
@@ -350,17 +380,18 @@ La Tabla~\ref{tab:presupuesto_total} consolida los subtotales de las secciones a
 		\textbf{Total del prototipo} & \textbf{706,92} & \textbf{100\,\%} \\
 		\midrule
 		Costo marginal estimado por unidad adicional, placa final$^{a}$ & 772,22 & --- \\
+		Costo marginal, versión 100\,\%~apta para producción$^{b}$ (Tabla~\ref{tab:costo_produccion}) & 999,78 & --- \\
 		\bottomrule
 	\end{tabularx}
 	\vspace{2mm}
 	\\
 	\begin{minipage}{\linewidth}
 		\small
-		\textit{Nota.} $^{a}$Estimado para la placa final (JLCPCB), no para el total del prototipo (placa preliminar de Robokit); detalle del cálculo a continuación.
+		\textit{Nota.} $^{a}$Estimado para la placa final (JLCPCB), no para el total del prototipo (placa preliminar de Robokit); detalle del cálculo a continuación. $^{b}$Suma el costo marginal anterior más la carcasa en PETG y el conector OBD-II J1962 nuevo (Sección~\ref{sec:costo_produccion}), en reemplazo del PLA y del conector reciclado que sí son adecuados para este prototipo pero no para una unidad de producción.
 	\end{minipage}
 \end{table}
 
-El costo marginal excluye las horas de diseño de hardware/firmware (Tabla~\ref{tab:costo_horas}), un costo de desarrollo único (\textit{non-recurring engineering}) que no se repite por unidad fabricada, e incluye los componentes (386,66\,Bs) más la fabricación de PCB y el ensamblaje PCBA a prorrata del lote mínimo de 5 unidades de JLCPCB (Tablas~\ref{tab:costo_pcb}/\ref{tab:costo_ensamblaje}: $(487{,}20+1\,440{,}60)/5 = 385{,}56$\,Bs), es decir $386{,}66+385{,}56=772{,}22$\,Bs por unidad adicional dentro del mismo lote.
+El costo marginal excluye las horas de diseño de hardware/firmware (Tabla~\ref{tab:costo_horas}), un costo de desarrollo único (\textit{non-recurring engineering}) que no se repite por unidad fabricada, e incluye los componentes (386,66\,Bs) más la fabricación de PCB y el ensamblaje PCBA a prorrata del lote mínimo de 5 unidades de JLCPCB (Tablas~\ref{tab:costo_pcb}/\ref{tab:costo_ensamblaje}: $(487{,}20+1\,440{,}60)/5 = 385{,}56$\,Bs), es decir $386{,}66+385{,}56=772{,}22$\,Bs por unidad adicional dentro del mismo lote. Sumando a esta cifra el costo de la carcasa en PETG y del conector OBD-II nuevo (227,56\,Bs, Tabla~\ref{tab:costo_produccion}) se obtiene $772{,}22+227{,}56=999{,}78$\,Bs por unidad, cifra que sí refleja un dispositivo listo para producción y no solo la réplica de los componentes reciclados o específicos de este prototipo.
 
 \begin{figure}[H]
 	\centering
@@ -402,6 +433,8 @@ Los costos anteriores son costos directos, sin margen de ganancia ni impuestos. 
 		\textit{Nota.} Utilidad y IVA aplicados de forma secuencial (utilidad sobre el costo directo, IVA sobre el precio ya con utilidad), no simultánea sobre el mismo costo base. El 20\,\%~de utilidad es un valor de referencia, no una cotización de mercado; puede ajustarse sin afectar el resto del capítulo. $^{a}$706,92\,Bs $-$ 153,33\,Bs de combustible (Tabla~\ref{tab:costo_pruebas}) $=$ 553,59\,Bs; a diferencia de la columna del centro, aquí sí se conservan el ELM327 y el tester dentro del costo, ya que son instrumentos físicos y no un insumo consumido.
 	\end{minipage}
 \end{table}
+
+Aplicando la misma utilidad del 20\,\%~y el mismo IVA del 13\,\%~al costo marginal de la versión 100\,\%~apta para producción (999,78\,Bs, Tabla~\ref{tab:presupuesto_total}) se obtiene un precio de venta estimado de 1\,355,70\,Bs (utilidad de 199,96\,Bs, subtotal de 1\,199,74\,Bs, IVA de 155,96\,Bs); esta es la cifra de referencia para una eventual comercialización, en lugar de la columna ``Unidad adicional, placa final'' de la Tabla~\ref{tab:precio_venta}, que todavía conserva el PLA y el conector reciclado propios de este prototipo.
 
 \section{Análisis de viabilidad económica}
 
