@@ -28,6 +28,11 @@ __pycache__/
 # ---- Respaldos internos de edición (no forman parte del proyecto de grado) ----
 .backups_style_pass/
 
+# ---- Manim (animaciones de la presentacion): cachés de render
+# regenerables, no forman parte del codigo fuente ----
+MANIM/media/
+MANIM/slides/
+
 # ---- Sistema operativo ----
 .DS_Store
 Thumbs.db
